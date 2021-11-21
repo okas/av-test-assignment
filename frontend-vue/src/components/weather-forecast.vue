@@ -1,10 +1,8 @@
 <template>
   <div class="hello">
-    <h1>'Hello world' leht</h1>
-    <p>
-      Kiire indikatsioon, et Web API käivitunud.
-    </p>
-    <h3>Ilmaprognoosi info <sup>(API genereeritud)</sup></h3>
+    <h2>
+      Ilmaprognoosi info <sup>(API genereeritud)</sup>
+    </h2>
     <table>
       <thead>
         <tr>
@@ -33,7 +31,7 @@
     name: "WeatherForecast",
     mixins: [formatDateMixin],
     data() {
-      return { data: [] }
+      return { data: [] };
     },
     beforeMount() {
       this.getForecast();
