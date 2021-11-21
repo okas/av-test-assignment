@@ -4,7 +4,7 @@
     <p>
       Kiire indikatsioon, et Web API käivitunud.
     </p>
-    <h3>Ilmaennestuse info (API genereeritud)</h3>
+    <h3>Ilmaprognoosi info <sup>(API genereeritud)</sup></h3>
     <table>
       <thead>
         <tr>
@@ -16,10 +16,10 @@
       </thead>
       <tbody>
         <tr v-for="(item, i) in data" :key="i">
-          <td class="item" v-text="item.date"></td>
-          <td class="item" v-text="item.temperatureC"></td>
-          <td class="item" v-text="item.temperatureF"></td>
-          <td class="item" v-text="item.summary"></td>
+          <td class="item" v-text="formatDate(item.date)" />
+          <td class="item" v-text="item.temperatureC" />
+          <td class="item" v-text="item.temperatureF" />
+          <td class="item" v-text="item.summary" />
         </tr>
       </tbody>
     </table>
@@ -27,25 +27,21 @@
 </template>
 
 <script>
+  import formatDateMixin from '../mixins/formatDateMixin';
+
   export default {
     name: "WeatherForecast",
+    mixins: [formatDateMixin],
     data() {
       return { data: [] }
     },
     beforeMount() {
-      this.getForecast()
+      this.getForecast();
     },
     methods: {
       async getForecast() {
         const res = await fetch('/weatherforecast');
-        const tempData = await res.json();
-        // Push result array to data
-        tempData.forEach(({ date, ...rest }) =>
-          this.data.push(
-            //Handle date presentation
-            { date: new Date(date).toLocaleDateString('et'), ...rest }
-          )
-        );
+        this.data = await res.json();
       }
     }
   };
@@ -63,5 +59,9 @@
 
   td {
     color: #42b983;
+  }
+
+  sup {
+    font-size: 0.5em
   }
 </style>
