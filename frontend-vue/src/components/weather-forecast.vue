@@ -14,10 +14,10 @@
       </thead>
       <tbody>
         <tr v-for="(item, i) in data" :key="i">
-          <td class="item" v-text="formatDate(item.date)" />
-          <td class="item" v-text="item.temperatureC" />
-          <td class="item" v-text="item.temperatureF" />
-          <td class="item" v-text="item.summary" />
+          <td class="item">{{formatDate(item.date)}}</td>
+          <td class="item">{{item.temperatureC}}</td>
+          <td class="item">{{item.temperatureF}}</td>
+          <td class="item">{{item.summary}}</td>
         </tr>
       </tbody>
     </table>
