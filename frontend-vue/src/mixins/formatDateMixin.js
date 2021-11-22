@@ -7,7 +7,7 @@ export default {
      */
     formatDate(date, locale = navigator.languages) {
       const d = new Date(date);
-      return new Intl.DateTimeFormat(locale, { dateStyle: 'short' }).format(d);
-    }
-  }
-}
+      return new Intl.DateTimeFormat(locale, { dateStyle: "short" }).format(d);
+    },
+  },
+};

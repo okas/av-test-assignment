@@ -27,7 +27,7 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      "Access-Control-Allow-Origin": "*",
     },
     disableHostCheck: true,
     https: {
@@ -39,16 +39,16 @@ module.exports = {
         target: "https://localhost:5001/",
       },
     },
-    host: 'localhost',
+    host: "localhost",
     port: 5002,
-    hot: true
+    hot: true,
   },
 
   runtimeCompiler: true,
   productionSourceMap: false,
 
   css: {
-    modules: true,
-    sourceMap: true
-  }
+    requireModuleExtension: true,
+    sourceMap: true,
+  },
 };
