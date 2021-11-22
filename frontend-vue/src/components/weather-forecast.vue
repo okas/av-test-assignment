@@ -1,8 +1,6 @@
 <template>
-  <div class="hello">
-    <h2>
-      Ilmaprognoosi info <sup>(API genereeritud)</sup>
-    </h2>
+  <div class="weather-forecast">
+    <h2>Ilmaprognoosi info <sup>(API genereeritud)</sup></h2>
     <table>
       <thead>
         <tr>
@@ -13,11 +11,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, i) in data" :key="i">
-          <td class="item">{{formatDate(item.date)}}</td>
-          <td class="item">{{item.temperatureC}}</td>
-          <td class="item">{{item.temperatureF}}</td>
-          <td class="item">{{item.summary}}</td>
+        <tr v-for="(item, i) in forecasts" :key="i">
+          <td class="item">{{ formatDate(item.date) }}</td>
+          <td class="item">{{ item.temperatureC }}</td>
+          <td class="item">{{ item.temperatureF }}</td>
+          <td class="item">{{ item.summary }}</td>
         </tr>
       </tbody>
     </table>
@@ -25,41 +23,39 @@
 </template>
 
 <script>
-  import formatDateMixin from '../mixins/formatDateMixin';
+import formatDateMixin from "../mixins/formatDateMixin";
 
-  export default {
-    name: "WeatherForecast",
-    mixins: [formatDateMixin],
-    data() {
-      return { data: [] };
+export default {
+  name: "WeatherForecast",
+  mixins: [formatDateMixin],
+  data: () => ({ forecasts: [] }),
+  beforeMount() {
+    this.getForecast();
+  },
+  methods: {
+    async getForecast() {
+      const res = await fetch("/weatherforecast");
+      this.forecasts = await res.json();
     },
-    beforeMount() {
-      this.getForecast();
-    },
-    methods: {
-      async getForecast() {
-        const res = await fetch('/weatherforecast');
-        this.data = await res.json();
-      }
-    }
-  };
+  },
+};
 </script>
 
 <style scoped>
-  h3 {
-    margin: 40px 0 0;
-  }
+h3 {
+  margin: 40px 0 0;
+}
 
-  table {
-    margin-left: auto;
-    margin-right: auto;
-  }
+table {
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  td {
-    color: #42b983;
-  }
+td {
+  color: #42b983;
+}
 
-  sup {
-    font-size: 0.5em
-  }
+sup {
+  font-size: 0.5em;
+}
 </style>
