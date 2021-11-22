@@ -23,39 +23,39 @@
 </template>
 
 <script>
-import formatDateMixin from "../mixins/formatDateMixin";
+  import formatDateMixin from "../mixins/formatDateMixin";
 
-export default {
-  name: "WeatherForecast",
-  mixins: [formatDateMixin],
-  data: () => ({ forecasts: [] }),
-  beforeMount() {
-    this.getForecast();
-  },
-  methods: {
-    async getForecast() {
-      const res = await fetch("/weatherforecast");
-      this.forecasts = await res.json();
+  export default {
+    name: "WeatherForecast",
+    mixins: [formatDateMixin],
+    data: () => ({ forecasts: [] }),
+    beforeMount() {
+      this.getForecast();
     },
-  },
-};
+    methods: {
+      async getForecast() {
+        const res = await fetch("/weatherforecast");
+        this.forecasts = await res.json();
+      },
+    },
+  };
 </script>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
+  h3 {
+    margin: 40px 0 0;
+  }
 
-table {
-  margin-left: auto;
-  margin-right: auto;
-}
+  table {
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-td {
-  color: #42b983;
-}
+  td {
+    color: #42b983;
+  }
 
-sup {
-  font-size: 0.5em;
-}
+  sup {
+    font-size: 0.5em;
+  }
 </style>
