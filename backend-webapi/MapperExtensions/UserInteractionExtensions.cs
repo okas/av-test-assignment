@@ -15,6 +15,7 @@ public static class UserInteractionExtensions
         var model = ToModel(source);
         model.Id = source.Id;
         model.Created = source.Created;
+        model.IsOpen = source.IsOpen;
         return model;
     }
 
@@ -40,8 +41,7 @@ public static class UserInteractionExtensions
         return new UserInteraction
         {
             Deadline = source.Deadline,
-            Description = source.Description,
-            IsOpen = source.IsOpen
+            Description = source.Description
         };
     }
 

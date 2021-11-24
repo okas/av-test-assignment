@@ -12,6 +12,4 @@ public class UserInteractionNewDto
 
     [Required]
     public string Description { get; set; }
-
-    public bool IsOpen { get; set; }
 }
