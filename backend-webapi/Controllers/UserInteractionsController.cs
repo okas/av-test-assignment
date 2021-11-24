@@ -78,6 +78,38 @@ public class UserInteractionsController : ControllerBase
     }
 
     /// <summary>
+    /// Patch UserInteraction model: change IsOpen state.
+    /// </summary>
+    /// <remarks>Patching is constrainted to set IsOpen property only, other props are ignored even if sent.</remarks>
+    /// <param name="id"></param>
+    /// <param name="isOpenDto"></param>
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionIsOpenDto isOpenDto)
+    {
+        if (id != isOpenDto.Id)
+        {
+            return BadRequest();
+        }
+
+        var partialModel = new UserInteraction { Id = id, IsOpen = isOpenDto.IsOpen };
+        _context.Attach(partialModel).Property(model => model.IsOpen).IsModified = true;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!UserInteractionExists(id))
+                return NotFound();
+            else
+                throw;
+        }
+        // TODO describe all result types for API
+        return NoContent();
+    }
+
+    /// <summary>
     /// Create Userinteraction.
     /// </summary>
     /// <param name="newDto"></param>
