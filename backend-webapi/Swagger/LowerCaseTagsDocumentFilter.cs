@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Backend.WebApi.Swagger;
 
 /// <summary>
-/// Coneverts ann tags of OAS document to lowercase.
+/// Coneverts all tags of OAS document to lowercase.
 /// </summary>
 /// <remarks>
 /// In both types of places in document tree: tags in OpenaAPI Object and Paths->Operation Item->Tags.

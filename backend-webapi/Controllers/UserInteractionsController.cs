@@ -20,7 +20,7 @@ public class UserInteractionsController : ControllerBase
     public UserInteractionsController(ApiDbContext context) => _context = context;
 
     /// <summary>
-    /// Get all Userinteractions
+    /// Get all Userinteractions.
     /// </summary>
     /// <returns>Collection of all interactions.</returns>
     [HttpGet]
@@ -51,7 +51,7 @@ public class UserInteractionsController : ControllerBase
     /// Update Userinteraction.
     /// </summary>
     /// <remarks>It do not allow fully to replace entity on given URI;
-    /// Created property is protected, because it cannot be updated by user.
+    /// `Created` property is protected, because it cannot be updated by user.
     /// </remarks>
     [HttpPut("{id}")]
     public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionUpdateDto dto)
@@ -79,9 +79,9 @@ public class UserInteractionsController : ControllerBase
     }
 
     /// <summary>
-    /// Patch UserInteraction model: change IsOpen state.
+    /// Patch UserInteraction model: change `IsOpen` state.
     /// </summary>
-    /// <remarks>Patching is constrainted to set IsOpen property only,
+    /// <remarks>Patching is constrainted to set `IsOpen` property only,
     /// other props are ignored even if sent.
     /// </remarks>
     [HttpPatch("{id}")]

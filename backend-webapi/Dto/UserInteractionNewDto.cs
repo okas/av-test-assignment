@@ -3,7 +3,7 @@
 namespace Backend.WebApi.Dto;
 
 /// <summary>
-/// User Interaction DTO with base properties, that use should provide. For creation purpose.
+/// Userinteraction DTO with base properties, that user should provide. For creation purpose.
 /// </summary>
 public class UserInteractionNewDto
 {

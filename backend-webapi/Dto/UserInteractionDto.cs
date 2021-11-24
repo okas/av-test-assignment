@@ -3,7 +3,7 @@
 namespace Backend.WebApi.Dto;
 
 /// <summary>
-/// User Interaction DTO with full data. For full detail presentation purpose of the model entity.
+/// Userinteraction DTO with full data. For full detail presentation purpose of the model entity.
 /// </summary>
 public class UserInteractionDto : UserInteractionUpdateDto
 {
