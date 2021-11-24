@@ -1,7 +1,14 @@
 using Backend.WebApi.Swagger;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using Backend.WebApi.Data.EF;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApiDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ApiDbContext"));
+});
 
 // Add services to the container.
 builder.Services.Configure<RouteOptions>(options =>
