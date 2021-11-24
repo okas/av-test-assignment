@@ -1,4 +1,4 @@
-using Backend.WebApi;
+using Backend.WebApi.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.WebApi.Controllers
