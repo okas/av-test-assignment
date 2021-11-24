@@ -8,34 +8,27 @@ public static class UserInteractionExtensions
     /// <summary>
     /// Map DTO to Model.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
     public static UserInteraction ToModel(this UserInteractionDto source)
     {
-        var model = ToModel(source);
-        model.Id = source.Id;
+        var model = ToModel(source as UserInteractionUpdateDto);
         model.Created = source.Created;
-        model.IsOpen = source.IsOpen;
         return model;
-    }
-
-    /// <summary>
-    /// Map Model to non-create DTO.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static UserInteractionDto ToDto(this UserInteraction source)
-    {
-        var dto = (UserInteractionDto)ToNewDto(source);
-        dto.Id = source.Id;
-        return dto;
     }
 
     /// <summary>
     /// Map DTO to Model.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
+    public static UserInteraction ToModel(this UserInteractionUpdateDto source)
+    {
+        var model = ToModel(source as UserInteractionNewDto);
+        model.Id = source.Id;
+        model.IsOpen = source.IsOpen;
+        return model;
+    }
+
+    /// <summary>
+    /// Map DTO to Model.
+    /// </summary>
     public static UserInteraction ToModel(this UserInteractionNewDto source)
     {
         return new UserInteraction
@@ -46,19 +39,35 @@ public static class UserInteractionExtensions
     }
 
     /// <summary>
+    /// Map Model to full detail DTO.
+    /// </summary>
+    public static UserInteractionDto ToDto(this UserInteraction source)
+    {
+        var dto = (UserInteractionDto)ToUpdateDto(source);
+        dto.Id = source.Id;
+        return dto;
+    }
+
+    /// <summary>
+    /// Map Model to update DTO.
+    /// </summary>
+    private static UserInteractionUpdateDto ToUpdateDto(this UserInteraction source)
+    {
+        var dto = (UserInteractionUpdateDto)ToNewDto(source);
+        dto.Id = source.Id;
+        dto.IsOpen = source.IsOpen;
+        return dto;
+    }
+
+    /// <summary>
     /// Map Model to create DTO.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
     private static UserInteractionNewDto ToNewDto(this UserInteraction source)
     {
-        return new UserInteractionDto
+        return new UserInteractionNewDto
         {
-            Created = source.Created,
             Deadline = source.Deadline,
             Description = source.Description,
-            IsOpen = source.IsOpen
         };
     }
 }
-

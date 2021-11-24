@@ -50,16 +50,17 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Update Userinteraction.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="dto"></param>
+    /// <remarks>It do not allow fully to replace entity on given URI;
+    /// Created property is protected, because it cannot be updated by user.
+    /// </remarks>
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionDto dto)
+    public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionUpdateDto dto)
     {
         if (id != dto.Id)
         {
             return BadRequest();
         }
-
+        // TODO might need .Created property protection?
         _context.Entry(dto.ToModel()).State = EntityState.Modified;
 
         try
@@ -80,9 +81,9 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Patch UserInteraction model: change IsOpen state.
     /// </summary>
-    /// <remarks>Patching is constrainted to set IsOpen property only, other props are ignored even if sent.</remarks>
-    /// <param name="id"></param>
-    /// <param name="isOpenDto"></param>
+    /// <remarks>Patching is constrainted to set IsOpen property only,
+    /// other props are ignored even if sent.
+    /// </remarks>
     [HttpPatch("{id}")]
     public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionIsOpenDto isOpenDto)
     {
@@ -112,12 +113,14 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Create Userinteraction.
     /// </summary>
-    /// <param name="newDto"></param>
     [HttpPost]
 
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto)
     {
+        // Map to model and add to DbContext, return reference to model.
         var model = _context.UserInteraction.Add(newDto.ToModel()).Entity;
+
+        // These values setup is system's responsibility, thus doing it here.
         model.IsOpen = true;
         model.Created = DateTime.Now;
 

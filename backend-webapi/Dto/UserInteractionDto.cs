@@ -3,16 +3,10 @@
 namespace Backend.WebApi.Dto;
 
 /// <summary>
-/// User Interaction DTO with full data. For presentation (and update purposes).
+/// User Interaction DTO with full data. For full detail presentation purpose of the model entity.
 /// </summary>
-public class UserInteractionDto : UserInteractionNewDto
+public class UserInteractionDto : UserInteractionUpdateDto
 {
     [Required]
-    public Guid Id { get; set; }
-
-    [Required]
     public DateTime Created { get; set; }
-
-    [Required]
-    public bool IsOpen { get; set; }
 }
