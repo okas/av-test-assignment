@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Backend.WebApi.Tests;
+namespace Backend.WebApi.Tests.DummyTests;
 
 public class UnitTestsUsingTheories
 {

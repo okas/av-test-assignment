@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
-namespace Backend.WebApi.Tests;
+namespace Backend.WebApi.Tests.DummyTests;
 
 public class UnitTestsUsingFixture : IClassFixture<MyTestFixture>
 {
@@ -15,16 +14,18 @@ public class UnitTestsUsingFixture : IClassFixture<MyTestFixture>
     public void IsEven_EvenValues_ReturnTrue()
     {
         var subject = new LogicToTest();
-        var result = ImportantInstanceToTest.Instance.EvenNumbers.All(subject.IsEven);
-        Assert.True(result, $"{{{string.Join(", ", ImportantInstanceToTest.Instance.EvenNumbers)}}}, but all should be even numbers.");
+        Assert.All(ImportantInstanceToTest.Instance.EvenNumbers,
+            x => Assert.True(subject.IsEven(x), $"\"{x}\": should be even number")
+        );
     }
 
     [Fact]
     public void IsEven_OddValues_ReturnTrue()
     {
         var subject = new LogicToTest();
-        var result = !ImportantInstanceToTest.Instance.EvenNumbers.All(subject.IsEven);
-        Assert.False(result, $"{{{string.Join(", ", ImportantInstanceToTest.Instance.OddNumbers)}}}, but all should be odd numbers.");
+        Assert.All(ImportantInstanceToTest.Instance.OddNumbers,
+            x => Assert.False(subject.IsEven(x), $"\"{x}\": should be odd number")
+        );
     }
 }
 
@@ -61,9 +62,4 @@ public class SomeExpensiveTestResourceToShare
     public List<int> EvenNumbers { get; private set; }
 
     public List<int> OddNumbers { get; private set; }
-}
-
-public class LogicToTest
-{
-    public bool IsEven(int candidate) => candidate % 2 == 0;
 }
