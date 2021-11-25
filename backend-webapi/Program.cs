@@ -1,7 +1,5 @@
-using System.Reflection;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Swagger;
-using Backend.WebApi.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,17 +22,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    // For .NET XML documentation inclusion to OAS documentation.
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    c.IncludeXmlCommentsOfCurrentProject();
     c.DocumentFilter<LowerCaseTagsDocumentFilter>();
-    c.CustomOperationIds(apiDesc =>
-    {
-        var controller = apiDesc.ActionDescriptor.RouteValues["controller"];
-        var action = apiDesc.ActionDescriptor.RouteValues["action"];
-        return StringUtilities.ToCamelCase($"{controller}{action}");
-    });
+    c.CustomOperationIdsControllerAndActionCamelCase();
 });
 
 var app = builder.Build();
