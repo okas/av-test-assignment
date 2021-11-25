@@ -1,9 +1,9 @@
+using Backend.WebApi.Data.EF;
+using Backend.WebApi.Dto;
+using Backend.WebApi.MapperExtensions;
+using Backend.WebApi.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Backend.WebApi.Data.EF;
-using Backend.WebApi.MapperExtensions;
-using Backend.WebApi.Dto;
-using Backend.WebApi.Model;
 
 namespace Backend.WebApi.Controllers;
 
@@ -77,9 +77,13 @@ public class UserInteractionsController : ControllerBase
         catch (DbUpdateConcurrencyException)
         {
             if (!UserInteractionExists(id))
+            {
                 return NotFound();
+            }
             else
+            {
                 throw;
+            }
         }
         return NoContent();
     }
@@ -112,9 +116,13 @@ public class UserInteractionsController : ControllerBase
         catch (DbUpdateConcurrencyException)
         {
             if (!UserInteractionExists(id))
+            {
                 return NotFound();
+            }
             else
+            {
                 throw;
+            }
         }
         // TODO describe all result types for API
         return NoContent();

@@ -1,8 +1,8 @@
-using Backend.WebApi.Swagger;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using Backend.WebApi.Data.EF;
+using Backend.WebApi.Swagger;
 using Backend.WebApi.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
