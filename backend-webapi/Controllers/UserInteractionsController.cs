@@ -24,6 +24,7 @@ public class UserInteractionsController : ControllerBase
     /// </summary>
     /// <returns>Collection of all interactions.</returns>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetAllUserInteractions()
     {
         return await _context.UserInteraction.AsNoTracking()
@@ -36,6 +37,8 @@ public class UserInteractionsController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id)
     {
         var model = await _context.UserInteraction.FindAsync(id);
@@ -54,6 +57,10 @@ public class UserInteractionsController : ControllerBase
     /// `Created` property is protected, because it cannot be updated by user.
     /// </remarks>
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionUpdateDto dto)
     {
         if (id != dto.Id)
@@ -74,7 +81,6 @@ public class UserInteractionsController : ControllerBase
             else
                 throw;
         }
-        // TODO describe all result types for API
         return NoContent();
     }
 
@@ -85,6 +91,10 @@ public class UserInteractionsController : ControllerBase
     /// other props are ignored even if sent.
     /// </remarks>
     [HttpPatch("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionIsOpenDto isOpenDto)
     {
         if (id != isOpenDto.Id)
@@ -114,7 +124,9 @@ public class UserInteractionsController : ControllerBase
     /// Create Userinteraction.
     /// </summary>
     [HttpPost]
-
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto)
     {
         // Map to model and add to DbContext, return reference to model.
