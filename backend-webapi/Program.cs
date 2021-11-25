@@ -2,6 +2,7 @@ using Backend.WebApi.Swagger;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Backend.WebApi.Data.EF;
+using Backend.WebApi.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,12 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
     c.DocumentFilter<LowerCaseTagsDocumentFilter>();
+    c.CustomOperationIds(apiDesc =>
+    {
+        var controller = apiDesc.ActionDescriptor.RouteValues["controller"];
+        var action = apiDesc.ActionDescriptor.RouteValues["action"];
+        return StringUtilities.ToCamelCase($"{controller}{action}");
+    });
 });
 
 var app = builder.Build();
