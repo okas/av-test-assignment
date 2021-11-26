@@ -43,29 +43,11 @@ public static class UserInteractionExtensions
     /// </summary>
     public static UserInteractionDto ToDto(this UserInteraction source)
     {
-        var dto = (UserInteractionDto)ToUpdateDto(source);
-        dto.Id = source.Id;
-        return dto;
-    }
-
-    /// <summary>
-    /// Map Model to update DTO.
-    /// </summary>
-    private static UserInteractionUpdateDto ToUpdateDto(this UserInteraction source)
-    {
-        var dto = (UserInteractionUpdateDto)ToNewDto(source);
-        dto.Id = source.Id;
-        dto.IsOpen = source.IsOpen;
-        return dto;
-    }
-
-    /// <summary>
-    /// Map Model to create DTO.
-    /// </summary>
-    private static UserInteractionNewDto ToNewDto(this UserInteraction source)
-    {
-        return new UserInteractionNewDto
+        return new UserInteractionDto
         {
+            Created = source.Created,
+            Id = source.Id,
+            IsOpen = source.IsOpen,
             Deadline = source.Deadline,
             Description = source.Description,
         };
