@@ -39,34 +39,30 @@ public class UserInteractionControllerTests : IClassFixture<ApiDbContextLocalDbF
     [Fact]
     public async void Post_CanCreateInteraction_ReturnCreatedActionResultWithDtoInstance()
     {
-        using (var context = DbFixture.CreateContext())
-        {
-            var controller = new UserInteractionsController(context);
+        using var context = DbFixture.CreateContext();
+        var controller = new UserInteractionsController(context);
 
-            var responseResult = (await controller.PostUserInteraction(CorrectNewDto)).Result;
+        var responseResult = (await controller.PostUserInteraction(CorrectNewDto)).Result;
 
-            responseResult.Should().NotBeNull()
-                .And.BeOfType<CreatedAtActionResult>()
-                .Which.Value.Should().BeOfType<UserInteractionDto>()
-                .Which.Should().NotBeNull();
-        }
+        responseResult.Should().NotBeNull()
+            .And.BeOfType<CreatedAtActionResult>()
+            .Which.Value.Should().BeOfType<UserInteractionDto>()
+            .Which.Should().NotBeNull();
     }
 
     [Fact]
     public async void Post_CanCreateInteraction_ReturnCorrectApiGeneratedProperties()
     {
-        using (var context = DbFixture.CreateContext())
-        {
-            var controller = new UserInteractionsController(context);
+        using var context = DbFixture.CreateContext();
+        var controller = new UserInteractionsController(context);
 
-            var dto = (await controller.PostUserInteraction(CorrectNewDto))
-                .Result.As<CreatedAtActionResult>().Value.As<UserInteractionDto>();
+        var dto = (await controller.PostUserInteraction(CorrectNewDto))
+            .Result.As<CreatedAtActionResult>().Value.As<UserInteractionDto>();
 
-            dto.Id.Should().NotBeEmpty();
-            dto.Created.Should().BeOnOrAfter(DateTime.Now.AddSeconds(-5)).And.NotBeAfter(DateTime.Now);
-            dto.IsOpen.Should().BeTrue();
-            dto.Description.Should().BeEquivalentTo(CorrectNewDto.Description);
-        }
+        dto.Id.Should().NotBeEmpty();
+        dto.Created.Should().BeOnOrAfter(DateTime.Now.AddSeconds(-5)).And.NotBeAfter(DateTime.Now);
+        dto.IsOpen.Should().BeTrue();
+        dto.Description.Should().BeEquivalentTo(CorrectNewDto.Description);
     }
 }
 

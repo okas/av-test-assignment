@@ -17,6 +17,7 @@ public class ApiDbContextLocalDbFixture : IDisposable
         Seed();
         Connection.Open();
     }
+
     public DbConnection Connection { get; }
 
     /// <summary>
