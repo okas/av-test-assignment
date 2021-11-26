@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Backend.WebApi.Tests;
 
-/// <summary>
-/// Optional .Use transactions in Facts/Theories to roll back data in test DB!
-/// </summary>
 public class UserInteractionControllerTests : IClassFixture<ApiDbContextLocalDbFixture>
 {
     const string _nonEmptyDescription = "Non-empty";

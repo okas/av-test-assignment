@@ -13,12 +13,16 @@ public class ApiDbContextLocalDbFixture : IDisposable
 
     public ApiDbContextLocalDbFixture()
     {
-        Connection = new SqlConnection(@"Server=(localdb)\mssqllocaldb;Database=EFTestSample;Trusted_Connection=True");
+        Connection = new SqlConnection(@"Server=(localdb)\mssqllocaldb;Database=av-test-assignment_webapi-tests;Trusted_Connection=True");
         Seed();
         Connection.Open();
     }
     public DbConnection Connection { get; }
 
+    /// <summary>
+    /// Optional. Use transactions in Facts/Theories to roll back data in test if it is necessary!
+    /// </summary>
+    /// <param name="transaction">Transaction instance, that is given to EF.</param>
     public ApiDbContext CreateContext(DbTransaction transaction = null)
     {
         var modelBuilder = new DbContextOptionsBuilder<ApiDbContext>().UseSqlServer(Connection);
