@@ -3,6 +3,7 @@ using System.Data.Common;
 using Backend.WebApi.Data.EF;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 namespace Backend.WebApi.Tests;
 
@@ -55,4 +56,12 @@ public class ApiDbContextLocalDbFixture : IDisposable
         }
     }
     public void Dispose() => Connection.Dispose();
+}
+
+[CollectionDefinition("ApiDbContext")]
+public class ApiDbContextCollection : ICollectionFixture<ApiDbContextLocalDbFixture>
+{
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }
