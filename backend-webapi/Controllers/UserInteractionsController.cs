@@ -157,7 +157,7 @@ public class UserInteractionsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, "Some unexpected error occured. Sorry.");
         }
 
-        return CreatedAtAction("GetUserInteraction", new { id = model.Id }, model.ToDto());
+        return CreatedAtAction(nameof(GetUserInteraction), model.ToDto());
     }
 
     private bool UserInteractionExists(Guid id)
