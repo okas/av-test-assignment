@@ -10,18 +10,18 @@
       <table>
         <thead>
           <tr>
+            <th>Kirjeldus</th>
             <th>Sisestatud</th>
             <th>Tähtaeg</th>
-            <th>Kirjeldus</th>
             <th>Avatud</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in interactions" :key="item.id">
-            <td class="item">{{ formatDate(item.created) }}</td>
-            <td class="item">{{ formatDate(item.deadline) }}</td>
-            <td class="item">{{ item.description }}</td>
-            <td class="item">{{ item.isOpen }}</td>
+            <td class="item-description">{{ item.description }}</td>
+            <td>{{ formatDateTimeShortDateShortTime(item.created) }}</td>
+            <td>{{ formatDateTimeShortDateShortTime(item.deadline) }}</td>
+            <td>{{ item.isOpen }}</td>
           </tr>
         </tbody>
       </table>
@@ -58,4 +58,26 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  table {
+    table-layout: auto;
+    border-spacing: 0px;
+    border: 1px #42b983 solid;
+    width: 100%;
+  }
+  td, th {
+    padding: 0.75rem 0.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  td {
+    text-align: right;
+  }
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  td.item-description {
+    text-align: justify;
+  }
+</style>

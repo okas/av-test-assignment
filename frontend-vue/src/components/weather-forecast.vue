@@ -12,7 +12,7 @@
       </thead>
       <tbody>
         <tr v-for="(item, i) in forecasts" :key="i">
-          <td class="item">{{ formatDate(item.date) }}</td>
+          <td class="item">{{ formatDateShort(item.date) }}</td>
           <td class="item">{{ item.temperatureC }}</td>
           <td class="item">{{ item.temperatureF }}</td>
           <td class="item">{{ item.summary }}</td>

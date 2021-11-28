@@ -51,6 +51,7 @@ public class UserInteractionsController : ControllerBase
         // TODO describe all result types for API
         return Ok(model.ToDto());
     }
+
     /// <summary>
     /// Update Userinteraction.
     /// </summary>
