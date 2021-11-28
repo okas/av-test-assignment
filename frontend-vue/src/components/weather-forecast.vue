@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     async getForecast() {
-      const resp = await this.$api.then(client =>
+      const resp = await this.$api.then((client) =>
         client.execute({ operationId: "get_weatherforecast" })
       );
       if (resp.ok) {
