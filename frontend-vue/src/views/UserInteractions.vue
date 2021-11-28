@@ -74,7 +74,10 @@ export default {
   td {
     text-align: right;
   }
-  tr:nth-child(even) {
+  th {
+    border-bottom: 1px #42b983 solid;
+  }
+  tbody tr:nth-child(even) {
     background-color: #f2f2f2;
   }
   td.item-description {
