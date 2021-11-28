@@ -11,16 +11,16 @@
         <thead>
           <tr>
             <th>Sisestatud</th>
-            <th>Kirjeldus</th>
             <th>Tähtaeg</th>
+            <th>Kirjeldus</th>
             <th>Avatud</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in interactions" :key="item.id">
             <td class="item">{{ formatDate(item.created) }}</td>
-            <td class="item">{{ item.description }}</td>
             <td class="item">{{ formatDate(item.deadline) }}</td>
+            <td class="item">{{ item.description }}</td>
             <td class="item">{{ item.isOpen }}</td>
           </tr>
         </tbody>
@@ -47,6 +47,12 @@ export default {
       if (resp.ok) {
         this.interactions = resp.body;
       }
+    },
+  },
+  watch: {
+    "this.interactions"() {
+      // Keep table sorted by deadline always.
+      this.interactions.sort((a, b) => a.deadline - b.deadline);
     },
   },
 };
