@@ -10,16 +10,17 @@ using Xunit;
 namespace Backend.WebApi.Tests.UserInteractionControllerTests;
 
 [Collection("ApiDbContext")]
-public class UserInteractionOpenStateTests : IDisposable
+public class UserInteractionOpenStateChangeTests : IDisposable
 {
     private readonly ApiDbContextLocalDbFixture _dbFixture;
     private readonly Guid _entityId;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
-    public UserInteractionOpenStateTests(ApiDbContextLocalDbFixture dbFixture)
+    // Arrange for tests
+    public UserInteractionOpenStateChangeTests(ApiDbContextLocalDbFixture dbFixture)
     {
-        this._dbFixture = dbFixture;
+        _dbFixture = dbFixture;
         _entityId = Guid.NewGuid();
         _sutDbContext = dbFixture.CreateContext();
         SeedData(dbFixture);
@@ -27,8 +28,11 @@ public class UserInteractionOpenStateTests : IDisposable
     }
 
     /// <summary>
-    /// Will use on-time DbContext to not conflict with context used for testing.
+    /// Generate test data to database, that can be requested from API tests.
     /// </summary>
+    /// <remarks>
+    /// Will use one-time DbContext to not to conflict with context used for testing.
+    /// </remarks>
     /// <param name="dbFixture"></param>
     private void SeedData(ApiDbContextLocalDbFixture dbFixture)
     {
@@ -61,6 +65,9 @@ public class UserInteractionOpenStateTests : IDisposable
         interactionModel.IsOpen.Should().BeFalse();
     }
 
+    /// <summary>
+    /// Clean up arranged resources of tests
+    /// </summary>
     public void Dispose()
     {
         // Clean up //Arranged resources

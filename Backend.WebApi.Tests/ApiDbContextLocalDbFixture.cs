@@ -9,16 +9,29 @@ namespace Backend.WebApi.Tests;
 
 public class ApiDbContextLocalDbFixture : IDisposable
 {
-    private static readonly object _lock = new();
+    private static readonly string _localDbConnectionString;
+    private static readonly object _lock;
     private static bool _databaseInitialized;
+
+    static ApiDbContextLocalDbFixture()
+    {
+        _localDbConnectionString = @"Server=(localdb)\mssqllocaldb;Database=av-test-assignment_webapi-tests;Trusted_Connection=True";
+        _lock = new();
+    }
 
     public ApiDbContextLocalDbFixture()
     {
-        Connection = new SqlConnection(@"Server=(localdb)\mssqllocaldb;Database=av-test-assignment_webapi-tests;Trusted_Connection=True");
-        Seed();
+        Connection = new SqlConnection(_localDbConnectionString);
+        InitializeCleanDatabase();
         Connection.Open();
     }
 
+    /// <summary>
+    /// It is kept alive throughout the liftime of the instance.
+    /// </summary>
+    /// <remarks>
+    /// Regarding liftime, keep attention whether the instance is provided via IClassfixture<> interface or Collection("..") atribute!
+    /// </remarks>
     public DbConnection Connection { get; }
 
     /// <summary>
@@ -39,7 +52,7 @@ public class ApiDbContextLocalDbFixture : IDisposable
         return context;
     }
 
-    private void Seed()
+    private void InitializeCleanDatabase()
     {
         lock (_lock)
         {

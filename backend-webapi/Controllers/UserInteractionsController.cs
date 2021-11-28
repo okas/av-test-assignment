@@ -27,9 +27,11 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetAllUserInteractions()
     {
-        return await _context.UserInteraction.AsNoTracking()
+        var dtos = await _context.UserInteraction.AsNoTracking()
             .Select(model => model.ToDto())
             .ToListAsync();
+
+        return Ok(dtos);
     }
 
     /// <summary>
@@ -47,9 +49,8 @@ public class UserInteractionsController : ControllerBase
             return NotFound();
         }
         // TODO describe all result types for API
-        return model.ToDto();
+        return Ok(model.ToDto());
     }
-
     /// <summary>
     /// Update Userinteraction.
     /// </summary>
