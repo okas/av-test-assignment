@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.RegularExpressions;
 using Backend.WebApi.Utilities;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -36,6 +37,23 @@ public static class SwaggerGenExtensionMethods
             var controller = apiDesc.ActionDescriptor.RouteValues["controller"];
             var action = apiDesc.ActionDescriptor.RouteValues["action"];
             return StringUtilities.ToCamelCase($"{controller}{action}");
+        });
+    }
+
+    /// <summary>
+    /// Uses HTTP method name and path of the action to generate operationId in snake_case.
+    /// </summary>
+    /// <example>
+    /// Input:  `GET /api/userinteractions/{id}`
+    /// Output: `get_api_userinteractions__id_`
+    /// </example>
+    /// <param name="options"></param>
+    public static void CustomOperationIdsMethodAndApiPathToSnakeCase(this SwaggerGenOptions options)
+    {
+        options.CustomOperationIds(apiDesc =>
+        {
+            string input = $@"{apiDesc.HttpMethod}_{apiDesc.RelativePath}";
+            return new Regex(@"[\W]").Replace(input.ToLowerInvariant(), "_");
         });
     }
 }

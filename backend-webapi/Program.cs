@@ -24,7 +24,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.IncludeXmlCommentsOfCurrentProject();
     c.DocumentFilter<LowerCaseTagsDocumentFilter>();
-    c.CustomOperationIdsControllerAndActionCamelCase();
+    c.CustomOperationIdsMethodAndApiPathToSnakeCase();
 });
 
 var app = builder.Build();
@@ -33,7 +33,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.DisplayOperationId();
+    });
 }
 
 app.UseHttpsRedirection();
