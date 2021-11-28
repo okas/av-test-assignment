@@ -1,11 +1,18 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Algus</router-link> |
-    <router-link to="/about">Rakendusest</router-link> |
-    <router-link to="/userinteractions">Kasutaja pöördumised</router-link> |
-    <a class="external" href="https://localhost:5003/swagger" target="_blank">Swagger</a>
-  </div>
-  <router-view />
+  <header>
+    <nav id="nav" class="app-menu">
+      <router-link to="/">Algus</router-link> |
+      <router-link to="/about">Rakendusest</router-link> |
+      <router-link to="/userinteractions">Kasutaja pöördumised</router-link> |
+      <a class="external" href="https://localhost:5003/swagger" target="_blank"
+        >Swagger</a
+      >
+    </nav>
+  </header>
+  <main>
+    <router-view />
+  </main>
+  <aside></aside>
 </template>
 
 <style>
@@ -21,14 +28,14 @@
   padding: 30px;
 }
 
-  #nav a {
-    font-weight: bold;
-    color: #2c3e50;
-  }
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
 
-    #nav a.router-link-exact-active {
-      color: #42b983;
-    }
+#nav a.router-link-exact-active {
+  color: #42b983;
+}
 
 a.external[target="_blank"]::after {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);

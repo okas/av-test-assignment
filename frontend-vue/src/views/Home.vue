@@ -1,10 +1,12 @@
 <template>
-  <div class="home">
+  <article>
     <img alt="Vue logo" src="../assets/logo.png" />
-    <h1>'Hello world' leht</h1>
+    <header>
+      <h1>'Hello world' leht</h1>
+    </header>
     <p>Kiire indikatsioon, et Web API käivitunud.</p>
     <WeatherForecast />
-  </div>
+  </article>
 </template>
 
 <script>

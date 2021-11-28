@@ -1,5 +1,5 @@
 <template>
-  <div class="weather-forecast">
+  <section class="weather-forecast">
     <h2>Ilmaprognoosi info <sup>(API genereeritud)</sup></h2>
     <table>
       <thead>
@@ -19,7 +19,7 @@
         </tr>
       </tbody>
     </table>
-  </div>
+  </section>
 </template>
 
 <script>

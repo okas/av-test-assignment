@@ -1,6 +1,8 @@
 <template>
-  <div class="about">
-    <h1>Test ülesande kirjeldus</h1>
+  <article class="about">
+    <header>
+      <h1>Test ülesande kirjeldus</h1>
+    </header>
     <p>
       Ülesanne on teostada lihtne veebirakendus, mis võimaldaks hallata
       kasutajatoele saadetud pöördumisi. Lihtsustatud süsteemi funktsionaalsus
@@ -31,7 +33,7 @@
       andmebaasi salvestada, võib vabalt hoida neid ka mälus. Sooviksime töös
       näha kindlasti ka üksusteste.
     </p>
-  </div>
+  </article>
 </template>
 
 <style scoped>
