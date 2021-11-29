@@ -66,7 +66,7 @@ export default {
         client.execute({ operationId: "get_api_userinteractions" })
       );
       if (resp.ok) {
-        this.interactions = resp.body.map(this.convertToVM);
+        this.interactions = resp.body.filter(i => i.isOpen).map(this.convertToVM);
       }
     },
     async markInteractionClosed(itnteraction) {
