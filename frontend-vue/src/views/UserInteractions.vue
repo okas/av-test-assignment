@@ -6,22 +6,8 @@
       <h1>Kasutajate pöördumiste vaade</h1>
     </header>
     <section>
-      <div class="form-container">
-        <div class="control">
-          <input type="text" id="new-description" placeholder="kirjeldus" size="50" v-model="newInteraction.description" />
-        </div>
-        <div class="control">
-          <input id="new-deadline" type="datetime-local" v-model="newInteraction.deadline" />
-          <label for="new-deadline"> : tähtaeg</label>
-        </div>
-        <div class="control">
-          <button @click="addNewInteraction(newInteraction)">lisa uus</button>
-        </div>
-      </div>
-    </section>
-    <section>
       <header>
-        <h4>Aktiivsed pöördumised</h4>
+        <h2></h2>
       </header>
       <table>
         <thead>
@@ -53,10 +39,7 @@ import formatDateMixin from "../mixins/formatDateMixin";
 export default {
   name: "UserInteractions",
   mixins: [formatDateMixin],
-  data: () => ({
-    interactions: [],
-    newInteraction: { description: "", deadline: "" },
-  }),
+  data: () => ({ interactions: [] }),
   beforeMount() {
     this.getInteractions();
   },
@@ -82,6 +65,8 @@ export default {
       );
       if (resp.ok) {
         this.interactions.splice(this.interactions.indexOf(itnteraction), 1);
+      } else {
+        alert(resp);
       }
     },
     /** Convert dates to JS Date instances from response. */
@@ -100,29 +85,11 @@ export default {
     toYesNo(interaction) {
       return interaction.isOpen ? "jah" : "ei";
     },
-    async addNewInteraction({ description, deadline }) {
-      const resp = await this.$api.then((client) =>
-        client.execute({
-          operationId: "post_api_userinteractions",
-          requestBody: { description, deadline: new Date(deadline) },
-        })
-      );
-      if (resp.ok) {
-        this.interactions.push(this.convertToVM(resp.body));
-        this.newInteraction.description = "";
-        this.newInteraction.deadline = "";
-      }
-    },
   },
   watch: {
     /** Keep table sorted by deadline desc. always.*/
-    interactions: {
-      immediate: true,
-      deep: true,
-      /** Sort by deadline property/column */
-      handler() {
-        this.interactions.sort((a, b) => a.deadline - b.deadline);
-      },
+    "this.interactions"() {
+      this.interactions.sort((a, b) => a.deadline - b.deadline);
     },
   },
 };
@@ -176,18 +143,5 @@ tbody tr.due-problem {
 
 tbody tr.due-problem:hover {
   outline: 1px solid black;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 1rem;
-}
-
-.control {
-  align-self: auto;
-  flex-grow: 4;
 }
 </style>
