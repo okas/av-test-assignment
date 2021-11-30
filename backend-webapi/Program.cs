@@ -1,5 +1,6 @@
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Swagger;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,9 +18,14 @@ builder.Services.Configure<RouteOptions>(options =>
     options.LowercaseQueryStrings = true;
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddOData(c =>
+{
+    c.Select().Filter().OrderBy();
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.IncludeXmlCommentsOfCurrentProject();
