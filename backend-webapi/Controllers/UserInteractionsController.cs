@@ -20,31 +20,16 @@ public class UserInteractionsController : ControllerBase
     public UserInteractionsController(ApiDbContext context) => _context = context;
 
     /// <summary>
-    /// Get all Userinteractions.
+    /// Get User interactions. By default, all Interactions. Allows filtering by `IsOpen` property in query string.
     /// </summary>
-    /// <returns>Collection of all interactions.</returns>
-    [HttpGet("all")]
+    /// <param name="isOpen">Ommiting this parameter will return all User interactions.</param>
+    /// <returns>All or filtered by `IsOpen` collection of interactions.</returns>
+    [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetAllUserInteractions()
+    public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen = null)
     {
         var dtos = await _context.UserInteraction.AsNoTracking()
-            .Select(model => model.ToDto())
-            .ToListAsync();
-
-        return Ok(dtos);
-    }
-
-    /// <summary>
-    /// Get filtered User interactions. By default is `IsOpen=true`.
-    /// </summary>
-    /// <param name="is">If `false` then responds "Closed" User interactions.</param>
-    /// <returns>Filtered by `IsOpen` collection of interactions.</returns>
-    [HttpGet("open")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetOpenUserInteractions(bool? @is = null)
-    {
-        var dtos = await _context.UserInteraction.AsNoTracking()
-            .Where(model => !@is.HasValue || model.IsOpen == @is)
+            .Where(model => !isOpen.HasValue || model.IsOpen == isOpen)
             .Select(model => model.ToDto())
             .ToListAsync();
 

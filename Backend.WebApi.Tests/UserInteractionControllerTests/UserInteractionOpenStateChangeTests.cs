@@ -70,7 +70,7 @@ public class UserInteractionOpenStateChangeTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        // Clean up //Arranged resources
+        // Clean up test class level Arranged resources
         _sutDbContext.Dispose();
     }
 }

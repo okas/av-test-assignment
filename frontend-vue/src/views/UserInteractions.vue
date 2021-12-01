@@ -64,8 +64,8 @@ export default {
     async getInteractions() {
       const resp = await this.$api.then((client) =>
         client.execute({
-          operationId: "get_api_userinteractions_open",
-          parameters: { is: true },
+          operationId: "get_api_userinteractions",
+          parameters: { isOpen: true },
         })
       );
       if (resp.ok) {
