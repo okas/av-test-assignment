@@ -68,6 +68,7 @@ public class ApiDbContextLocalDbFixture : IDisposable
             }
         }
     }
+
     public void Dispose() => Connection.Dispose();
 }
 
