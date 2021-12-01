@@ -18,15 +18,19 @@ public class UserInteractionQueryTests : IDisposable
     private readonly IList<Guid> _knownEntityIds;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
+    private readonly ApiDbContextLocalDbFixture _dbFixture;
 
     public UserInteractionQueryTests(ApiDbContextLocalDbFixture dbFixture)
     {
+        _dbFixture = dbFixture;
         // Arrange for tests
-        _knownEntityIds = Enumerable.Range(0, 2).Select(_ => Guid.NewGuid()).ToList();
-        _sutDbContext = dbFixture.CreateContext();
+        // - Generate 10 unique ID's that will be known and stored to DB for every test.
+        _knownEntityIds = Enumerable.Range(0, 10).Select(_ => Guid.NewGuid()).ToList();
         SeedData(dbFixture);
+        _sutDbContext = dbFixture.CreateContext();
         _sutController = new UserInteractionsController(_sutDbContext);
     }
+
     /// <summary>
     /// Generate test data to database, that can be requested from API tests.
     /// </summary>
@@ -42,11 +46,11 @@ public class UserInteractionQueryTests : IDisposable
             _knownEntityIds.Select((id, i) =>
             new UserInteraction()
             {
-                Id = id,
+                Id = id,// known guid
                 Created = DateTime.Now,
                 Deadline = DateTime.Now.AddDays(1),
-                Description = $@"Test e\ntity""{i}"" for query tests ",
-                IsOpen = true
+                Description = $@"Test entity to test {id.ToString()[..10]}",// take first 9 chars for visual uniqueness
+                IsOpen = i % 2 == 0,// every other entity will have "closed" state
             }));
 
         context.SaveChanges();
@@ -56,7 +60,7 @@ public class UserInteractionQueryTests : IDisposable
     public async Task Get_CanGetAll_ReturnOkObjectResultAndNonNullValue()
     {
         // Act
-        var response = await _sutController.GetAllUserInteractions();
+        var response = await _sutController.GetOpenUserInteractions();
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -95,6 +99,20 @@ public class UserInteractionQueryTests : IDisposable
 
         // Assert
         response.Result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task Get_CanGetFiltererInteractions_ReturnNonEmptyCollectionOfOpenObjects()
+    {
+        // Arrange
+        // Act
+        var response = await _sutController.GetOpenUserInteractions(true);
+
+        // Assert
+        response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
+        response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
+                 .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
+                 .Which.Should().HaveCountGreaterThan(1);
     }
 
     /// <summary>

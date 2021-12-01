@@ -63,10 +63,13 @@ export default {
   methods: {
     async getInteractions() {
       const resp = await this.$api.then((client) =>
-        client.execute({ operationId: "get_api_userinteractions" })
+        client.execute({
+          operationId: "get_api_userinteractions_open",
+          parameters: { is: true },
+        })
       );
       if (resp.ok) {
-        this.interactions = resp.body.filter(i => i.isOpen).map(this.convertToVM);
+        this.interactions = resp.body.map(this.convertToVM);
       }
     },
     async markInteractionClosed(itnteraction) {
@@ -174,9 +177,9 @@ tbody tr.due-problem {
   background-color: #ffe6e6;
 }
 
-tbody tr.due-problem:hover {
-  outline: 1px solid black;
-}
+  tbody tr.due-problem:hover {
+    outline: 1px solid black;
+  }
 
 .form-container {
   display: flex;

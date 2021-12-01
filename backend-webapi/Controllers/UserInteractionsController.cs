@@ -23,11 +23,28 @@ public class UserInteractionsController : ControllerBase
     /// Get all Userinteractions.
     /// </summary>
     /// <returns>Collection of all interactions.</returns>
-    [HttpGet]
+    [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetAllUserInteractions()
     {
         var dtos = await _context.UserInteraction.AsNoTracking()
+            .Select(model => model.ToDto())
+            .ToListAsync();
+
+        return Ok(dtos);
+    }
+
+    /// <summary>
+    /// Get filtered User interactions. By default is `IsOpen=true`.
+    /// </summary>
+    /// <param name="is">If `false` then responds "Closed" User interactions.</param>
+    /// <returns>Filtered by `IsOpen` collection of interactions.</returns>
+    [HttpGet("open")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetOpenUserInteractions(bool? @is = null)
+    {
+        var dtos = await _context.UserInteraction.AsNoTracking()
+            .Where(model => !@is.HasValue || model.IsOpen == @is)
             .Select(model => model.ToDto())
             .ToListAsync();
 
