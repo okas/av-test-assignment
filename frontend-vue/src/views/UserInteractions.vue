@@ -17,6 +17,9 @@
         <div class="control">
           <button @click="addNewInteraction(newInteraction)">lisa uus</button>
         </div>
+        <div class="control">
+          <button class="refresh-icon" @click="getInteractions">↻</button>
+        </div>
       </div>
     </section>
     <section>
@@ -177,9 +180,9 @@ tbody tr.due-problem {
   background-color: #ffe6e6;
 }
 
-  tbody tr.due-problem:hover {
-    outline: 1px solid black;
-  }
+tbody tr.due-problem:hover {
+  outline: 1px solid black;
+}
 
 .form-container {
   display: flex;
@@ -192,5 +195,12 @@ tbody tr.due-problem {
 .control {
   align-self: auto;
   flex-grow: 4;
+}
+
+.refresh-icon {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1rem;
+  color: #14b8b8;
 }
 </style>
