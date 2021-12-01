@@ -49,7 +49,7 @@ public class UserInteractionQueryTests : IDisposable
                 Id = id,// known guid
                 Created = DateTime.Now,
                 Deadline = DateTime.Now.AddDays(1),
-                Description = $@"Test entity to test {id.ToString()[..10]}",// take first 9 chars for visual uniqueness
+                Description = $@"Test entity to test {id.ToString()[..8]}",// take first 8 chars for visual uniqueness
                 IsOpen = i % 2 == 0,// every other entity will have "closed" state
             }));
 
