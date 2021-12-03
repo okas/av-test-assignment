@@ -7,7 +7,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace Backend.WebApi.Tests.UserInteractionControllerTests;
+namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiDbContext")]
 public class UserInteractionCreationTests : IDisposable

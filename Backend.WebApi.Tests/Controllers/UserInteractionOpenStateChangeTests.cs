@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 using Backend.WebApi.Controllers;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
+using Backend.WebApi.Tests.TestInfrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace Backend.WebApi.Tests.UserInteractionControllerTests;
+namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiDbContext")]
 public class UserInteractionOpenStateChangeTests : IDisposable
@@ -23,29 +24,8 @@ public class UserInteractionOpenStateChangeTests : IDisposable
         _dbFixture = dbFixture;
         _entityId = Guid.NewGuid();
         _sutDbContext = dbFixture.CreateContext();
-        SeedData(dbFixture);
+        UserInteractionUtilities.SeedData(dbFixture, (_entityId, true));
         _sutController = new UserInteractionsController(_sutDbContext);
-    }
-
-    /// <summary>
-    /// Generate test data to database, that can be requested from API tests.
-    /// </summary>
-    /// <remarks>
-    /// Will use one-time DbContext to not to conflict with context used for testing.
-    /// </remarks>
-    /// <param name="dbFixture"></param>
-    private void SeedData(ApiDbContextLocalDbFixture dbFixture)
-    {
-        using var context = dbFixture.CreateContext();
-        context.UserInteraction.Add(new()
-        {
-            Id = _entityId,
-            Created = DateTime.Now,
-            Deadline = DateTime.Now.AddDays(1),
-            Description = "Test \"IsOpen\" = false",
-            IsOpen = true
-        });
-        context.SaveChanges();
     }
 
     [Fact]

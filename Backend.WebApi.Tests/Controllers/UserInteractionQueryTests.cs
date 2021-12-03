@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Backend.WebApi.Controllers;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
-using Backend.WebApi.Model;
+using Backend.WebApi.Tests.TestInfrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace Backend.WebApi.Tests.UserInteractionControllerTests;
+namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiDbContext")]
 public class UserInteractionQueryTests : IDisposable
 {
-    private readonly IList<(Guid, bool)> _knownEntityIds;
+    private readonly (Guid Id, bool IsOpen)[] _knownEntityIds;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
@@ -27,40 +27,16 @@ public class UserInteractionQueryTests : IDisposable
     {
         // Arrange for tests
         // Generate some unique ID's and their `IsOpen` states that will be known to an guaranteed to exist in DB during test.
-        _knownEntityIds = Enumerable.Range(0, 5).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToList();
+        _knownEntityIds = Enumerable.Range(0, 5).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
         _sutDbContext = dbFixture.CreateContext();
-        SeedData(dbFixture);
+        UserInteractionUtilities.SeedData(dbFixture, _knownEntityIds);
         _sutController = new UserInteractionsController(_sutDbContext);
-    }
-
-    /// <summary>
-    /// Generate test data to database, that can be requested from API tests.
-    /// </summary>
-    /// <remarks>
-    /// Will use one-time DbContext to not to conflict with context used for testing.
-    /// </remarks>
-    /// <param name="dbFixture"></param>
-    private void SeedData(ApiDbContextLocalDbFixture dbFixture)
-    {
-        using var context = dbFixture.CreateContext();
-
-        context.UserInteraction.AddRange(
-            _knownEntityIds.Select(tuple =>
-            new UserInteraction()
-            {
-                Id = tuple.Item1,// known guid
-                Created = DateTime.Now,
-                Deadline = DateTime.Now.AddDays(1),
-                Description = $@"Test entity to test {tuple.Item1.ToString()[..8]}",// take first 8 chars for visual uniqueness
-                IsOpen = tuple.Item2,// known state.
-            }));
-
-        context.SaveChanges();
     }
 
     [Fact]
     public async Task Get_CanGetAll_ReturnOkObjectResultAndNonNullValue()
     {
+        // Arrange
         // Act
         var response = await _sutController.GetUserInteractions();
 
@@ -73,8 +49,11 @@ public class UserInteractionQueryTests : IDisposable
     [Fact]
     public async Task Get_CanGetSingleById_ReturnOkObjectResultAndNonNullValue()
     {
+        // Arrange+
+        Guid knownId = _knownEntityIds.First().Id;
+
         // Act
-        var response = await _sutController.GetUserInteraction(_knownEntityIds[0].Item1);
+        var response = await _sutController.GetUserInteraction(knownId);
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -85,17 +64,21 @@ public class UserInteractionQueryTests : IDisposable
     [Fact]
     public async Task Get_CanGetSingleById_ReturnDtoWithCorrectId()
     {
+        // Arrange+
+        Guid knownId = _knownEntityIds.First(known => known.IsOpen).Id;
+
         // Act
-        var response = await _sutController.GetUserInteraction(_knownEntityIds[1].Item1);
+        var response = await _sutController.GetUserInteraction(knownId);
 
         // Assert
         response.Result.As<OkObjectResult>().Value.As<UserInteractionDto>()
-                .Id.Should().Be(_knownEntityIds[1].Item1);
+                .Id.Should().Be(knownId);
     }
 
     [Fact]
     public async Task Get_CannotGetUsingNonExistingId_ReturnNotFoundResult()
     {
+        // Arrange
         // Act
         var response = await _sutController.GetUserInteraction(Guid.NewGuid());
 
@@ -130,7 +113,6 @@ public class UserInteractionQueryTests : IDisposable
                  .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
                  .Which.Should().HaveCountGreaterThan(0);
     }
-
 
     [Fact]
     public async Task Get_CanFilteredIsOpenFalse_ReturnSome()
