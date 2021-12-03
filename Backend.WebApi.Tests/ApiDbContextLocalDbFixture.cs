@@ -38,7 +38,7 @@ public class ApiDbContextLocalDbFixture : IDisposable
     /// Optional. Use transactions in Facts/Theories to roll back data in test if it is necessary!
     /// </summary>
     /// <param name="transaction">Transaction instance, that is given to EF.</param>
-    public ApiDbContext CreateContext(DbTransaction transaction = null)
+    public ApiDbContext CreateContext(DbTransaction? transaction = default)
     {
         var modelBuilder = new DbContextOptionsBuilder<ApiDbContext>().UseSqlServer(Connection);
 
