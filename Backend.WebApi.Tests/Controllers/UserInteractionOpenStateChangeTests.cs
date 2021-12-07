@@ -42,7 +42,7 @@ public class UserInteractionOpenStateChangeTests : IDisposable
         response.Should().BeOfType<NoContentResult>().And.NotBeNull();
 
         var interactionModel = newContext.UserInteraction.Find(_entityId);
-        interactionModel.IsOpen.Should().BeFalse();
+        interactionModel?.IsOpen.Should().BeFalse();
     }
 
     /// <summary>
