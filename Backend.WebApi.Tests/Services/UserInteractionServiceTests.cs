@@ -69,7 +69,7 @@ public class UserInteractionServiceTests : IDisposable
     public async Task SetOpenState_CurrentlyOpenInteraction_WasSetToClosed()
     {
         // Arrange+
-        var known = _knownEntitesIdIsOpen.Single(k => k.IsOpen);
+        var known = _knownEntitesIdIsOpen.First(k => k.IsOpen);
 
         // Act
         var (succeed, errors) = await _sutService.SetOpenState(
@@ -81,7 +81,7 @@ public class UserInteractionServiceTests : IDisposable
         errors.Should().BeNullOrEmpty();
 
         using var context = _dbFixture.CreateContext();
-        context.UserInteraction.Should().
+        context.UserInteraction.Should().Contain(model => !model.IsOpen);
     }
 
     [Fact]
@@ -94,12 +94,11 @@ public class UserInteractionServiceTests : IDisposable
         var (succeed, errors) = await _sutService.SetOpenState(unknownId, true);
 
         // Assert
-        using (new AssertionScope())
-        {
-            succeed.Should().BeFalse();
-            errors.Should().NotBeNullOrEmpty();
-            errors.Select(error => error.ResultType).Should().Contain(ServiceResultType.NotFound);
-        }
+        using var _ = new AssertionScope();
+        succeed.Should().BeFalse();
+        errors.Should().NotBeNullOrEmpty();
+        errors.Select(error => error.ResultType).Should().Contain(ServiceResultType.NotFound);
+
     }
 
     [Fact]
