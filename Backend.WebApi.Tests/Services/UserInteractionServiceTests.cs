@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Backend.WebApi.Data.EF;
+using Backend.WebApi.Dto;
 using Backend.WebApi.MapperExtensions;
 using Backend.WebApi.Model;
 using Backend.WebApi.Services;
@@ -16,10 +18,16 @@ namespace Backend.WebApi.Tests.Services;
 [Collection("ApiDbContext")]
 public class UserInteractionServiceTests : IDisposable
 {
+    private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionService _sutService;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContextLocalDbFixture _dbFixture;
+
+    static UserInteractionServiceTests()
+    {
+        _becauseKnownOrMoreEntitiesExpected = "test data may contain more models, but never less than known entities";
+    }
 
     public UserInteractionServiceTests(ApiDbContextLocalDbFixture dbFixture)
     {
@@ -33,48 +41,93 @@ public class UserInteractionServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetSome_FilterOpen_ReturnsCollectionFilteredByCriterion()
+    public async Task GetSome_FilterOpenWithoutProjection_ReturnsCollectionFilteredByCriterion()
     {
-        // Arrange+
+        // Arrange
+        Expression<Func<UserInteraction, bool>> filters = model => model.IsOpen;
+
         // Act
-        var result = await _sutService.GetSome<UserInteraction>(
-            filters: model => model.IsOpen
-        );
+        (IEnumerable<ServiceError>? errors, IList<UserInteraction>? models, int totalCount) =
+            await _sutService.GetSome<UserInteraction>(
+                filters: filters
+                );
 
         // Assert
-        using var _ = new AssertionScope();
-        result.Should().NotBeNull();
-        result.Should().HaveCountGreaterThan(0);
-        result.Should().Match(model => model.All(m => m.IsOpen));
+        using (AssertionScope _ = new())
+        {
+            errors.Should().BeNullOrEmpty();
+            models.Should().NotBeNullOrEmpty();
+            models.Should().Match(model => model.All(m => m.IsOpen));
+        }
+        totalCount.Should().BeGreaterThanOrEqualTo(
+            _knownEntitesIdIsOpen.Length,
+            _becauseKnownOrMoreEntitiesExpected
+            );
     }
 
     [Fact]
-    public async Task GetSome_FilterClosedAndProjectToDto_ReturnsCollectionFilteredByCriterion()
+    public async Task GetSome_FilterClosedWithoutProjection_ReturnsCollectionFilteredByCriterion()
     {
-        // Arrange+
+        // Arrange
+        Expression<Func<UserInteraction, UserInteractionDto>> projection = model => model.ToDto();
+        Expression<Func<UserInteraction, bool>> filters = model => !model.IsOpen;
+
         // Act
-        IEnumerable<Dto.UserInteractionDto>? result = await _sutService.GetSome(
-            projection: model => model.ToDto(),
-            filters: model => !model.IsOpen
-        );
+        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? models, int totalCount) =
+            await _sutService.GetSome(
+                projection: projection,
+                filters: filters
+                );
 
         // Assert
-        using var _ = new AssertionScope();
-        result.Should().NotBeNull();
-        result.Should().HaveCountGreaterThan(0);
-        result.Should().Match(list => list.All(m => !m.IsOpen));
+        using (AssertionScope _ = new())
+        {
+            errors.Should().BeNullOrEmpty();
+            models.Should().NotBeNullOrEmpty();
+            models.Should().Match(list => list.All(m => !m.IsOpen));
+        };
+        totalCount.Should().BeGreaterThanOrEqualTo(
+            _knownEntitesIdIsOpen.Length,
+            _becauseKnownOrMoreEntitiesExpected
+            );
+    }
+
+    [Fact]
+    public async Task GetSome_ProjectToDto_ReturnsCollectionProjectedToDtoType()
+    {
+        // Arrange+
+        Expression<Func<UserInteraction, Dto.UserInteractionDto>> projection = model => model.ToDto();
+
+        // Act
+        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? modelsDto, int totalCount) =
+            await _sutService.GetSome(
+                projection: projection
+                );
+
+        // Assert
+        using (AssertionScope _ = new())
+        {
+            errors.Should().BeNullOrEmpty();
+            modelsDto.Should().NotBeNullOrEmpty();
+        }
+        totalCount.Should().BeGreaterThanOrEqualTo(
+            _knownEntitesIdIsOpen.Length,
+            _becauseKnownOrMoreEntitiesExpected
+            );
     }
 
     [Fact]
     public async Task SetOpenState_CurrentlyOpenInteraction_WasSetToClosed()
     {
         // Arrange+
-        var known = _knownEntitesIdIsOpen.First(k => k.IsOpen);
+        var (id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
 
         // Act
-        var (succeed, errors) = await _sutService.SetOpenState(
-            known.Id,
-            false);
+        var (succeed, errors) =
+            await _sutService.SetOpenState(
+                id,
+                false
+                );
 
         // Assert
         succeed.Should().BeTrue();
@@ -87,18 +140,21 @@ public class UserInteractionServiceTests : IDisposable
     [Fact]
     public async Task SetOpenState_NonExistingInteraction_ReturnNotFoundResultWithCorrectError()
     {
-        // Arrange
+        // Arrange+
         var unknownId = Guid.NewGuid();
 
         // Act
-        var (succeed, errors) = await _sutService.SetOpenState(unknownId, true);
+        var (succeed, errors) =
+            await _sutService.SetOpenState(
+                unknownId,
+                true
+                );
 
         // Assert
-        using var _ = new AssertionScope();
+        using AssertionScope _ = new();
         succeed.Should().BeFalse();
         errors.Should().NotBeNullOrEmpty();
-        errors.Select(error => error.ResultType).Should().Contain(ServiceResultType.NotFound);
-
+        errors.Select(error => error.ResultType).Should().Contain(ServiceResultType.NotFoundOnChange);
     }
 
     [Fact]
@@ -113,23 +169,20 @@ public class UserInteractionServiceTests : IDisposable
         var serviceQueryTime = DateTime.Now;
 
         // Act
-        var (succeed, createdModel, errors) = await _sutService.Create(correctNewModel);
+        var (errors, createdModel) =
+            await _sutService.Create(
+                correctNewModel
+                );
 
         // Assert
-        using (new AssertionScope())
-        {
-            succeed.Should().BeTrue();
-            errors.Should().BeNullOrEmpty();
-        }
-        using (new AssertionScope())
-        {
-            createdModel.Should().NotBeNull();
-            createdModel.Deadline.Should().Be(correctNewModel.Deadline);
-            createdModel.Description.Should().Be(correctNewModel.Description);
-            createdModel.Created.Should().BeAfter(serviceQueryTime);
-            createdModel.IsOpen.Should().BeTrue();
-            createdModel.Id.Should().NotBeEmpty();
-        }
+        errors.Should().BeNullOrEmpty();
+        using AssertionScope _ = new();
+        createdModel.Should().NotBeNull();
+        createdModel.Deadline.Should().Be(correctNewModel.Deadline);
+        createdModel.Description.Should().Be(correctNewModel.Description);
+        createdModel.Created.Should().BeAfter(serviceQueryTime);
+        createdModel.IsOpen.Should().BeTrue();
+        createdModel.Id.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -144,14 +197,13 @@ public class UserInteractionServiceTests : IDisposable
         };
 
         // Act
-        var (succeed, existingModel, errors) = await _sutService.Create(attemptedModel);
+        var (errors, existingModel) =
+            await _sutService.Create(
+                attemptedModel
+                );
 
         // Assert
-        using (new AssertionScope())
-        {
-            succeed.Should().BeFalse();
-            errors.Should().ContainSingle(error => error.ResultType == ServiceResultType.AlreadyExists);
-        }
+        errors.Should().ContainSingle(error => error.ResultType == ServiceResultType.AlreadyExistsOnCreate);
         using (new AssertionScope())
         {
             existingModel.Should().NotBeNull();
