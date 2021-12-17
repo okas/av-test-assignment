@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Backend.WebApi.Controllers;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
+using Backend.WebApi.Services;
 using Backend.WebApi.Tests.TestInfrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ public class UserInteractionQueryTests : IDisposable
         _knownEntityIds = Enumerable.Range(0, 5).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
         _sutDbContext = dbFixture.CreateContext();
         UserInteractionUtilities.SeedData(dbFixture, _knownEntityIds);
-        _sutController = new UserInteractionsController(_sutDbContext);
+        _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
 
     [Fact]

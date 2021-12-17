@@ -1,9 +1,7 @@
-using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
 using Backend.WebApi.MapperExtensions;
-using Backend.WebApi.Model;
+using Backend.WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.Controllers;
 
@@ -15,9 +13,12 @@ namespace Backend.WebApi.Controllers;
 [Produces("application/json")]
 public class UserInteractionsController : ControllerBase
 {
-    private readonly ApiDbContext _context;
+    private readonly UserInteractionService _service;
 
-    public UserInteractionsController(ApiDbContext context) => _context = context;
+    public UserInteractionsController(UserInteractionService service)
+    {
+        _service = service;
+    }
 
     /// <summary>
     /// Get User interactions. By default, all Interactions. Allows filtering by `IsOpen` property in query string.
@@ -28,10 +29,10 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen = null)
     {
-        var dtos = await _context.UserInteraction.AsNoTracking()
-            .Where(model => !isOpen.HasValue || model.IsOpen == isOpen)
-            .Select(model => model.ToDto())
-            .ToListAsync();
+        var (errors, dtos, totalCount) = await _service.GetSome(
+               model => model.ToDto(),
+               model => !isOpen.HasValue || model.IsOpen == isOpen
+               );
 
         return Ok(dtos);
     }
@@ -45,51 +46,13 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id)
     {
-        var model = await _context.UserInteraction.FindAsync(id);
-        if (model == null)
+        var (_, model) = await _service.GetOne(id);
+        if (model is null)
         {
             return NotFound();
         }
         // TODO describe all result types for API
         return Ok(model.ToDto());
-    }
-
-    /// <summary>
-    /// Update Userinteraction.
-    /// </summary>
-    /// <remarks>It do not allow fully to replace entity on given URI;
-    /// `Created` property is protected, because it cannot be updated by user.
-    /// </remarks>
-    [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionUpdateDto dto)
-    {
-        if (id != dto.Id)
-        {
-            return BadRequest();
-        }
-        // TODO might need .Created property protection?
-        _context.Entry(dto.ToModel()).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!UserInteractionExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-        return NoContent();
     }
 
     /// <summary>
@@ -110,26 +73,24 @@ public class UserInteractionsController : ControllerBase
             return BadRequest();
         }
 
-        var partialModel = new UserInteraction { Id = id, IsOpen = isOpenDto.IsOpen };
-        _context.Attach(partialModel).Property(model => model.IsOpen).IsModified = true;
+        //var partialModel = new UserInteraction { Id = id, IsOpen = isOpenDto.IsOpen };
+        //_context.Attach(partialModel).Property(model => model.IsOpen).IsModified = true;
 
-        try
+        var errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
+
+        if (errors is null || !errors.Any())
         {
-            await _context.SaveChangesAsync();
+            return NoContent();
         }
-        catch (DbUpdateConcurrencyException)
+
+        if (errors.Any(err => err.ResultType == ServiceResultType.NotFoundOnChange))
         {
-            if (!UserInteractionExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
+            return NotFound();
         }
-        // TODO describe all result types for API
-        return NoContent();
+
+        var (_, _, exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
+
+        throw exceptions.First();
     }
 
     /// <summary>
@@ -141,41 +102,29 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto)
     {
-        // Map to model and add to DbContext, return reference to model.
-        var model = _context.UserInteraction.Add(newDto.ToModel()).Entity;
+        var (errors, model) = await _service.Create(newDto.ToModel());
 
-        // These values setup is system's responsibility, thus doing it here.
-        model.IsOpen = true;
-        model.Created = DateTime.Now;
-
-        try
+        if (errors is null || !errors.Any())
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            return HandleDbUpdateException(ex);
-        }
-        catch (Exception)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Some unexpected error occured. Sorry.");
+            return CreatedAtAction(nameof(GetUserInteraction), new { id = model.Id }, model.ToDto());
         }
 
-        return CreatedAtAction(nameof(GetUserInteraction), new { id = model.Id }, model.ToDto());
-    }
+        ServiceError error;
+        error = errors.First(err => err.ResultType == ServiceResultType.AlreadyExistsOnCreate);
+        if (error is not null)
+        {
+            ModelState.AddModelError("", error.Message ?? "Duplicate entity error.");
+            return BadRequest(ModelState);
+        }
 
-    private bool UserInteractionExists(Guid id)
-    {
-        return _context.UserInteraction.Any(model => model.Id == id);
-    }
+        error = errors.First(err => err.ResultType == ServiceResultType.InternalError);
+        if (error is not null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
+        }
 
-    private ActionResult<UserInteractionDto> HandleDbUpdateException(DbUpdateException ex)
-    {
-        var errorMessage = ex.InnerException.Message.Contains("duplicat", StringComparison.InvariantCultureIgnoreCase)
-            ? "Attempted to insert duplicate contract: only one Contract can exists between Company and User."
-            : ex.InnerException.Message;
+        var (_, _, exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
 
-        ModelState.AddModelError("", errorMessage);
-        return BadRequest(ModelState);
+        throw exceptions.First();
     }
 }

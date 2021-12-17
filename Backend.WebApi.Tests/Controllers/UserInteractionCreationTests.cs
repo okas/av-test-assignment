@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Backend.WebApi.Controllers;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
+using Backend.WebApi.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
@@ -21,17 +22,14 @@ public class UserInteractionCreationTests : IDisposable
         //  //Arrange common code!
         // I think it is OK, because this class is instantiated for every test(method). 
         _sutDbContext = dbFixture.CreateContext();
-        _sutController = new UserInteractionsController(_sutDbContext);
+        _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
 
-    public UserInteractionNewDto CorrectNewDto
+    public UserInteractionNewDto CorrectNewDto => new()
     {
-        get => new()
-        {
-            Deadline = DateTime.Now.AddDays(1),
-            Description = _nonEmptyDescription,
-        };
-    }
+        Deadline = DateTime.Now.AddDays(1),
+        Description = _nonEmptyDescription,
+    };
 
     [Fact]
     public async Task Post_CanCreateInteraction_ReturnCreatedActionResultWithDtoInstance()

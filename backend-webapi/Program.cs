@@ -1,4 +1,5 @@
 using Backend.WebApi.Data.EF;
+using Backend.WebApi.Services;
 using Backend.WebApi.Swagger;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,8 @@ builder.Services.Configure<RouteOptions>(options =>
     options.LowercaseUrls = true;
     options.LowercaseQueryStrings = true;
 });
+
+builder.Services.AddScoped<UserInteractionService>();
 
 builder.Services.AddControllers().AddOData(c =>
 {
