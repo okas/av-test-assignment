@@ -37,7 +37,7 @@ public class UserInteractionService
         catch (Exception ex)
         {
             return (new ServiceError[] {
-                new(ServiceResultType.InternalError, Exceptions: ex)
+                new(ServiceErrorKind.InternalError, Exceptions: ex)
             }, default);
         }
     }
@@ -88,7 +88,7 @@ public class UserInteractionService
             if (!await _interactionsRepo.AnyAsync(model => model.Id == id))
             {
                 return new[] {
-                    new ServiceError(ServiceResultType.NotFoundOnChange)
+                    new ServiceError(ServiceErrorKind.NotFoundOnChange)
                 };
             }
             else
@@ -100,7 +100,7 @@ public class UserInteractionService
         catch (Exception ex)
         {
             return new[] {
-                new ServiceError(ServiceResultType.InternalError, Exceptions: ex)
+                new ServiceError(ServiceErrorKind.InternalError, Exceptions: ex)
             };
         }
     }
@@ -131,7 +131,7 @@ public class UserInteractionService
         {
             // TODO Log here.
             return (new[] {
-                new ServiceError(ServiceResultType.InternalError, _queryingErrorMessage, ex)
+                new ServiceError(ServiceErrorKind.InternalError, _queryingErrorMessage, ex)
             }, default);
         }
     }
@@ -190,7 +190,7 @@ public class UserInteractionService
         switch (dbException.InnerException)
         {
             case SqlException ex when ex.Number == 2627:
-                return new(ServiceResultType.AlreadyExistsOnCreate);
+                return new(ServiceErrorKind.AlreadyExistsOnCreate);
 
             default:
                 return GenerateInternaError(dbException);
@@ -199,6 +199,6 @@ public class UserInteractionService
 
     private static ServiceError GenerateInternaError(Exception ex)
     {
-        return new(ServiceResultType.InternalError, _createNewModelErrorMessage, ex);
+        return new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex);
     }
 }

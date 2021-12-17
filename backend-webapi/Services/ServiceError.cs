@@ -1,7 +1,7 @@
 ﻿namespace Backend.WebApi.Services;
 
 public record ServiceError(
-    ServiceResultType ResultType,
+    ServiceErrorKind Kind,
     string? Message = default,
     params Exception?[]? Exceptions
     );

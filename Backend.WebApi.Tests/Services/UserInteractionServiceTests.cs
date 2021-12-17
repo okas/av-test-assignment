@@ -152,7 +152,7 @@ public class UserInteractionServiceTests : IDisposable
 
         // Assert
         errors.Should().NotBeNullOrEmpty();
-        errors.Select(error => error.ResultType).Should().Contain(ServiceResultType.NotFoundOnChange);
+        errors.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class UserInteractionServiceTests : IDisposable
                 );
 
         // Assert
-        errors.Should().ContainSingle(error => error.ResultType == ServiceResultType.AlreadyExistsOnCreate);
+        errors.Should().ContainSingle(error => error.Kind == ServiceErrorKind.AlreadyExistsOnCreate);
         existingModel.Should().BeNull();
     }
 

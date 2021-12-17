@@ -83,7 +83,7 @@ public class UserInteractionsController : ControllerBase
             return NoContent();
         }
 
-        if (errors.Any(err => err.ResultType == ServiceResultType.NotFoundOnChange))
+        if (errors.Any(err => err.Kind == ServiceErrorKind.NotFoundOnChange))
         {
             return NotFound();
         }
@@ -110,14 +110,14 @@ public class UserInteractionsController : ControllerBase
         }
 
         ServiceError error;
-        error = errors.First(err => err.ResultType == ServiceResultType.AlreadyExistsOnCreate);
+        error = errors.First(err => err.Kind == ServiceErrorKind.AlreadyExistsOnCreate);
         if (error is not null)
         {
             ModelState.AddModelError("", error.Message ?? "Duplicate entity error.");
             return BadRequest(ModelState);
         }
 
-        error = errors.First(err => err.ResultType == ServiceResultType.InternalError);
+        error = errors.First(err => err.Kind == ServiceErrorKind.InternalError);
         if (error is not null)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
