@@ -13,6 +13,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 
+
 namespace Backend.WebApi.Tests.Services;
 
 [Collection("ApiDbContext")]
@@ -186,7 +187,7 @@ public class UserInteractionServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateNew_ModelAlreadyExists_ShouldNotSucceedAndReturnExistingModelAndError()
+    public async Task CreateNew_ModelAlreadyExists_ReturnsErrorOfAlreadyExistingAndNullModel()
     {
         // Arrange+
         UserInteraction attemptedModel = new()
@@ -204,14 +205,7 @@ public class UserInteractionServiceTests : IDisposable
 
         // Assert
         errors.Should().ContainSingle(error => error.ResultType == ServiceResultType.AlreadyExistsOnCreate);
-        using (new AssertionScope())
-        {
-            existingModel.Should().NotBeNull();
-            existingModel.Deadline.Should().BeAfter(DateTime.MinValue);
-            existingModel.Description.Should().NotBeNullOrEmpty();
-            existingModel.Created.Should().BeAfter(DateTime.MinValue);
-            existingModel.Id.Should().Be(attemptedModel.Id);
-        }
+        existingModel.Should().BeNull();
     }
 
     /// <summary>

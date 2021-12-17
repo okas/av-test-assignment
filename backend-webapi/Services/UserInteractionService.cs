@@ -16,8 +16,7 @@ public class UserInteractionService
 
     static UserInteractionService()
     {
-        _queryingErrorMessage = $@"{nameof(UserInteractionService)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
-
+        _queryingErrorMessage = $"{nameof(UserInteractionService)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
         _createNewModelErrorMessage = $"Attempted to create new `{nameof(UserInteraction)}`, but operation was cancelled unexpectedly. See excpetion details.";
     }
 
@@ -167,6 +166,8 @@ public class UserInteractionService
 
     private async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> TryCreate(UserInteraction newModel)
     {
+        ServiceError error;
+
         try
         {
             _interactionsRepo.Add(newModel);
@@ -175,23 +176,28 @@ public class UserInteractionService
         }
         catch (DbUpdateException ex)
         {
-            return HandleCreateModelException(ex);
+            // TODO Log it
+            error = HandleDbUpdateException(ex);
         }
         catch (Exception ex)
         {
-            return (new[] {
-                new ServiceError(ServiceResultType.InternalError, _createNewModelErrorMessage, ex)
-            }, default);
+            // TODO Log it
+            error = new ServiceError(ServiceResultType.InternalError, _createNewModelErrorMessage, ex);
         }
+
+        return (new[] { error }, default);
     }
 
-    private (IEnumerable<ServiceError>? errors, UserInteraction? model) HandleCreateModelException(DbUpdateException ex)
+    private ServiceError HandleDbUpdateException(DbUpdateException dbException)
     {
-        if (ex.InnerException is SqlException)
+        switch (dbException.InnerException)
         {
+            case SqlException ex when ex.Number == 2627:
+                return new(ServiceResultType.AlreadyExistsOnCreate);
 
+            default:
+                return new(ServiceResultType.InternalError, _createNewModelErrorMessage, dbException);
         }
-        return default;
     }
 }
 
