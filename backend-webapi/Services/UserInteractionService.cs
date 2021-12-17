@@ -124,7 +124,8 @@ public class UserInteractionService
     {
         try
         {
-            return (default, await RunGetSomeToList(query, projection));
+            return (default,
+                await RunGetSomeToList(query, projection));
         }
         catch (Exception ex)
         {
@@ -171,15 +172,16 @@ public class UserInteractionService
         catch (DbUpdateException ex)
         {
             // TODO Log it
-            return (new[] { HandleDbUpdateException(ex) },
-                default);
+            return (new[] {
+                HandleDbUpdateException(ex)
+            }, default);
         }
         catch (Exception ex)
         {
             // TODO Log it
             return (new[] {
-                new ServiceError(ServiceResultType.InternalError, _createNewModelErrorMessage, ex) },
-                default);
+                GenerateInternaError(ex)
+            }, default);
         }
     }
 
@@ -191,31 +193,12 @@ public class UserInteractionService
                 return new(ServiceResultType.AlreadyExistsOnCreate);
 
             default:
-                return new(ServiceResultType.InternalError, _createNewModelErrorMessage, dbException);
+                return GenerateInternaError(dbException);
         }
     }
-}
 
-public record ServiceError(ServiceResultType ResultType, string? Message = default, params Exception?[]? Exceptions);
-
-/// <summary>
-/// Typest that indicate what went in Service wrong while called action.
-/// </summary>
-public enum ServiceResultType
-{
-    /// <summary>
-    /// Entity not found result on change operation.
-    /// </summary>
-    /// <remarks>Not intended to use on query operations where entity is not found.</remarks>
-    NotFoundOnChange,
-
-    /// <summary>
-    /// Entit already exists in database result.
-    /// </summary>
-    AlreadyExistsOnCreate,
-
-    /// <summary>
-    /// Something unknown and serious happened result.
-    /// </summary>
-    InternalError,
+    private static ServiceError GenerateInternaError(Exception ex)
+    {
+        return new(ServiceResultType.InternalError, _createNewModelErrorMessage, ex);
+    }
 }
