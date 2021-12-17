@@ -124,14 +124,13 @@ public class UserInteractionServiceTests : IDisposable
         var (id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
 
         // Act
-        var (succeed, errors) =
+        var errors =
             await _sutService.SetOpenState(
                 id,
                 false
                 );
 
         // Assert
-        succeed.Should().BeTrue();
         errors.Should().BeNullOrEmpty();
 
         using var context = _dbFixture.CreateContext();
@@ -145,15 +144,13 @@ public class UserInteractionServiceTests : IDisposable
         var unknownId = Guid.NewGuid();
 
         // Act
-        var (succeed, errors) =
+        var errors =
             await _sutService.SetOpenState(
                 unknownId,
                 true
                 );
 
         // Assert
-        using AssertionScope _ = new();
-        succeed.Should().BeFalse();
         errors.Should().NotBeNullOrEmpty();
         errors.Select(error => error.ResultType).Should().Contain(ServiceResultType.NotFoundOnChange);
     }

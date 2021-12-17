@@ -30,7 +30,9 @@ public class UserInteractionService
     {
         try
         {
-            return (default, await _interactionsRepo.AsNoTracking().FirstOrDefaultAsync(model => model.Id == id));
+            return (default,
+                await _interactionsRepo.AsNoTracking().FirstOrDefaultAsync(model => model.Id == id)
+                );
         }
         catch (Exception ex)
         {
@@ -67,7 +69,7 @@ public class UserInteractionService
         return (errors, models, total);
     }
 
-    public async Task<(bool succeed, IEnumerable<ServiceError>? errors)> SetOpenState(Guid id, bool newState)
+    public async Task<IEnumerable<ServiceError>?> SetOpenState(Guid id, bool newState)
     {
         _context.Attach(new UserInteraction
         {
@@ -79,14 +81,15 @@ public class UserInteractionService
         try
         {
             await _context.SaveChangesAsync();
+            return default;
         }
         catch (DbUpdateConcurrencyException)
         {
             if (!await _interactionsRepo.AnyAsync(model => model.Id == id))
             {
-                return (false, new[] {
+                return new[] {
                     new ServiceError(ServiceResultType.NotFoundOnChange)
-                });
+                };
             }
             else
             {
@@ -96,12 +99,10 @@ public class UserInteractionService
         }
         catch (Exception ex)
         {
-            return (false, new[] {
+            return new[] {
                 new ServiceError(ServiceResultType.InternalError, Exceptions: ex)
-            });
+            };
         }
-
-        return (true, default);
     }
 
     /// <summary>
@@ -121,22 +122,17 @@ public class UserInteractionService
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection)
     {
-        ServiceError[]? errors = default;
-        IList<Tout>? models = default;
-
         try
         {
-            models = await RunGetSomeToList(query, projection);
+            return (default, await RunGetSomeToList(query, projection));
         }
         catch (Exception ex)
         {
             // TODO Log here.
-            errors = new[] {
+            return (new[] {
                 new ServiceError(ServiceResultType.InternalError, _queryingErrorMessage, ex)
-            };
+            }, default);
         }
-
-        return (errors, models);
     }
 
     /// <summary>
@@ -166,8 +162,6 @@ public class UserInteractionService
 
     private async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> TryCreate(UserInteraction newModel)
     {
-        ServiceError error;
-
         try
         {
             _interactionsRepo.Add(newModel);
@@ -177,15 +171,16 @@ public class UserInteractionService
         catch (DbUpdateException ex)
         {
             // TODO Log it
-            error = HandleDbUpdateException(ex);
+            return (new[] { HandleDbUpdateException(ex) },
+                default);
         }
         catch (Exception ex)
         {
             // TODO Log it
-            error = new ServiceError(ServiceResultType.InternalError, _createNewModelErrorMessage, ex);
+            return (new[] {
+                new ServiceError(ServiceResultType.InternalError, _createNewModelErrorMessage, ex) },
+                default);
         }
-
-        return (new[] { error }, default);
     }
 
     private ServiceError HandleDbUpdateException(DbUpdateException dbException)
