@@ -1,5 +1,5 @@
 using Backend.WebApi.Dto;
-using Backend.WebApi.MapperExtensions;
+using Backend.WebApi.Model;
 using Backend.WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,10 +29,11 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen = null)
     {
-        var (errors, dtos, totalCount) = await _service.GetSome(
-               model => model.ToDto(),
-               model => !isOpen.HasValue || model.IsOpen == isOpen
-               );
+        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? dtos, int totalCount) =
+            await _service.GetSome(
+                UserInteractionDto.Projection,
+                model => !isOpen.HasValue || model.IsOpen == isOpen
+                );
 
         return Ok(dtos);
     }
@@ -46,13 +47,13 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id)
     {
-        var (_, model) = await _service.GetOne(id);
+        (_, UserInteraction? model) = await _service.GetOne(id);
         if (model is null)
         {
             return NotFound();
         }
         // TODO describe all result types for API
-        return Ok(model.ToDto());
+        return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
     }
 
     /// <summary>
@@ -76,7 +77,7 @@ public class UserInteractionsController : ControllerBase
         //var partialModel = new UserInteraction { Id = id, IsOpen = isOpenDto.IsOpen };
         //_context.Attach(partialModel).Property(model => model.IsOpen).IsModified = true;
 
-        var errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
+        IEnumerable<ServiceError>? errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
 
         if (errors is null || !errors.Any())
         {
@@ -88,7 +89,7 @@ public class UserInteractionsController : ControllerBase
             return NotFound();
         }
 
-        var (_, _, exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
+        (_, _, Exception[] exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
 
         throw exceptions.First();
     }
@@ -102,11 +103,19 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto)
     {
-        var (errors, model) = await _service.Create(newDto.ToModel());
+        (IEnumerable<ServiceError>? errors, UserInteraction? model) = await _service.Create(new()
+        {
+            Description = newDto.Description,
+            Deadline = newDto.Deadline,
+        });
 
         if (errors is null || !errors.Any())
         {
-            return CreatedAtAction(nameof(GetUserInteraction), new { id = model.Id }, model.ToDto());
+            return CreatedAtAction(
+                nameof(GetUserInteraction),
+                new { id = model.Id },
+                UserInteractionDto.Projection.Compile().Invoke(model)
+                );
         }
 
         ServiceError error;
@@ -123,7 +132,7 @@ public class UserInteractionsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
         }
 
-        var (_, _, exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
+        (_, _, Exception[] exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
 
         throw exceptions.First();
     }

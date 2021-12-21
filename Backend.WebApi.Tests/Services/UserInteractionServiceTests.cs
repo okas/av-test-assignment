@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
-using Backend.WebApi.MapperExtensions;
 using Backend.WebApi.Model;
 using Backend.WebApi.Services;
 using Backend.WebApi.Tests.TestInfrastructure;
@@ -70,7 +69,12 @@ public class UserInteractionServiceTests : IDisposable
     public async Task GetSome_FilterClosedWithoutProjection_ReturnsCollectionFilteredByCriterion()
     {
         // Arrange
-        Expression<Func<UserInteraction, UserInteractionDto>> projection = model => model.ToDto();
+        Expression<Func<UserInteraction, UserInteractionDto>> projection = model => new()
+        {
+            Description = model.Description,
+            Deadline = model.Deadline,
+        };
+
         Expression<Func<UserInteraction, bool>> filters = model => !model.IsOpen;
 
         // Act
@@ -97,7 +101,11 @@ public class UserInteractionServiceTests : IDisposable
     public async Task GetSome_ProjectToDto_ReturnsCollectionProjectedToDtoType()
     {
         // Arrange+
-        Expression<Func<UserInteraction, Dto.UserInteractionDto>> projection = model => model.ToDto();
+        Expression<Func<UserInteraction, UserInteractionDto>> projection = model => new()
+        {
+            Description = model.Description,
+            Deadline = model.Deadline,
+        };
 
         // Act
         (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? modelsDto, int totalCount) =
@@ -121,10 +129,10 @@ public class UserInteractionServiceTests : IDisposable
     public async Task SetOpenState_CurrentlyOpenInteraction_WasSetToClosed()
     {
         // Arrange+
-        var (id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
+        (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
 
         // Act
-        var errors =
+        IEnumerable<ServiceError>? errors =
             await _sutService.SetOpenState(
                 id,
                 false
@@ -133,7 +141,7 @@ public class UserInteractionServiceTests : IDisposable
         // Assert
         errors.Should().BeNullOrEmpty();
 
-        using var context = _dbFixture.CreateContext();
+        using ApiDbContext context = _dbFixture.CreateContext();
         context.UserInteraction.Should().Contain(model => !model.IsOpen);
     }
 
@@ -141,10 +149,10 @@ public class UserInteractionServiceTests : IDisposable
     public async Task SetOpenState_NonExistingInteraction_ReturnNotFoundResultWithCorrectError()
     {
         // Arrange+
-        var unknownId = Guid.NewGuid();
+        Guid unknownId = Guid.NewGuid();
 
         // Act
-        var errors =
+        IEnumerable<ServiceError>? errors =
             await _sutService.SetOpenState(
                 unknownId,
                 true
@@ -164,10 +172,10 @@ public class UserInteractionServiceTests : IDisposable
             Deadline = DateTime.Now.AddDays(1),
             Description = "Non-empty"
         };
-        var serviceQueryTime = DateTime.Now;
+        DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        var (errors, createdModel) =
+        (IEnumerable<ServiceError>? errors, UserInteraction? createdModel) =
             await _sutService.Create(
                 correctNewModel
                 );
@@ -195,7 +203,7 @@ public class UserInteractionServiceTests : IDisposable
         };
 
         // Act
-        var (errors, existingModel) =
+        (IEnumerable<ServiceError>? errors, UserInteraction? existingModel) =
             await _sutService.Create(
                 attemptedModel
                 );
