@@ -7,7 +7,11 @@ export default {
      */
     formatDateShort(date, locale = navigator.languages) {
       const d = new Date(date);
-      return new Intl.DateTimeFormat(locale, { dateStyle: "short" }).format(d);
+      if (d == "Invalid Date") {
+        return d;
+      }
+      const options = { dateStyle: "short" };
+      return new Intl.DateTimeFormat(locale, options).format(d);
     },
 
     /**
@@ -18,7 +22,10 @@ export default {
      */
     formatDateTimeShortDateShortTime(date, locale = navigator.languages) {
       const d = new Date(date);
-      var options = {
+      if (d == "Invalid Date") {
+        return d;
+      }
+      const options = {
         year: "numeric",
         month: "short",
         day: "numeric",
