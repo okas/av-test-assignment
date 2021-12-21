@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "localhost (Chrome)",
+      "runtimeArgs": [ "--auto-open-devtools-for-tabs" ],
+      "url": "https://localhost:5002",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-userdatadir"
+    },
+    {
+      "type": "edge",
+      "request": "launch",
+      "name": "localhost (Edge)",
+      "runtimeArgs": [ "--auto-open-devtools-for-tabs" ],
+      "url": "https://localhost:5002",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-userdatadir"
+    }
+  ]
+}
