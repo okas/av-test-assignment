@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.WebApi.ValidationExtensions;
 
 namespace Backend.WebApi.Dto;
 
@@ -8,7 +9,7 @@ namespace Backend.WebApi.Dto;
 /// </summary>
 public class UserInteractionIsOpenDto
 {
-    [Required]
+    [NotDefault]
     public Guid Id { get; set; }
 
     [Required]

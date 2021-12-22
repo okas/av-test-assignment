@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Backend.WebApi.Model;
+using Backend.WebApi.ValidationExtensions;
 
 namespace Backend.WebApi.Dto;
 
@@ -8,6 +9,7 @@ namespace Backend.WebApi.Dto;
 /// </summary>
 public class UserInteractionDto
 {
+    [NotDefault]
     public Guid Id { get; set; }
 
     public string Description { get; set; }

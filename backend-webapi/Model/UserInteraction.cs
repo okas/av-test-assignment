@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.WebApi.ValidationExtensions;
 
 namespace Backend.WebApi.Model;
 
@@ -7,6 +8,7 @@ namespace Backend.WebApi.Model;
 /// </summary>
 public class UserInteraction
 {
+    [NotDefault]
     public Guid Id { get; set; }
 
     public DateTime Created { get; set; }
