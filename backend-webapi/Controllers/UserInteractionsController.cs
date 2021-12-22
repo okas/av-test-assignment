@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Backend.WebApi.Dto;
 using Backend.WebApi.Model;
 using Backend.WebApi.Services;
@@ -13,7 +14,13 @@ namespace Backend.WebApi.Controllers;
 [Produces("application/json")]
 public class UserInteractionsController : ControllerBase
 {
+    private static readonly string _noExceptionInErrorMessage;
     private readonly UserInteractionService _service;
+
+    static UserInteractionsController()
+    {
+        _noExceptionInErrorMessage = $"For developer: {nameof(UserInteractionService)} returned error result, but exception is not found.";
+    }
 
     public UserInteractionsController(UserInteractionService service)
     {
@@ -29,11 +36,10 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen = null)
     {
+        Expression<Func<UserInteraction, bool>> filters = model => !isOpen.HasValue || model.IsOpen == isOpen;
+
         (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? dtos, int totalCount) =
-            await _service.GetSome(
-                UserInteractionDto.Projection,
-                model => !isOpen.HasValue || model.IsOpen == isOpen
-                );
+            await _service.GetSome(UserInteractionDto.Projection, filters);
 
         return Ok(dtos);
     }
@@ -48,12 +54,13 @@ public class UserInteractionsController : ControllerBase
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id)
     {
         (_, UserInteraction? model) = await _service.GetOne(id);
-        if (model is null)
+
+        if (model is not null)
         {
-            return NotFound();
+            return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
         }
-        // TODO describe all result types for API
-        return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
+
+        return NotFound();
     }
 
     /// <summary>
@@ -73,9 +80,6 @@ public class UserInteractionsController : ControllerBase
         {
             return BadRequest();
         }
-
-        //var partialModel = new UserInteraction { Id = id, IsOpen = isOpenDto.IsOpen };
-        //_context.Attach(partialModel).Property(model => model.IsOpen).IsModified = true;
 
         IEnumerable<ServiceError>? errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
 
@@ -111,29 +115,25 @@ public class UserInteractionsController : ControllerBase
 
         if (errors is null || !errors.Any())
         {
-            return CreatedAtAction(
-                nameof(GetUserInteraction),
-                new { id = model.Id },
-                UserInteractionDto.Projection.Compile().Invoke(model)
-                );
+            UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(model);
+
+            return CreatedAtAction(nameof(GetUserInteraction), new { id = model.Id }, dto);
         }
 
-        ServiceError error;
-        error = errors.First(err => err.Kind == ServiceErrorKind.AlreadyExistsOnCreate);
-        if (error is not null)
+        if (errors.First(err => err.Kind == ServiceErrorKind.AlreadyExistsOnCreate) is ServiceError error1)
         {
-            ModelState.AddModelError("", error.Message ?? "Duplicate entity error.");
+            ModelState.AddModelError("", error1.Message ?? "Duplicate entity error.");
+
             return BadRequest(ModelState);
         }
 
-        error = errors.First(err => err.Kind == ServiceErrorKind.InternalError);
-        if (error is not null)
+        if (errors.First(err => err.Kind == ServiceErrorKind.InternalError) is ServiceError error2)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, error.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, error2.Message);
         }
 
-        (_, _, Exception[] exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
+        (_, _, Exception?[]? exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
 
-        throw exceptions.First();
+        throw exceptions?.First() ?? new Exception(_noExceptionInErrorMessage);
     }
 }
