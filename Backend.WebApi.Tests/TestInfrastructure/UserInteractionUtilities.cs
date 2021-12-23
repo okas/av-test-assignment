@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Backend.WebApi.Data.EF;
 using Backend.WebApi.Model;
 
 namespace Backend.WebApi.Tests.TestInfrastructure;
@@ -20,7 +21,7 @@ public static class UserInteractionUtilities
             throw new ArgumentException("Lähteandmed on nõutud entity'te genereerimiseks", nameof(knownEntityIds));
         }
 
-        var entities = knownEntityIds.Select(known =>
+        UserInteraction[] entities = knownEntityIds.Select(known =>
             new UserInteraction()
             {
                 Id = known.Id,
@@ -28,15 +29,15 @@ public static class UserInteractionUtilities
                 Deadline = DateTime.Now.AddDays(1),
                 Description = TestNameGenerator(known.Id),
                 IsOpen = known.IsOpen,
-            });
+            })
+            .ToArray();
 
-        using var context = dbFixture.CreateContext();
+        using ApiDbContext context = dbFixture.CreateContext();
 
         context.UserInteraction.AddRange(entities);
 
         context.SaveChanges();
     }
 
-    private static string TestNameGenerator(Guid knownId) =>
-        $@"Test entity to test {knownId.ToString()[..8]}";
+    private static string TestNameGenerator(Guid knownId) => $@"Test entity to test {knownId.ToString()[..8]}";
 }
