@@ -13,17 +13,11 @@ public static class IQueryableExtensions
     /// <returns>Updated query, chainable.</returns>
     public static IQueryable<T> AppendFiltersToQuery<T>(this IQueryable<T> query, params Expression<Func<T, bool>>?[]? filters)
     {
-        if (filters?.Any() ?? false)
+        if (filters is null)
         {
-            foreach (var predicate in filters)
-            {
-                if (predicate != null)
-                {
-                    query = query.Where(predicate);
-                }
-            }
+            return query;
         }
 
-        return query;
+        return filters.Aggregate(query, (seed, predicate) => predicate is not null ? seed.Where(predicate) : seed);
     }
 }
