@@ -40,85 +40,29 @@ public class UserInteractionServiceTests : IDisposable
         _sutService = new UserInteractionService(_sutDbContext);
     }
 
-    [Fact]
-    public async Task Get_FilterOpenWithoutProjection_ReturnsFilteredCollection()
-    {
-        // Arrange
-        Expression<Func<UserInteraction, bool>> filters = model => model.IsOpen;
-
-        // Act
-        (IEnumerable<ServiceError>? errors, IList<UserInteraction>? models, int totalCount) =
-            await _sutService.Get<UserInteraction>(
-                filters: filters
-                );
-
-        // Assert
-        using (AssertionScope _ = new())
-        {
-            errors.Should().BeNullOrEmpty();
-            models.Should().NotBeNullOrEmpty();
-            models.Should().Match(model => model.All(m => m.IsOpen));
-        }
-        totalCount.Should().BeGreaterThanOrEqualTo(
-            _knownEntitesIdIsOpen.Length,
-            _becauseKnownOrMoreEntitiesExpected
-            );
-    }
-
-    [Fact]
-    public async Task Get_FilterClosedWithoutProjection_ReturnsFilteredCollection()
-    {
-        // Arrange
-        Expression<Func<UserInteraction, UserInteractionDto>> projection = model => new()
-        {
-            Description = model.Description,
-            Deadline = model.Deadline,
-        };
-
-        Expression<Func<UserInteraction, bool>> filters = model => !model.IsOpen;
-
-        // Act
-        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? models, int totalCount) =
-            await _sutService.Get(
-                projection: projection,
-                filters: filters
-                );
-
-        // Assert
-        using (AssertionScope _ = new())
-        {
-            errors.Should().BeNullOrEmpty();
-            models.Should().NotBeNullOrEmpty();
-            models.Should().Match(list => list.All(m => !m.IsOpen));
-        };
-        totalCount.Should().BeGreaterThanOrEqualTo(
-            _knownEntitesIdIsOpen.Length,
-            _becauseKnownOrMoreEntitiesExpected
-            );
-    }
-
-    [Fact]
-    public async Task Get_ProjectToDto_ReturnsProjectedCollection()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Get_FilteredByIsOpenWithProjectToDto_ReturnsFilteredProjectedCollection(bool isOpenTestValue)
     {
         // Arrange+
-        Expression<Func<UserInteraction, UserInteractionDto>> projection = model => new()
-        {
-            Description = model.Description,
-            Deadline = model.Deadline,
-        };
+        Expression<Func<UserInteraction, bool>> filter = model => model.IsOpen == isOpenTestValue;
 
         // Act
         (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? modelsDto, int totalCount) =
-            await _sutService.Get(
-                projection: projection
-                );
+             await _sutService.Get(
+                 projection: UserInteractionDto.Projection,
+                 filters: filter
+                 );
 
         // Assert
-        using (AssertionScope _ = new())
+        using (new AssertionScope())
         {
             errors.Should().BeNullOrEmpty();
             modelsDto.Should().NotBeNullOrEmpty();
+            modelsDto.Should().OnlyContain(d => d.IsOpen == isOpenTestValue);
         }
+
         totalCount.Should().BeGreaterThanOrEqualTo(
             _knownEntitesIdIsOpen.Length,
             _becauseKnownOrMoreEntitiesExpected
@@ -182,6 +126,7 @@ public class UserInteractionServiceTests : IDisposable
 
         // Assert
         errors.Should().BeNullOrEmpty();
+
         using AssertionScope _ = new();
         createdModel.Should().NotBeNull();
         createdModel.Deadline.Should().Be(correctNewModel.Deadline);
@@ -214,11 +159,7 @@ public class UserInteractionServiceTests : IDisposable
     }
 
     /// <summary>
-    /// Clean up arranged resources of tests
+    /// Clean up test class level arrangements.
     /// </summary>
-    public void Dispose()
-    {
-        // Clean up test class level Arranged resources
-        _sutDbContext.Dispose();
-    }
+    public void Dispose() => _sutDbContext.Dispose();
 }
