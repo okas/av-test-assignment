@@ -10,14 +10,14 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.Controllers;
 
-[Collection("ApiDbContext")]
+[Collection("ApiLocalDb")]
 public class UserInteractionCreationTests : IDisposable
 {
-    const string _nonEmptyDescription = "Non-empty";
+    private const string _nonEmptyDescription = "Non-empty";
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
-    public UserInteractionCreationTests(ApiDbContextLocalDbFixture dbFixture)
+    public UserInteractionCreationTests(ApiLocalDbFixture dbFixture)
     {
         //  //Arrange common code!
         // I think it is OK, because this class is instantiated for every test(method). 

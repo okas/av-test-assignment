@@ -7,19 +7,19 @@ using Xunit;
 
 namespace Backend.WebApi.Tests;
 
-public class ApiDbContextLocalDbFixture : IDisposable
+public class ApiLocalDbFixture : IDisposable
 {
     private static readonly string _localDbConnectionString;
     private static readonly object _lock;
-    private static bool _databaseInitialized;
+    private bool _databaseInitialized;
 
-    static ApiDbContextLocalDbFixture()
+    static ApiLocalDbFixture()
     {
         _localDbConnectionString = @"Server=(localdb)\mssqllocaldb;Database=av-test-assignment_webapi-tests;Trusted_Connection=True";
         _lock = new();
     }
 
-    public ApiDbContextLocalDbFixture()
+    public ApiLocalDbFixture()
     {
         Connection = new SqlConnection(_localDbConnectionString);
         InitializeCleanDatabase();
@@ -35,7 +35,7 @@ public class ApiDbContextLocalDbFixture : IDisposable
     public DbConnection Connection { get; }
 
     /// <summary>
-    /// Optional. Use transactions in Facts/Theories to roll back data in test if it is necessary!
+    /// Use transactions in Facts/Theories to roll back data in test if it is necessary!
     /// </summary>
     /// <param name="transaction">Transaction instance, that is given to EF.</param>
     public ApiDbContext CreateContext(DbTransaction? transaction = default)
@@ -72,8 +72,8 @@ public class ApiDbContextLocalDbFixture : IDisposable
     public void Dispose() => Connection.Dispose();
 }
 
-[CollectionDefinition("ApiDbContext")]
-public class ApiDbContextCollection : ICollectionFixture<ApiDbContextLocalDbFixture>
+[CollectionDefinition("ApiLocalDb")]
+public class ApiLocalDbCollection : ICollectionFixture<ApiLocalDbFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the

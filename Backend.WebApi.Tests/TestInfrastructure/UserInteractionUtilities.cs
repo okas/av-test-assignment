@@ -14,14 +14,14 @@ public static class UserInteractionUtilities
     /// Will use one-time DbContext to not to conflict with context used for testing.
     /// </remarks>
     /// <param name="dbFixture"></param>
-    public static void SeedData(ApiDbContextLocalDbFixture dbFixture, params (Guid Id, bool IsOpen)[] knownEntityIds)
+    public static void SeedData(ApiLocalDbFixture dbFixture, params (Guid Id, bool IsOpen)[] knownEntityIds)
     {
         if (!knownEntityIds.Any())
         {
             throw new ArgumentException("Lähteandmed on nõutud entity'te genereerimiseks", nameof(knownEntityIds));
         }
 
-        UserInteraction[] entities = knownEntityIds.Select(known =>
+        var entities = knownEntityIds.Select(known =>
             new UserInteraction()
             {
                 Id = known.Id,

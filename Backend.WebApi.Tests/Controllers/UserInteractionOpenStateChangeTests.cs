@@ -11,16 +11,16 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.Controllers;
 
-[Collection("ApiDbContext")]
+[Collection("ApiLocalDb")]
 public class UserInteractionOpenStateChangeTests : IDisposable
 {
-    private readonly ApiDbContextLocalDbFixture _dbFixture;
+    private readonly ApiLocalDbFixture _dbFixture;
     private readonly Guid _entityId;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
     // Arrange for tests
-    public UserInteractionOpenStateChangeTests(ApiDbContextLocalDbFixture dbFixture)
+    public UserInteractionOpenStateChangeTests(ApiLocalDbFixture dbFixture)
     {
         _dbFixture = dbFixture;
         _entityId = Guid.NewGuid();

@@ -15,21 +15,21 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.Services;
 
-[Collection("ApiDbContext")]
+[Collection("ApiLocalDb")]
 public class UserInteractionServiceTests : IDisposable
 {
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionService _sutService;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
-    private readonly ApiDbContextLocalDbFixture _dbFixture;
+    private readonly ApiLocalDbFixture _dbFixture;
 
     static UserInteractionServiceTests()
     {
         _becauseKnownOrMoreEntitiesExpected = "test data may contain more models, but never less than known entities";
     }
 
-    public UserInteractionServiceTests(ApiDbContextLocalDbFixture dbFixture)
+    public UserInteractionServiceTests(ApiLocalDbFixture dbFixture)
     {
         _dbFixture = dbFixture;
         // Arrange for tests

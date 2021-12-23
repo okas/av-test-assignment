@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.Controllers;
 
-[Collection("ApiDbContext")]
+[Collection("ApiLocalDb")]
 public class UserInteractionQueryTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntityIds;
@@ -24,7 +24,7 @@ public class UserInteractionQueryTests : IDisposable
     /// Uses DbTransaction to roll back changes after each test
     /// </summary>
     /// <param name="dbFixture"></param>
-    public UserInteractionQueryTests(ApiDbContextLocalDbFixture dbFixture)
+    public UserInteractionQueryTests(ApiLocalDbFixture dbFixture)
     {
         // Arrange for tests
         // Generate some unique ID's and their `IsOpen` states that will be known to an guaranteed to exist in DB during test.
