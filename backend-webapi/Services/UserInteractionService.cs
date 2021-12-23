@@ -52,11 +52,11 @@ public class UserInteractionService
     /// <param name="projection"></param>
     /// <param name="filters"></param>
     /// <returns></returns>
-    public async Task<(IEnumerable<ServiceError>? errors, IList<Tout>? models, int totalCount)> GetSome<Tout>(
+    public async Task<(IEnumerable<ServiceError>? errors, IList<Tout>? models, int totalCount)> Get<Tout>(
         Expression<Func<UserInteraction, Tout>>? projection = default,
         params Expression<Func<UserInteraction, bool>>?[]? filters)
     {
-        var filteredQuery = _interactionsRepo
+        IQueryable<UserInteraction>? filteredQuery = _interactionsRepo
             .AsNoTracking()
             .AppendFiltersToQuery(filters);
 
@@ -125,7 +125,7 @@ public class UserInteractionService
         try
         {
             return (default,
-                await RunGetSomeToList(query, projection));
+                await RunGetToList(query, projection));
         }
         catch (Exception ex)
         {
@@ -146,7 +146,7 @@ public class UserInteractionService
     /// <param name="query"></param>
     /// <param name="projection"></param>
     /// <returns></returns>
-    private static async Task<IList<Tout>?> RunGetSomeToList<Tout>(
+    private static async Task<IList<Tout>?> RunGetToList<Tout>(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection)
     {

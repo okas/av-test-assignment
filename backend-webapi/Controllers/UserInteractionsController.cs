@@ -39,7 +39,7 @@ public class UserInteractionsController : ControllerBase
         Expression<Func<UserInteraction, bool>> filters = model => !isOpen.HasValue || model.IsOpen == isOpen;
 
         (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? dtos, int totalCount) =
-            await _service.GetSome(UserInteractionDto.Projection, filters);
+            await _service.Get(UserInteractionDto.Projection, filters);
 
         return Ok(dtos);
     }

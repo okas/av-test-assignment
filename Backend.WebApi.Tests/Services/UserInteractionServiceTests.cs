@@ -41,14 +41,14 @@ public class UserInteractionServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetSome_FilterOpenWithoutProjection_ReturnsCollectionFilteredByCriterion()
+    public async Task Get_FilterOpenWithoutProjection_ReturnsFilteredCollection()
     {
         // Arrange
         Expression<Func<UserInteraction, bool>> filters = model => model.IsOpen;
 
         // Act
         (IEnumerable<ServiceError>? errors, IList<UserInteraction>? models, int totalCount) =
-            await _sutService.GetSome<UserInteraction>(
+            await _sutService.Get<UserInteraction>(
                 filters: filters
                 );
 
@@ -66,7 +66,7 @@ public class UserInteractionServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetSome_FilterClosedWithoutProjection_ReturnsCollectionFilteredByCriterion()
+    public async Task Get_FilterClosedWithoutProjection_ReturnsFilteredCollection()
     {
         // Arrange
         Expression<Func<UserInteraction, UserInteractionDto>> projection = model => new()
@@ -79,7 +79,7 @@ public class UserInteractionServiceTests : IDisposable
 
         // Act
         (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? models, int totalCount) =
-            await _sutService.GetSome(
+            await _sutService.Get(
                 projection: projection,
                 filters: filters
                 );
@@ -98,7 +98,7 @@ public class UserInteractionServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetSome_ProjectToDto_ReturnsCollectionProjectedToDtoType()
+    public async Task Get_ProjectToDto_ReturnsProjectedCollection()
     {
         // Arrange+
         Expression<Func<UserInteraction, UserInteractionDto>> projection = model => new()
@@ -109,7 +109,7 @@ public class UserInteractionServiceTests : IDisposable
 
         // Act
         (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? modelsDto, int totalCount) =
-            await _sutService.GetSome(
+            await _sutService.Get(
                 projection: projection
                 );
 
