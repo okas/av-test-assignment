@@ -3,7 +3,7 @@ using System.Linq;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Model;
 
-namespace Backend.WebApi.Tests.TestInfrastructure;
+namespace Backend.WebApi.Tests;
 
 public static class UserInteractionUtilities
 {
@@ -18,25 +18,31 @@ public static class UserInteractionUtilities
     {
         if (!knownEntityIds.Any())
         {
-            throw new ArgumentException("Lähteandmed on nõutud entity'te genereerimiseks", nameof(knownEntityIds));
+            throw new ArgumentException("Basedata for entity creation is mandatory.", nameof(knownEntityIds));
         }
 
-        var entities = knownEntityIds.Select(known =>
-            new UserInteraction()
-            {
-                Id = known.Id,
-                Created = DateTime.Now,
-                Deadline = DateTime.Now.AddDays(1),
-                Description = TestNameGenerator(known.Id),
-                IsOpen = known.IsOpen,
-            })
-            .ToArray();
+        UserInteraction[] entities = GenerateEntities(knownEntityIds);
 
         using ApiDbContext context = dbFixture.CreateContext();
 
         context.UserInteraction.AddRange(entities);
 
         context.SaveChanges();
+    }
+
+    private static UserInteraction[] GenerateEntities((Guid Id, bool IsOpen)[] knownEntityIds)
+    {
+        var entities = knownEntityIds.Select(known =>
+                    new UserInteraction()
+                    {
+                        Id = known.Id,
+                        Created = DateTime.Now,
+                        Deadline = DateTime.Now.AddDays(1),
+                        Description = TestNameGenerator(known.Id),
+                        IsOpen = known.IsOpen,
+                    });
+
+        return entities.ToArray();
     }
 
     private static string TestNameGenerator(Guid knownId) => $@"Test entity to test {knownId.ToString()[..8]}";

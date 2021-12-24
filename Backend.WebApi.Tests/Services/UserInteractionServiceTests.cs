@@ -7,22 +7,20 @@ using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
 using Backend.WebApi.Model;
 using Backend.WebApi.Services;
-using Backend.WebApi.Tests.TestInfrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 
-
 namespace Backend.WebApi.Tests.Services;
 
-[Collection("ApiLocalDb")]
+[Collection("ApiLocalDbFixture")]
 public class UserInteractionServiceTests : IDisposable
 {
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
+    private readonly ApiLocalDbFixture _dbFixture;
+    private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionService _sutService;
-    private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
-    private readonly ApiLocalDbFixture _dbFixture;
 
     static UserInteractionServiceTests()
     {

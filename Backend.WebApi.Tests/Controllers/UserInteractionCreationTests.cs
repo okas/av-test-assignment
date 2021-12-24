@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.Controllers;
 
-[Collection("ApiLocalDb")]
+[Collection("ApiLocalDbFixture")]
 public class UserInteractionCreationTests : IDisposable
 {
     private const string _nonEmptyDescription = "Non-empty";
@@ -19,8 +19,6 @@ public class UserInteractionCreationTests : IDisposable
 
     public UserInteractionCreationTests(ApiLocalDbFixture dbFixture)
     {
-        //  //Arrange common code!
-        // I think it is OK, because this class is instantiated for every test(method). 
         _sutDbContext = dbFixture.CreateContext();
         _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
@@ -58,9 +56,8 @@ public class UserInteractionCreationTests : IDisposable
         dto.Description.Should().BeEquivalentTo(CorrectNewDto.Description);
     }
 
-    public void Dispose()
-    {
-        // Clean up //Arranged resources
-        _sutDbContext.Dispose();
-    }
+    /// <summary>
+    /// Clean up test class level arrangements.
+    /// </summary>
+    public void Dispose() => _sutDbContext.Dispose();
 }

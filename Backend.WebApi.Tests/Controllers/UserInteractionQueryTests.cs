@@ -6,17 +6,16 @@ using Backend.WebApi.Controllers;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
 using Backend.WebApi.Services;
-using Backend.WebApi.Tests.TestInfrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Backend.WebApi.Tests.Controllers;
 
-[Collection("ApiLocalDb")]
+[Collection("ApiLocalDbFixture")]
 public class UserInteractionQueryTests : IDisposable
 {
-    private readonly (Guid Id, bool IsOpen)[] _knownEntityIds;
+    private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
@@ -28,9 +27,9 @@ public class UserInteractionQueryTests : IDisposable
     {
         // Arrange for tests
         // Generate some unique ID's and their `IsOpen` states that will be known to an guaranteed to exist in DB during test.
-        _knownEntityIds = Enumerable.Range(0, 5).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
+        _knownEntitesIdIsOpen = Enumerable.Range(0, 5).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
         _sutDbContext = dbFixture.CreateContext();
-        UserInteractionUtilities.SeedData(dbFixture, _knownEntityIds);
+        UserInteractionUtilities.SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
 
@@ -51,7 +50,7 @@ public class UserInteractionQueryTests : IDisposable
     public async Task Get_CanGetSingleById_ReturnOkObjectResultAndNonNullValue()
     {
         // Arrange+
-        Guid knownId = _knownEntityIds.First().Id;
+        Guid knownId = _knownEntitesIdIsOpen.First().Id;
 
         // Act
         var response = await _sutController.GetUserInteraction(knownId);
@@ -66,7 +65,7 @@ public class UserInteractionQueryTests : IDisposable
     public async Task Get_CanGetSingleById_ReturnDtoWithCorrectId()
     {
         // Arrange+
-        Guid knownId = _knownEntityIds.First(known => known.IsOpen).Id;
+        Guid knownId = _knownEntitesIdIsOpen.First(known => known.IsOpen).Id;
 
         // Act
         var response = await _sutController.GetUserInteraction(knownId);
@@ -130,11 +129,7 @@ public class UserInteractionQueryTests : IDisposable
     }
 
     /// <summary>
-    /// Clean up arranged resources of tests
+    /// Clean up test class level arrangements.
     /// </summary>
-    public void Dispose()
-    {
-        // Clean up test class level Arranged resources
-        _sutDbContext.Dispose();
-    }
+    public void Dispose() => _sutDbContext.Dispose();
 }

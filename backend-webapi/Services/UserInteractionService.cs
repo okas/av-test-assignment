@@ -185,16 +185,14 @@ public class UserInteractionService
         }
     }
 
-    private ServiceError HandleDbUpdateException(DbUpdateException dbException)
+    private static ServiceError HandleDbUpdateException(DbUpdateException dbException)
     {
-        switch (dbException.InnerException)
+        return dbException.InnerException switch
         {
-            case SqlException ex when ex.Number == 2627:
-                return new(ServiceErrorKind.AlreadyExistsOnCreate);
+            SqlException ex when ex.Number == 2627 => new(ServiceErrorKind.AlreadyExistsOnCreate),
 
-            default:
-                return GenerateInternaError(dbException);
-        }
+            _ => GenerateInternaError(dbException),
+        };
     }
 
     private static ServiceError GenerateInternaError(Exception ex)

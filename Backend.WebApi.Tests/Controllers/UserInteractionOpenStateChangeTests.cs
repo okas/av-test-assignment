@@ -3,15 +3,15 @@ using System.Threading.Tasks;
 using Backend.WebApi.Controllers;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
+using Backend.WebApi.Model;
 using Backend.WebApi.Services;
-using Backend.WebApi.Tests.TestInfrastructure;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Backend.WebApi.Tests.Controllers;
 
-[Collection("ApiLocalDb")]
+[Collection("ApiLocalDbFixture")]
 public class UserInteractionOpenStateChangeTests : IDisposable
 {
     private readonly ApiLocalDbFixture _dbFixture;
@@ -34,7 +34,6 @@ public class UserInteractionOpenStateChangeTests : IDisposable
     {
         // Arrange
         UserInteractionIsOpenDto isOpenDto = new() { Id = _entityId, IsOpen = false };
-        using var newContext = _dbFixture.CreateContext();
 
         // Act
         var response = await _sutController.PatchUserInteraction(_entityId, isOpenDto);
@@ -42,16 +41,14 @@ public class UserInteractionOpenStateChangeTests : IDisposable
         // Assert
         response.Should().BeOfType<NoContentResult>().And.NotBeNull();
 
-        var interactionModel = newContext.UserInteraction.Find(_entityId);
-        interactionModel?.IsOpen.Should().BeFalse();
+        using var newContext = _dbFixture.CreateContext();
+        UserInteraction? interactionModel = newContext.UserInteraction.Find(_entityId);
+        interactionModel.Should().NotBeNull();
+        interactionModel.IsOpen.Should().BeFalse();
     }
 
     /// <summary>
-    /// Clean up arranged resources of tests
+    /// Clean up test class level arrangements.
     /// </summary>
-    public void Dispose()
-    {
-        // Clean up test class level Arranged resources
-        _sutDbContext.Dispose();
-    }
+    public void Dispose() => _sutDbContext.Dispose();
 }

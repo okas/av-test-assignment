@@ -35,16 +35,19 @@ public class ApiLocalDbFixture : IDisposable
     public DbConnection Connection { get; }
 
     /// <summary>
-    /// Use transactions in Facts/Theories to roll back data in test if it is necessary!
+    /// Create context instance with test configuration, with optional instance of <see cref="DbTransaction"/>.
     /// </summary>
-    /// <param name="transaction">Transaction instance, that is given to EF.</param>
+    /// <param name="transaction">
+    /// If omitted then instance of <see cref="ApiDbContext"/> will use default transaction behavior of <see cref="DbContext"/>.
+    /// </param>
+    /// <returns></returns>
     public ApiDbContext CreateContext(DbTransaction? transaction = default)
     {
         var modelBuilder = new DbContextOptionsBuilder<ApiDbContext>().UseSqlServer(Connection);
 
         var context = new ApiDbContext(modelBuilder.Options);
 
-        if (transaction != null)
+        if (transaction is not null)
         {
             context.Database.UseTransaction(transaction);
         }
@@ -72,7 +75,7 @@ public class ApiLocalDbFixture : IDisposable
     public void Dispose() => Connection.Dispose();
 }
 
-[CollectionDefinition("ApiLocalDb")]
+[CollectionDefinition("ApiLocalDbFixture")]
 public class ApiLocalDbCollection : ICollectionFixture<ApiLocalDbFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
