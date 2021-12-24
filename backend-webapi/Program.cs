@@ -1,10 +1,12 @@
+using System.Reflection;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Services;
 using Backend.WebApi.Swagger;
+using MediatR;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApiDbContext>(options =>
 {
@@ -20,6 +22,7 @@ builder.Services.Configure<RouteOptions>(options =>
 });
 
 builder.Services.AddScoped<UserInteractionService>();
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 builder.Services.AddControllers().AddOData(c =>
 {
@@ -36,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
     c.CustomOperationIdsMethodAndApiPathToSnakeCase();
 });
 
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
