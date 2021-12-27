@@ -7,11 +7,11 @@ namespace Backend.WebApi.Dto;
 /// <summary>
 /// Userinteraction "open state" changing DTO. For PATH method purpose in API.
 /// </summary>
-public class UserInteractionIsOpenDto
+public record struct UserInteractionIsOpenDto
 {
     [NotDefault]
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     [Required]
-    public bool IsOpen { get; set; }
+    public bool IsOpen { get; init; }
 }

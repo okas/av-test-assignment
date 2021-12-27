@@ -7,18 +7,18 @@ namespace Backend.WebApi.Dto;
 /// <summary>
 /// Userinteraction DTO with full data. For full detail presentation purpose of the model entity.
 /// </summary>
-public class UserInteractionDto
+public record struct UserInteractionDto
 {
     [NotDefault]
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public string Description { get; set; }
+    public string Description { get; init; }
 
-    public DateTime Deadline { get; set; }
+    public DateTime Deadline { get; init; }
 
-    public DateTime Created { get; set; }
+    public DateTime Created { get; init; }
 
-    public bool IsOpen { get; set; }
+    public bool IsOpen { get; init; }
 
     public static Expression<Func<UserInteraction, UserInteractionDto>> Projection => (model) => new()
     {

@@ -5,11 +5,11 @@ namespace Backend.WebApi.Dto;
 /// <summary>
 /// Userinteraction DTO with base properties, that user should provide. For creation purpose.
 /// </summary>
-public class UserInteractionNewDto
+public record struct UserInteractionNewDto
 {
     [Required]
-    public DateTime Deadline { get; set; }
+    public DateTime Deadline { get; init; }
 
     [Required]
-    public string Description { get; set; }
+    public string Description { get; init; }
 }
