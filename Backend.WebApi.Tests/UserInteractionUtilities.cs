@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Backend.WebApi.Data.EF;
-using Backend.WebApi.Model;
+using Backend.WebApi.Domain.Model;
+using Backend.WebApi.Infrastructure.Data.EF;
 
 namespace Backend.WebApi.Tests;
 

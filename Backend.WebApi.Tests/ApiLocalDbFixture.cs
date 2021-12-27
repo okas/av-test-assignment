@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data.Common;
-using Backend.WebApi.Data.EF;
+using Backend.WebApi.Infrastructure.Data.EF;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Xunit;

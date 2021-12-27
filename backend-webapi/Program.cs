@@ -1,7 +1,7 @@
 using System.Reflection;
-using Backend.WebApi.Data.EF;
-using Backend.WebApi.Services;
-using Backend.WebApi.Swagger;
+using Backend.WebApi.App.Services;
+using Backend.WebApi.App.Swagger;
+using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
