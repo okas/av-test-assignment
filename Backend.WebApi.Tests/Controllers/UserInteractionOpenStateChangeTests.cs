@@ -12,7 +12,7 @@ using Xunit;
 namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionOpenStateChangeTests : IDisposable
+public sealed class UserInteractionOpenStateChangeTests : IDisposable
 {
     private readonly ApiLocalDbFixture _dbFixture;
     private readonly Guid _entityId;
@@ -44,7 +44,7 @@ public class UserInteractionOpenStateChangeTests : IDisposable
         using var newContext = _dbFixture.CreateContext();
         UserInteraction? interactionModel = newContext.UserInteraction.Find(_entityId);
         interactionModel.Should().NotBeNull();
-        interactionModel.IsOpen.Should().BeFalse();
+        interactionModel!.IsOpen.Should().BeFalse();
     }
 
     /// <summary>

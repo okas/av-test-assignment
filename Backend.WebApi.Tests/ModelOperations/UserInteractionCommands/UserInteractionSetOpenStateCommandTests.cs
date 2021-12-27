@@ -11,7 +11,7 @@ using Xunit;
 namespace Backend.WebApi.Tests.ModelOperations.UserInteractionCommands;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionSetOpenStateCommandTests : IDisposable
+public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
@@ -38,7 +38,7 @@ public class UserInteractionSetOpenStateCommandTests : IDisposable
         };
 
         // Act
-        IEnumerable<ServiceError>? errors =
+        IEnumerable<ServiceError> errors =
             await _sutCommandHandler.Handle(
                 correctModelCommand
                 );
@@ -60,14 +60,14 @@ public class UserInteractionSetOpenStateCommandTests : IDisposable
         };
 
         // Act
-        IEnumerable<ServiceError>? errors =
+        IEnumerable<ServiceError> errors =
             await _sutCommandHandler.Handle(
                 notExistingModelCommand
                 );
 
         // Assert
         errors.Should().NotBeNullOrEmpty();
-        errors.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
+        errors!.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
     }
 
     /// <summary>

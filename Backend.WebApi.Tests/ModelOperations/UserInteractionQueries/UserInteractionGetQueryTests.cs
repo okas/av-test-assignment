@@ -13,7 +13,7 @@ using Xunit;
 namespace Backend.WebApi.Tests.ModelOperations.UserInteractionQueries;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionGetQueryTests : IDisposable
+public sealed class UserInteractionGetQueryTests : IDisposable
 {
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
@@ -43,13 +43,13 @@ public class UserInteractionGetQueryTests : IDisposable
         UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler = new(_sutDbContext);
 
         // Act
-        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? dtos, int totalCount) =
+        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
             await _sutCommandHandler.Handle(
                 query
                 );
 
         // Assert
-        using (AssertionScope _ = new())
+        using (new AssertionScope())
         {
             errors.Should().BeNullOrEmpty();
             dtos.Should().NotBeNullOrEmpty();

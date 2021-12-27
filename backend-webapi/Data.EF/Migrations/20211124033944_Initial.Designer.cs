@@ -15,7 +15,7 @@ namespace Backend.WebApi.Data.EF.Migrations;
 [Migration("20211124033944_Initial")]
 partial class Initial
 {
-    protected void BuildTargetModel(ModelBuilder modelBuilder)
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
         modelBuilder

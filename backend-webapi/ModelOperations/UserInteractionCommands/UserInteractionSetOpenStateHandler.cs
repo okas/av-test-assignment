@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionCommands;
 
-public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractionSetOpenStateCommand, IEnumerable<ServiceError>?>
+public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractionSetOpenStateCommand, IEnumerable<ServiceError>>
 {
     private readonly ApiDbContext _context;
 
     public UserInteractionSetOpenStateHandler(ApiDbContext context) => _context = context;
 
-    public async Task<IEnumerable<ServiceError>?> Handle(
+    public async Task<IEnumerable<ServiceError>> Handle(
         UserInteractionSetOpenStateCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -27,7 +27,7 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
         {
             await _context.SaveChangesAsync(cancellationToken);
 
-            return default;
+            return Enumerable.Empty<ServiceError>();
         }
         catch (DbUpdateConcurrencyException)
         {

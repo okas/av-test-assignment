@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionQueries;
 
-public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<ServiceError>? errors, IList<Tout>? models, int totalCount)>
+public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)>
 {
     private static readonly string _queryingErrorMessage;
     private readonly ApiDbContext _dbContext;
@@ -20,7 +20,7 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
 
     public UserInteractionGetHandler(ApiDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<(IEnumerable<ServiceError>? errors, IList<Tout>? models, int totalCount)> Handle(
+    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)> Handle(
         UserInteractionGetQuery<Tout> request,
         CancellationToken cancellationToken = default)
     {
@@ -28,33 +28,33 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
             .AsNoTracking()
             .AppendFiltersToQuery(request.Filters);
 
-        (IEnumerable<ServiceError>? errors, IList<Tout>? models) =
+        (IEnumerable<ServiceError> errors, IEnumerable<Tout>? models) =
             await TryGetList(filteredQuery, request.Projection, cancellationToken);
 
-        int total = errors?.Any() ?? false
+        int total = errors.Any()
             ? 0
             : await _dbContext.UserInteraction.CountAsync(cancellationToken);
 
         return (errors, models, total);
     }
 
-    private static async Task<(IEnumerable<ServiceError>?, IList<Tout>?)> TryGetList(
+    private static async Task<(IEnumerable<ServiceError>, IEnumerable<Tout>?)> TryGetList(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection,
         CancellationToken cancellationToken)
     {
         try
         {
-            IList<Tout>? models = await RetreiveListFrom(query, projection, cancellationToken);
+            IEnumerable<Tout> models = await RetreiveListFrom(query, projection, cancellationToken);
 
-            return (default, models);
+            return (Enumerable.Empty<ServiceError>(), models);
         }
         catch (Exception ex)
         {
             // TODO Log here.
-            ServiceError[] serviceErrors = { new(ServiceErrorKind.InternalError, _queryingErrorMessage, ex) };
+            ServiceError[] errors = { new(ServiceErrorKind.InternalError, _queryingErrorMessage, ex) };
 
-            return (serviceErrors, default);
+            return (errors, default);
         }
     }
 
@@ -67,19 +67,15 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
     /// <param name="projection"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private static async Task<IList<Tout>?> RetreiveListFrom(
+    private static async Task<IEnumerable<Tout>> RetreiveListFrom(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection,
         CancellationToken cancellationToken)
     {
-        if (projection is null)
-        {
-            // Cast<>() is required, because in case of null projection, typeof(T) is not known
-            return await query.Cast<Tout>().ToListAsync(cancellationToken);
-        }
-        else
-        {
-            return await query.Select(projection).ToListAsync(cancellationToken);
-        }
+        IQueryable<Tout> modelsQuery = projection is null
+                    ? query.Cast<Tout>() // required, because in case of null projection, typeof(T) is not known
+                    : query.Select(projection);
+
+        return (await modelsQuery.ToListAsync(cancellationToken: cancellationToken)).AsReadOnly();
     }
 }

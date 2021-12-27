@@ -14,7 +14,7 @@ using Xunit;
 namespace Backend.WebApi.Tests.Services;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionServiceTests : IDisposable
+public sealed class UserInteractionServiceTests : IDisposable
 {
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly ApiLocalDbFixture _dbFixture;
@@ -47,7 +47,7 @@ public class UserInteractionServiceTests : IDisposable
         Expression<Func<UserInteraction, bool>> filter = model => model.IsOpen == isOpenTestValue;
 
         // Act
-        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? modelsDto, int totalCount) =
+        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? modelsDto, int totalCount) =
              await _sutService.Get(
                  projection: UserInteractionDto.Projection,
                  filters: filter
@@ -74,7 +74,7 @@ public class UserInteractionServiceTests : IDisposable
         (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
 
         // Act
-        IEnumerable<ServiceError>? errors =
+        IEnumerable<ServiceError> errors =
             await _sutService.SetOpenState(
                 id,
                 false
@@ -94,7 +94,7 @@ public class UserInteractionServiceTests : IDisposable
         Guid unknownId = Guid.NewGuid();
 
         // Act
-        IEnumerable<ServiceError>? errors =
+        IEnumerable<ServiceError> errors =
             await _sutService.SetOpenState(
                 unknownId,
                 true
@@ -117,7 +117,7 @@ public class UserInteractionServiceTests : IDisposable
         DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        (IEnumerable<ServiceError>? errors, UserInteraction? createdModel) =
+        (IEnumerable<ServiceError> errors, UserInteraction? createdModel) =
             await _sutService.Create(
                 correctNewModel
                 );
@@ -127,7 +127,7 @@ public class UserInteractionServiceTests : IDisposable
 
         using AssertionScope _ = new();
         createdModel.Should().NotBeNull();
-        createdModel.Deadline.Should().Be(correctNewModel.Deadline);
+        createdModel!.Deadline.Should().Be(correctNewModel.Deadline);
         createdModel.Description.Should().Be(correctNewModel.Description);
         createdModel.Created.Should().BeAfter(serviceQueryTime);
         createdModel.IsOpen.Should().BeTrue();
@@ -146,7 +146,7 @@ public class UserInteractionServiceTests : IDisposable
         };
 
         // Act
-        (IEnumerable<ServiceError>? errors, UserInteraction? existingModel) =
+        (IEnumerable<ServiceError> errors, UserInteraction? existingModel) =
             await _sutService.Create(
                 attemptedModel
                 );
