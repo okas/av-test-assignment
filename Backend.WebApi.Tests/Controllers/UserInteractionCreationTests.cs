@@ -13,28 +13,27 @@ namespace Backend.WebApi.Tests.Controllers;
 [Collection("ApiLocalDbFixture")]
 public sealed class UserInteractionCreationTests : IDisposable
 {
-    private const string _nonEmptyDescription = "Non-empty";
+    private readonly UserInteractionNewDto _knownCorrectDto;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
     public UserInteractionCreationTests(ApiLocalDbFixture dbFixture)
     {
+        _knownCorrectDto = new()
+        {
+            Deadline = DateTime.Now.AddDays(1),
+            Description = "Non-empty",
+        };
         _sutDbContext = dbFixture.CreateContext();
         _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
-
-    public UserInteractionNewDto CorrectNewDto => new()
-    {
-        Deadline = DateTime.Now.AddDays(1),
-        Description = _nonEmptyDescription,
-    };
 
     [Fact]
     public async Task Post_CanCreateInteraction_ReturnCreatedActionResultWithDtoInstance()
     {
         // Arrange
         // Act
-        var response = await _sutController.PostUserInteraction(CorrectNewDto);
+        var response = await _sutController.PostUserInteraction(_knownCorrectDto);
 
         // Assert
         response.Result.As<CreatedAtActionResult>().Value.As<UserInteractionDto>().Should().NotBeNull();
@@ -45,7 +44,7 @@ public sealed class UserInteractionCreationTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.PostUserInteraction(CorrectNewDto);
+        var response = await _sutController.PostUserInteraction(_knownCorrectDto);
         var dto = response.Result.As<CreatedAtActionResult>()
                           .Value.As<UserInteractionDto>();
 
@@ -53,7 +52,7 @@ public sealed class UserInteractionCreationTests : IDisposable
         dto.Id.Should().NotBeEmpty();
         dto.Created.Should().BeOnOrAfter(DateTime.Now.AddSeconds(-5)).And.NotBeAfter(DateTime.Now);
         dto.IsOpen.Should().BeTrue();
-        dto.Description.Should().BeEquivalentTo(CorrectNewDto.Description);
+        dto.Description.Should().BeEquivalentTo(_knownCorrectDto.Description);
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ using static Backend.WebApi.Tests.UserInteractionUtilities;
 namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionQueryTests : IDisposable
+public sealed class UserInteractionQueryTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;

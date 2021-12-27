@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Backend.WebApi.Tests;
 
-public class ApiLocalDbFixture : IDisposable
+public sealed class ApiLocalDbFixture : IDisposable
 {
     private static readonly string _localDbConnectionString;
     private static readonly object _lock;
