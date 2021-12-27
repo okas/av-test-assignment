@@ -8,6 +8,19 @@ namespace Backend.WebApi.Tests;
 public static class UserInteractionUtilities
 {
     /// <summary>
+    /// Generates array of named tuples of Guid and bool. The represent UserInteraction entity's <see cref="UserInteraction.Id"/> and <see cref="UserInteraction.IsOpen"/> known values for testing.
+    /// </summary>
+    /// <remarks>
+    /// Default implementation for IsOpen value will be <see langword="true"/> for every even element of returned array.
+    /// </remarks>
+    /// <param name="count">Count of elements to generate.</param>
+    /// <returns></returns>
+    public static (Guid Id, bool IsOpen)[] GenerateKnownData(int count = 4)
+    {
+        return Enumerable.Range(0, count).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
+    }
+
+    /// <summary>
     /// Generate test data to database, that can be requested from API tests.
     /// </summary>
     /// <remarks>

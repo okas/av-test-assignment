@@ -5,14 +5,9 @@ using MediatR;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionQueries;
 
-public class UserInteractionGetByIdQuery : IRequest<(IEnumerable<ServiceError>? errors, UserInteraction? model)>
+public record struct UserInteractionGetByIdQuery : IRequest<(IEnumerable<ServiceError> errors, UserInteraction? model)>
 {
-    public UserInteractionGetByIdQuery() { }
-
-    public UserInteractionGetByIdQuery(Guid id)
-    {
-        Id = id;
-    }
+    public UserInteractionGetByIdQuery(Guid id) => Id = id;
 
     [NotDefault]
     public Guid Id { get; init; }

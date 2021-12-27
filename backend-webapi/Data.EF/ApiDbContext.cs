@@ -7,5 +7,6 @@ public class ApiDbContext : DbContext
 {
     public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
-    public DbSet<UserInteraction> UserInteraction { get; set; }
+    public DbSet<UserInteraction> UserInteraction { get; init; } = default!;
+
 }

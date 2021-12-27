@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionQueries;
 
-public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetByIdQuery, (IEnumerable<ServiceError>? errors, UserInteraction? model)>
+public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetByIdQuery, (IEnumerable<ServiceError> errors, UserInteraction? model)>
 {
     private readonly ApiDbContext _context;
 
     public UserInteractionGetByIdHandler(ApiDbContext context) => _context = context;
 
-    public async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> Handle(
+    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(
         UserInteractionGetByIdQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -24,13 +24,13 @@ public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetB
                     cancellationToken
                     );
 
-            return (default, foundModel);
+            return (Enumerable.Empty<ServiceError>(), foundModel);
         }
         catch (Exception ex)
         {
-            ServiceError[] serviceErrors = { new(ServiceErrorKind.InternalError, Exceptions: ex) };
+            ServiceError[] errors = { new(ServiceErrorKind.InternalError, Exceptions: ex) };
 
-            return (serviceErrors, default);
+            return (errors, default);
         }
     }
 }

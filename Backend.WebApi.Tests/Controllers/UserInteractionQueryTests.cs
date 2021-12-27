@@ -9,6 +9,8 @@ using Backend.WebApi.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using static Backend.WebApi.Tests.UserInteractionUtilities;
+
 
 namespace Backend.WebApi.Tests.Controllers;
 
@@ -25,11 +27,9 @@ public class UserInteractionQueryTests : IDisposable
     /// <param name="dbFixture"></param>
     public UserInteractionQueryTests(ApiLocalDbFixture dbFixture)
     {
-        // Arrange for tests
-        // Generate some unique ID's and their `IsOpen` states that will be known to an guaranteed to exist in DB during test.
-        _knownEntitesIdIsOpen = Enumerable.Range(0, 5).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
+        _knownEntitesIdIsOpen = GenerateKnownData(5);
         _sutDbContext = dbFixture.CreateContext();
-        UserInteractionUtilities.SeedData(dbFixture, _knownEntitesIdIsOpen);
+        SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
 

@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using Backend.WebApi.Model;
-using Backend.WebApi.ValidationExtensions;
 
 namespace Backend.WebApi.Dto;
 
@@ -9,7 +8,6 @@ namespace Backend.WebApi.Dto;
 /// </summary>
 public record struct UserInteractionDto
 {
-    [NotDefault]
     public Guid Id { get; init; }
 
     public string Description { get; init; }
@@ -23,7 +21,7 @@ public record struct UserInteractionDto
     public static Expression<Func<UserInteraction, UserInteractionDto>> Projection => (model) => new()
     {
         Id = model.Id,
-        Description = model.Description,
+        Description = model.Description!,
         Deadline = model.Deadline,
         Created = model.Created,
         IsOpen = model.IsOpen

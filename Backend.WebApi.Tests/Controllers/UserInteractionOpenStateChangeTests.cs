@@ -8,11 +8,12 @@ using Backend.WebApi.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using static Backend.WebApi.Tests.UserInteractionUtilities;
 
 namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionOpenStateChangeTests : IDisposable
+public sealed class UserInteractionOpenStateChangeTests : IDisposable
 {
     private readonly ApiLocalDbFixture _dbFixture;
     private readonly Guid _entityId;
@@ -25,7 +26,7 @@ public class UserInteractionOpenStateChangeTests : IDisposable
         _dbFixture = dbFixture;
         _entityId = Guid.NewGuid();
         _sutDbContext = dbFixture.CreateContext();
-        UserInteractionUtilities.SeedData(dbFixture, (_entityId, true));
+        SeedData(dbFixture, (_entityId, true));
         _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
     }
 
@@ -44,7 +45,7 @@ public class UserInteractionOpenStateChangeTests : IDisposable
         using var newContext = _dbFixture.CreateContext();
         UserInteraction? interactionModel = newContext.UserInteraction.Find(_entityId);
         interactionModel.Should().NotBeNull();
-        interactionModel.IsOpen.Should().BeFalse();
+        interactionModel!.IsOpen.Should().BeFalse();
     }
 
     /// <summary>

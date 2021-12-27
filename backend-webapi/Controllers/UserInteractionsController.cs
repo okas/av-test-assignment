@@ -38,7 +38,7 @@ public class UserInteractionsController : ControllerBase
     {
         Expression<Func<UserInteraction, bool>> filters = model => !isOpen.HasValue || model.IsOpen == isOpen;
 
-        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? dtos, int totalCount) =
+        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
             await _service.Get(UserInteractionDto.Projection, filters);
 
         return Ok(dtos);
@@ -81,9 +81,9 @@ public class UserInteractionsController : ControllerBase
             return BadRequest();
         }
 
-        IEnumerable<ServiceError>? errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
+        IEnumerable<ServiceError> errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
 
-        if (errors is null || !errors.Any())
+        if (!errors.Any())
         {
             return NoContent();
         }
@@ -93,9 +93,9 @@ public class UserInteractionsController : ControllerBase
             return NotFound();
         }
 
-        (_, _, Exception[] exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
+        (_, _, Exception?[]? exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
 
-        throw exceptions.First();
+        throw exceptions?.First() ?? new Exception(_noExceptionInErrorMessage);
     }
 
     /// <summary>
@@ -107,13 +107,13 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto)
     {
-        (IEnumerable<ServiceError>? errors, UserInteraction? model) = await _service.Create(new()
+        (IEnumerable<ServiceError> errors, UserInteraction? model) = await _service.Create(new()
         {
             Description = newDto.Description,
             Deadline = newDto.Deadline,
         });
 
-        if (errors is null || !errors.Any())
+        if (!errors.Any() && model is not null)
         {
             UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(model);
 

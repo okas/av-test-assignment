@@ -7,11 +7,12 @@ using Backend.WebApi.ModelOperations.UserInteractionCommands;
 using Backend.WebApi.Services;
 using FluentAssertions;
 using Xunit;
+using static Backend.WebApi.Tests.UserInteractionUtilities;
 
 namespace Backend.WebApi.Tests.ModelOperations.UserInteractionCommands;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionSetOpenStateCommandTests : IDisposable
+public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
@@ -19,9 +20,9 @@ public class UserInteractionSetOpenStateCommandTests : IDisposable
 
     public UserInteractionSetOpenStateCommandTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = Enumerable.Range(0, 4).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
+        _knownEntitesIdIsOpen = GenerateKnownData(4);
         _sutDbContext = dbFixture.CreateContext();
-        UserInteractionUtilities.SeedData(dbFixture, _knownEntitesIdIsOpen);
+        SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutCommandHandler = new(_sutDbContext);
     }
 
@@ -38,7 +39,7 @@ public class UserInteractionSetOpenStateCommandTests : IDisposable
         };
 
         // Act
-        IEnumerable<ServiceError>? errors =
+        IEnumerable<ServiceError> errors =
             await _sutCommandHandler.Handle(
                 correctModelCommand
                 );
@@ -60,14 +61,14 @@ public class UserInteractionSetOpenStateCommandTests : IDisposable
         };
 
         // Act
-        IEnumerable<ServiceError>? errors =
+        IEnumerable<ServiceError> errors =
             await _sutCommandHandler.Handle(
                 notExistingModelCommand
                 );
 
         // Assert
         errors.Should().NotBeNullOrEmpty();
-        errors.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
+        errors!.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
     }
 
     /// <summary>

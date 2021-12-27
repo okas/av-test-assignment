@@ -26,19 +26,19 @@ public class UserInteractionService
         _interactionsRepo = dbContext.UserInteraction;
     }
 
-    public async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> GetOne(Guid id)
+    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> GetOne(Guid id)
     {
         try
         {
-            return (default,
-                await _interactionsRepo.AsNoTracking().FirstOrDefaultAsync(model => model.Id == id)
-                );
+            UserInteraction? model = await _interactionsRepo.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
+
+            return (errors: Array.Empty<ServiceError>(), model);
         }
         catch (Exception ex)
         {
-            return (new ServiceError[] {
-                new(ServiceErrorKind.InternalError, Exceptions: ex)
-            }, default);
+            ServiceError[] errors = new ServiceError[] { new(ServiceErrorKind.InternalError, Exceptions: ex) };
+
+            return (errors, model: default);
         }
     }
 
@@ -52,7 +52,7 @@ public class UserInteractionService
     /// <param name="projection"></param>
     /// <param name="filters"></param>
     /// <returns></returns>
-    public async Task<(IEnumerable<ServiceError>? errors, IList<Tout>? models, int totalCount)> Get<Tout>(
+    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)> Get<Tout>(
         Expression<Func<UserInteraction, Tout>>? projection = default,
         params Expression<Func<UserInteraction, bool>>?[]? filters)
     {
@@ -60,16 +60,16 @@ public class UserInteractionService
             .AsNoTracking()
             .AppendFiltersToQuery(filters);
 
-        (IEnumerable<ServiceError>? errors, IList<Tout>? models) = await TryGetList(filteredQuery, projection);
+        (IEnumerable<ServiceError> errors, IEnumerable<Tout>? models) = await TryGetList(filteredQuery, projection);
 
-        int total = errors?.Any() ?? false
-            ? 0
+        int total = errors.Any()
+            ? default
             : await _interactionsRepo.CountAsync();
 
         return (errors, models, total);
     }
 
-    public async Task<IEnumerable<ServiceError>?> SetOpenState(Guid id, bool newState)
+    public async Task<IEnumerable<ServiceError>> SetOpenState(Guid id, bool newState)
     {
         _context.Attach(new UserInteraction
         {
@@ -81,7 +81,7 @@ public class UserInteractionService
         try
         {
             await _context.SaveChangesAsync();
-            return default;
+            return Enumerable.Empty<ServiceError>();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -109,7 +109,7 @@ public class UserInteractionService
     /// Create new model into database.
     /// </summary>
     /// <param name="newModel"></param>
-    public async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> Create(UserInteraction newModel)
+    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Create(UserInteraction newModel)
     {
         // These values setup is system's responsibility, thus doing it here.
         newModel.IsOpen = true;
@@ -118,21 +118,21 @@ public class UserInteractionService
         return await TryCreate(newModel);
     }
 
-    private static async Task<(IEnumerable<ServiceError>?, IList<Tout>?)> TryGetList<Tout>(
+    private static async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout> models)> TryGetList<Tout>(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection)
     {
         try
         {
-            return (default,
-                await RunGetToList(query, projection));
+            return (errors: Enumerable.Empty<ServiceError>(),
+                models: await RunGetToList(query, projection));
         }
         catch (Exception ex)
         {
             // TODO Log here.
-            return (new[] {
+            return (errors: new[] {
                 new ServiceError(ServiceErrorKind.InternalError, _queryingErrorMessage, ex)
-            }, default);
+            }, models: Enumerable.Empty<Tout>());
         }
     }
 
@@ -146,57 +146,40 @@ public class UserInteractionService
     /// <param name="query"></param>
     /// <param name="projection"></param>
     /// <returns></returns>
-    private static async Task<IList<Tout>?> RunGetToList<Tout>(
+    private static async Task<IEnumerable<Tout>> RunGetToList<Tout>(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection)
     {
-        if (projection == null)
-        {
-            // Cast<>() is required, because in case of null projection, typeof(T) is not known
-            return await query.Cast<Tout>().ToListAsync();
-        }
-        else
-        {
-            return await query.Select(projection).ToListAsync();
-        }
+        IQueryable<Tout> modelsQuery = projection is null
+            ? query.Cast<Tout>() // required, because in case of null projection, typeof(T) is not known
+            : query.Select(projection);
+
+        return (await modelsQuery.ToListAsync()).AsReadOnly();
     }
 
-    private async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> TryCreate(UserInteraction newModel)
+    private async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> TryCreate(UserInteraction model)
     {
+        IEnumerable<ServiceError> errors;
         try
         {
-            _interactionsRepo.Add(newModel);
+            await _context.UserInteraction.AddAsync(model);
             await _context.SaveChangesAsync();
-            return (default, newModel);
+
+            return (Enumerable.Empty<ServiceError>(), model);
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
         {
             // TODO Log it
-            return (new[] {
-                HandleDbUpdateException(ex)
-            }, default);
+            errors = new ServiceError[] { new(ServiceErrorKind.AlreadyExistsOnCreate) };
+
+            return (errors, default);
         }
         catch (Exception ex)
         {
             // TODO Log it
-            return (new[] {
-                GenerateInternaError(ex)
-            }, default);
+            errors = new ServiceError[] { new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex) };
+
+            return (errors, default);
         }
-    }
-
-    private static ServiceError HandleDbUpdateException(DbUpdateException dbException)
-    {
-        return dbException.InnerException switch
-        {
-            SqlException ex when ex.Number == 2627 => new(ServiceErrorKind.AlreadyExistsOnCreate),
-
-            _ => GenerateInternaError(dbException),
-        };
-    }
-
-    private static ServiceError GenerateInternaError(Exception ex)
-    {
-        return new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex);
     }
 }

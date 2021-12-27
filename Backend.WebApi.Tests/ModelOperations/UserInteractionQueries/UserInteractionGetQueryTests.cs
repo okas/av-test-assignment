@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Backend.WebApi.Data.EF;
 using Backend.WebApi.Dto;
@@ -9,11 +8,12 @@ using Backend.WebApi.Services;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
+using static Backend.WebApi.Tests.UserInteractionUtilities;
 
 namespace Backend.WebApi.Tests.ModelOperations.UserInteractionQueries;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionGetQueryTests : IDisposable
+public sealed class UserInteractionGetQueryTests : IDisposable
 {
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
@@ -26,9 +26,9 @@ public class UserInteractionGetQueryTests : IDisposable
 
     public UserInteractionGetQueryTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = Enumerable.Range(0, 4).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
+        _knownEntitesIdIsOpen = GenerateKnownData(4);
         _sutDbContext = dbFixture.CreateContext();
-        UserInteractionUtilities.SeedData(dbFixture, _knownEntitesIdIsOpen);
+        SeedData(dbFixture, _knownEntitesIdIsOpen);
     }
 
     [Theory]
@@ -43,13 +43,13 @@ public class UserInteractionGetQueryTests : IDisposable
         UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler = new(_sutDbContext);
 
         // Act
-        (IEnumerable<ServiceError>? errors, IList<UserInteractionDto>? dtos, int totalCount) =
+        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
             await _sutCommandHandler.Handle(
                 query
                 );
 
         // Assert
-        using (AssertionScope _ = new())
+        using (new AssertionScope())
         {
             errors.Should().BeNullOrEmpty();
             dtos.Should().NotBeNullOrEmpty();

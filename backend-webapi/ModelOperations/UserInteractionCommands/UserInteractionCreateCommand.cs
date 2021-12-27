@@ -5,10 +5,8 @@ using MediatR;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionCommands;
 
-public class UserInteractionCreateCommand : IRequest<(IEnumerable<ServiceError>? errors, UserInteraction? model)>
+public record struct UserInteractionCreateCommand : IRequest<(IEnumerable<ServiceError> errors, UserInteraction? model)>
 {
-    public UserInteractionCreateCommand() { }
-
     public UserInteractionCreateCommand(DateTime deadline, string description)
     {
         Deadline = deadline;
@@ -19,5 +17,5 @@ public class UserInteractionCreateCommand : IRequest<(IEnumerable<ServiceError>?
     public DateTime Deadline { get; init; }
 
     [Required, MinLength(2)]
-    public string Description { get; init; }
+    public string? Description { get; init; }
 }

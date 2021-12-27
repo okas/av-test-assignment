@@ -11,7 +11,7 @@ using Xunit;
 namespace Backend.WebApi.Tests.Controllers;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionCreationTests : IDisposable
+public sealed class UserInteractionCreationTests : IDisposable
 {
     private const string _nonEmptyDescription = "Non-empty";
     private readonly ApiDbContext _sutDbContext;

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionCommands;
 
-public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreateCommand, (IEnumerable<ServiceError>? errors, UserInteraction? model)>
+public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreateCommand, (IEnumerable<ServiceError> errors, UserInteraction? model)>
 {
     private readonly ApiDbContext _context;
     private static readonly string _createNewModelErrorMessage;
@@ -19,7 +19,7 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
 
     public UserInteractionCreateHandler(ApiDbContext dbContext) => _context = dbContext;
 
-    public async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> Handle(
+    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(
         UserInteractionCreateCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -34,46 +34,31 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
         return await TryCreate(model, cancellationToken);
     }
 
-    private async Task<(IEnumerable<ServiceError>? errors, UserInteraction? model)> TryCreate(
-        UserInteraction newModel, CancellationToken cancellationToken)
+    private async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> TryCreate(
+        UserInteraction model, CancellationToken cancellationToken)
     {
+        IEnumerable<ServiceError> errors;
+
         try
         {
-            await _context.UserInteraction.AddAsync(newModel, cancellationToken);
+            await _context.UserInteraction.AddAsync(model, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return (default, newModel);
+            return (Enumerable.Empty<ServiceError>(), model);
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
         {
             // TODO Log it
-            ServiceError[] serviceErrors = new[] { HandleDbUpdateException(ex) };
+            errors = new ServiceError[] { new(ServiceErrorKind.AlreadyExistsOnCreate) };
 
-            return (serviceErrors, default);
+            return (errors, default);
         }
         catch (Exception ex)
         {
             // TODO Log it
-            ServiceError[] serviceErrors = new[] { GenerateInternaError(ex) };
+            errors = new ServiceError[] { new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex) };
 
-            return (serviceErrors, default);
+            return (errors, default);
         }
-    }
-
-    private static ServiceError HandleDbUpdateException(DbUpdateException dbException)
-    {
-        switch (dbException.InnerException)
-        {
-            case SqlException ex when ex.Number == 2627:
-                return new(ServiceErrorKind.AlreadyExistsOnCreate);
-
-            default:
-                return GenerateInternaError(dbException);
-        }
-    }
-
-    private static ServiceError GenerateInternaError(Exception ex)
-    {
-        return new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex);
     }
 }

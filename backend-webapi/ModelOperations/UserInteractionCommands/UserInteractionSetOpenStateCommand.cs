@@ -5,10 +5,8 @@ using MediatR;
 
 namespace Backend.WebApi.ModelOperations.UserInteractionCommands;
 
-public class UserInteractionSetOpenStateCommand : IRequest<IEnumerable<ServiceError>?>
+public record struct UserInteractionSetOpenStateCommand : IRequest<IEnumerable<ServiceError>>
 {
-    public UserInteractionSetOpenStateCommand() { }
-
     public UserInteractionSetOpenStateCommand(Guid id, bool isOpen)
     {
         Id = id;

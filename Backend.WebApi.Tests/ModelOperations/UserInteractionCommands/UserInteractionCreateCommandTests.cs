@@ -11,7 +11,7 @@ using Xunit;
 namespace Backend.WebApi.Tests.ModelOperations.UserInteractionCommands;
 
 [Collection("ApiLocalDbFixture")]
-public class UserInteractionCreateCommandTests : IDisposable
+public sealed class UserInteractionCreateCommandTests : IDisposable
 {
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionCreateHandler _sutCommandHandler;
@@ -35,7 +35,7 @@ public class UserInteractionCreateCommandTests : IDisposable
         DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        (IEnumerable<ServiceError>? errors, Model.UserInteraction? createdModel) =
+        (IEnumerable<ServiceError> errors, Model.UserInteraction? createdModel) =
             await _sutCommandHandler.Handle(
                 correctCommand
                 );
@@ -45,7 +45,7 @@ public class UserInteractionCreateCommandTests : IDisposable
 
         using AssertionScope _ = new();
         createdModel.Should().NotBeNull();
-        createdModel.Deadline.Should().Be(correctCommand.Deadline);
+        createdModel!.Deadline.Should().Be(correctCommand.Deadline);
         createdModel.Description.Should().Be(correctCommand.Description);
         createdModel.Created.Should().BeAfter(serviceQueryTime);
         createdModel.IsOpen.Should().BeTrue();
