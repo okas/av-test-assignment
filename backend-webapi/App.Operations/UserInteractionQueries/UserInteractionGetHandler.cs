@@ -22,18 +22,18 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
 
     public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)> Handle(
         UserInteractionGetQuery<Tout> request,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct)
     {
         IQueryable<UserInteraction> filteredQuery = _dbContext.UserInteraction
             .AsNoTracking()
             .AppendFiltersToQuery(request.Filters);
 
         (IEnumerable<ServiceError> errors, IEnumerable<Tout>? models) =
-            await TryGetList(filteredQuery, request.Projection, cancellationToken);
+            await TryGetList(filteredQuery, request.Projection, ct);
 
         int total = errors.Any()
             ? 0
-            : await _dbContext.UserInteraction.CountAsync(cancellationToken);
+            : await _dbContext.UserInteraction.CountAsync(ct);
 
         return (errors, models, total);
     }
@@ -41,11 +41,11 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
     private static async Task<(IEnumerable<ServiceError>, IEnumerable<Tout>?)> TryGetList(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection,
-        CancellationToken cancellationToken)
+        CancellationToken ct)
     {
         try
         {
-            IEnumerable<Tout> models = await RetreiveListFrom(query, projection, cancellationToken);
+            IEnumerable<Tout> models = await RetreiveListFrom(query, projection, ct);
 
             return (Enumerable.Empty<ServiceError>(), models);
         }
@@ -65,17 +65,18 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
     /// </remarks>
     /// <param name="query"></param>
     /// <param name="projection"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
     private static async Task<IEnumerable<Tout>> RetreiveListFrom(
         IQueryable<UserInteraction> query,
         Expression<Func<UserInteraction, Tout>>? projection,
-        CancellationToken cancellationToken)
+        CancellationToken ct)
     {
         IQueryable<Tout> modelsQuery = projection is null
                     ? query.Cast<Tout>() // required, because in case of null projection, typeof(T) is not known
                     : query.Select(projection);
 
-        return (await modelsQuery.ToListAsync(cancellationToken: cancellationToken)).AsReadOnly();
+        // TODO refactor .AsReadOnly() call to public API method of service: clearer responsibilities and allows to return Tak<> instead.
+        return (await modelsQuery.ToListAsync(ct)).AsReadOnly();
     }
 }

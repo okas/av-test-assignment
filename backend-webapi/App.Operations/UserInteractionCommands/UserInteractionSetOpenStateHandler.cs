@@ -14,7 +14,7 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
 
     public async Task<IEnumerable<ServiceError>> Handle(
         UserInteractionSetOpenStateCommand request,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct)
     {
         _context.Attach(new UserInteraction
         {
@@ -25,7 +25,7 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
 
         try
         {
-            await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(ct);
 
             return Enumerable.Empty<ServiceError>();
         }
@@ -33,7 +33,7 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
         {
             bool isAny = await _context.UserInteraction.AnyAsync(
                 model => model.Id == request.Id,
-                cancellationToken
+                ct
                 );
 
             if (!isAny)

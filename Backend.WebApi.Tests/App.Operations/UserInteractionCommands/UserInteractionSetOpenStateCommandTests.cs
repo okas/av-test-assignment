@@ -41,7 +41,8 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
         // Act
         IEnumerable<ServiceError> errors =
             await _sutCommandHandler.Handle(
-                correctModelCommand
+                correctModelCommand,
+                ct: default
                 );
 
         // Assert
@@ -63,7 +64,8 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
         // Act
         IEnumerable<ServiceError> errors =
             await _sutCommandHandler.Handle(
-                notExistingModelCommand
+                notExistingModelCommand,
+                ct: default
                 );
 
         // Assert

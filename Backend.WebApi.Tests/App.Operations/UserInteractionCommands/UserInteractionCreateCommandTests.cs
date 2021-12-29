@@ -37,7 +37,8 @@ public sealed class UserInteractionCreateCommandTests : IDisposable
         // Act
         (IEnumerable<ServiceError> errors, Backend.WebApi.Domain.Model.UserInteraction? createdModel) =
             await _sutCommandHandler.Handle(
-                correctCommand
+                correctCommand,
+                ct: default
                 );
 
         // Assert

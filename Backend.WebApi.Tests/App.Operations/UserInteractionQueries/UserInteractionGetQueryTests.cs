@@ -45,7 +45,8 @@ public sealed class UserInteractionGetQueryTests : IDisposable
         // Act
         (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
             await _sutCommandHandler.Handle(
-                query
+                query,
+                ct: default
                 );
 
         // Assert

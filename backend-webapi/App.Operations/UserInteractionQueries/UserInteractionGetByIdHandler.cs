@@ -14,14 +14,14 @@ public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetB
 
     public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(
         UserInteractionGetByIdQuery request,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct)
     {
         try
         {
             UserInteraction? foundModel = await _context.UserInteraction.AsNoTracking()
                 .FirstOrDefaultAsync(
                     model => model.Id == request.Id,
-                    cancellationToken
+                    ct
                     );
 
             return (Enumerable.Empty<ServiceError>(), foundModel);

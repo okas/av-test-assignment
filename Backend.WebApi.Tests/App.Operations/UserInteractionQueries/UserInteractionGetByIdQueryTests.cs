@@ -40,7 +40,8 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
         // Act
         (IEnumerable<ServiceError> errors, UserInteraction? model) =
            await _sutCommandHandler.Handle(
-               correctQuery
+               correctQuery,
+                ct: default
                );
 
         // Assert

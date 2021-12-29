@@ -21,7 +21,7 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
 
     public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(
         UserInteractionCreateCommand request,
-        CancellationToken cancellationToken = default)
+        CancellationToken ct)
     {
         UserInteraction model = new()
         {
@@ -31,18 +31,18 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
             Deadline = request.Deadline,
         };
 
-        return await TryCreate(model, cancellationToken);
+        return await TryCreate(model, ct);
     }
 
     private async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> TryCreate(
-        UserInteraction model, CancellationToken cancellationToken)
+        UserInteraction model, CancellationToken ct)
     {
         IEnumerable<ServiceError> errors;
 
         try
         {
-            await _context.UserInteraction.AddAsync(model, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _context.UserInteraction.AddAsync(model, ct);
+            await _context.SaveChangesAsync(ct);
 
             return (Enumerable.Empty<ServiceError>(), model);
         }
