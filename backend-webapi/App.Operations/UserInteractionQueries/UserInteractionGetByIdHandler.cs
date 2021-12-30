@@ -20,7 +20,7 @@ public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetB
         {
             UserInteraction? foundModel = await _context.UserInteraction
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == request.Id, ct);
+                .FirstOrDefaultAsync(m => m.Id == request.Id, ct).ConfigureAwait(false);
 
             return (Enumerable.Empty<ServiceError>(), model: foundModel);
         }

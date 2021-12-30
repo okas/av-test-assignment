@@ -25,8 +25,8 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
 
         try
         {
-            List<Tout> models = await query.ToListAsync(ct);
-            int totalCount = await _dbContext.UserInteraction.CountAsync(ct);
+            List<Tout> models = await query.ToListAsync(ct).ConfigureAwait(false);
+            int totalCount = await _dbContext.UserInteraction.CountAsync(ct).ConfigureAwait(false);
 
             return (Enumerable.Empty<ServiceError>(), models.AsReadOnly(), totalCount);
         }

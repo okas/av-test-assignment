@@ -25,14 +25,14 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
 
         try
         {
-            await _context.SaveChangesAsync(ct);
+            await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
             return Enumerable.Empty<ServiceError>();
         }
         catch (DbUpdateConcurrencyException)
         {
             // TODO Log it
-            if (await _context.UserInteraction.AnyAsync(model => model.Id == request.Id, ct))
+            if (await _context.UserInteraction.AnyAsync(model => model.Id == request.Id, ct).ConfigureAwait(false))
             {
                 throw;
             }

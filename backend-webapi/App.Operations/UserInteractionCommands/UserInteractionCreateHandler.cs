@@ -31,8 +31,8 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
 
         try
         {
-            await _context.UserInteraction.AddAsync(model, ct);
-            await _context.SaveChangesAsync(ct);
+            await _context.UserInteraction.AddAsync(model, ct).ConfigureAwait(false);
+            await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
             return (Enumerable.Empty<ServiceError>(), model);
         }

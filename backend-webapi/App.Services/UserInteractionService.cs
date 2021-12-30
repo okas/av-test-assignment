@@ -32,7 +32,7 @@ public class UserInteractionService
         {
             UserInteraction? model = await _interactionsRepo
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id, ct);
+                .FirstOrDefaultAsync(m => m.Id == id, ct).ConfigureAwait(false);
 
             return (errors: Array.Empty<ServiceError>(), model);
         }
@@ -72,8 +72,8 @@ public class UserInteractionService
 
         try
         {
-            List<Tout> models = await query.ToListAsync(ct);
-            int totalCount = await _interactionsRepo.CountAsync(ct);
+            List<Tout> models = await query.ToListAsync(ct).ConfigureAwait(false);
+            int totalCount = await _interactionsRepo.CountAsync(ct).ConfigureAwait(false);
 
             return (Enumerable.Empty<ServiceError>(), models.AsReadOnly(), totalCount);
         }
@@ -102,14 +102,14 @@ public class UserInteractionService
 
         try
         {
-            await _context.SaveChangesAsync(ct);
+            await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
             return Enumerable.Empty<ServiceError>();
         }
         catch (DbUpdateConcurrencyException)
         {
             // TODO Log it
-            if (await _context.UserInteraction.AnyAsync(model => model.Id == id, ct))
+            if (await _context.UserInteraction.AnyAsync(model => model.Id == id, ct).ConfigureAwait(false))
             {
                 throw;
             }
@@ -141,8 +141,8 @@ public class UserInteractionService
 
         try
         {
-            await _interactionsRepo.AddAsync(newModel, ct);
-            await _context.SaveChangesAsync(ct);
+            await _interactionsRepo.AddAsync(newModel, ct).ConfigureAwait(false);
+            await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
             return (Enumerable.Empty<ServiceError>(), newModel);
         }
