@@ -12,14 +12,12 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
 
     public UserInteractionSetOpenStateHandler(ApiDbContext context) => _context = context;
 
-    public async Task<IEnumerable<ServiceError>> Handle(
-        UserInteractionSetOpenStateCommand request,
-        CancellationToken ct)
+    public async Task<IEnumerable<ServiceError>> Handle(UserInteractionSetOpenStateCommand rq, CancellationToken ct)
     {
         _context.Attach(new UserInteraction
         {
-            Id = request.Id,
-            IsOpen = request.IsOpen,
+            Id = rq.Id,
+            IsOpen = rq.IsOpen,
         }
         ).Property(model => model.IsOpen).IsModified = true;
 
@@ -32,7 +30,7 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
         catch (DbUpdateConcurrencyException)
         {
             // TODO Log it
-            if (await _context.UserInteraction.AnyAsync(model => model.Id == request.Id, ct).ConfigureAwait(false))
+            if (await _context.UserInteraction.AnyAsync(model => model.Id == rq.Id, ct).ConfigureAwait(false))
             {
                 throw;
             }

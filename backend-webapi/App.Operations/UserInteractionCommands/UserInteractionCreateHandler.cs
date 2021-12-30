@@ -17,16 +17,14 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
 
     public UserInteractionCreateHandler(ApiDbContext dbContext) => _context = dbContext;
 
-    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(
-        UserInteractionCreateCommand request,
-        CancellationToken ct)
+    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(UserInteractionCreateCommand rq, CancellationToken ct)
     {
         UserInteraction model = new()
         {
             IsOpen = true,
             Created = DateTime.Now,
-            Description = request.Description,
-            Deadline = request.Deadline,
+            Description = rq.Description,
+            Deadline = rq.Deadline,
         };
 
         try

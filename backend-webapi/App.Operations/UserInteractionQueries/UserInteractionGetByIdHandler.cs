@@ -12,15 +12,13 @@ public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetB
 
     public UserInteractionGetByIdHandler(ApiDbContext context) => _context = context;
 
-    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(
-        UserInteractionGetByIdQuery request,
-        CancellationToken ct)
+    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
     {
         try
         {
             UserInteraction? foundModel = await _context.UserInteraction
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == request.Id, ct).ConfigureAwait(false);
+                .FirstOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
 
             return (Enumerable.Empty<ServiceError>(), model: foundModel);
         }

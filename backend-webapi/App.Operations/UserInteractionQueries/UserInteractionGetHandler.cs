@@ -17,11 +17,9 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
 
     public UserInteractionGetHandler(ApiDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)> Handle(
-        UserInteractionGetQuery<Tout> request,
-        CancellationToken ct)
+    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)> Handle(UserInteractionGetQuery<Tout> rq, CancellationToken ct)
     {
-        IQueryable<Tout> query = BuildQuery(request);
+        IQueryable<Tout> query = BuildQuery(rq);
 
         try
         {
@@ -46,15 +44,15 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
         }
     }
 
-    private IQueryable<Tout> BuildQuery(UserInteractionGetQuery<Tout> request)
+    private IQueryable<Tout> BuildQuery(UserInteractionGetQuery<Tout> rq)
     {
         IQueryable<UserInteraction> filteredQuery = _dbContext.UserInteraction
             .AsNoTracking()
-            .AppendFiltersToQuery(request.Filters);
+            .AppendFiltersToQuery(rq.Filters);
 
-        return request.Projection is null
+        return rq.Projection is null
             ? filteredQuery.Cast<Tout>() // required, because in case of null projection, typeof(Tout) is not known for result.
-            : filteredQuery.Select(request.Projection);
+            : filteredQuery.Select(rq.Projection);
 
     }
 }

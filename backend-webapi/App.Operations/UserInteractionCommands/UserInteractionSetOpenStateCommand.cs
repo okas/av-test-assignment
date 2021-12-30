@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using Backend.WebApi.App.Services;
 using Backend.WebApi.CrossCutting.Extensions.Validation;
 using MediatR;
 
 namespace Backend.WebApi.App.Operations.UserInteractionCommands;
+
+[StructLayout(LayoutKind.Auto)]
 
 public record struct UserInteractionSetOpenStateCommand : IRequest<IEnumerable<ServiceError>>
 {
