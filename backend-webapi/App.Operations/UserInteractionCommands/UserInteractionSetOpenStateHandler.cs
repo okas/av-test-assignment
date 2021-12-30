@@ -19,7 +19,7 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
         _context.Attach(new UserInteraction
         {
             Id = request.Id,
-            IsOpen = request.IsOpen
+            IsOpen = request.IsOpen,
         }
         ).Property(model => model.IsOpen).IsModified = true;
 
@@ -31,24 +31,22 @@ public class UserInteractionSetOpenStateHandler : IRequestHandler<UserInteractio
         }
         catch (DbUpdateConcurrencyException)
         {
-            bool isAny = await _context.UserInteraction.AnyAsync(
-                model => model.Id == request.Id,
-                ct
-                );
-
-            if (!isAny)
+            // TODO Log it
+            if (await _context.UserInteraction.AnyAsync(model => model.Id == request.Id, ct))
             {
-                return new ServiceError[] { new(ServiceErrorKind.NotFoundOnChange) };
-            }
-            else
-            {
-                // TODO Log
-                // HACK
                 throw;
             }
+
+            return new ServiceError[] { new(ServiceErrorKind.NotFoundOnChange) };
+        }
+        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        {
+            // TODO Log it
+            return new ServiceError[] { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
         }
         catch (Exception ex)
         {
+            // TODO Log it
             return new ServiceError[] { new(ServiceErrorKind.InternalError, Exceptions: ex) };
         }
     }

@@ -33,7 +33,7 @@ public sealed class UserInteractionCreationTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.PostUserInteraction(_knownCorrectDto);
+        var response = await _sutController.PostUserInteraction(_knownCorrectDto, ct: default);
 
         // Assert
         response.Result.As<CreatedAtActionResult>().Value.As<UserInteractionDto>().Should().NotBeNull();
@@ -44,7 +44,7 @@ public sealed class UserInteractionCreationTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.PostUserInteraction(_knownCorrectDto);
+        var response = await _sutController.PostUserInteraction(_knownCorrectDto, ct: default);
         var dto = response.Result.As<CreatedAtActionResult>()
                           .Value.As<UserInteractionDto>();
 

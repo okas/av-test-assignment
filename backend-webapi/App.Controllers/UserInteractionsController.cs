@@ -32,14 +32,15 @@ public class UserInteractionsController : ControllerBase
     /// </summary>
     /// <param name="isOpen">Ommiting this parameter will return all User interactions.</param>
     /// <returns>All or filtered by `IsOpen` collection of interactions.</returns>
+    /// <param name="ct"></param>
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen = null)
+    public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen, CancellationToken ct)
     {
         Expression<Func<UserInteraction, bool>> filters = model => !isOpen.HasValue || model.IsOpen == isOpen;
 
         (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
-            await _service.Get(UserInteractionDto.Projection, filters);
+            await _service.Get(ct, UserInteractionDto.Projection, filters);
 
         return Ok(dtos);
     }
@@ -48,12 +49,13 @@ public class UserInteractionsController : ControllerBase
     /// Get Userinteraction by ID.
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="ct"></param>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id)
+    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id, CancellationToken ct)
     {
-        (_, UserInteraction? model) = await _service.GetOne(id);
+        (_, UserInteraction? model) = await _service.GetOne(id, ct);
 
         if (model is not null)
         {
@@ -74,14 +76,14 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionIsOpenDto isOpenDto)
+    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionIsOpenDto isOpenDto, CancellationToken ct)
     {
         if (id != isOpenDto.Id)
         {
             return BadRequest();
         }
 
-        IEnumerable<ServiceError> errors = await _service.SetOpenState(id, isOpenDto.IsOpen);
+        IEnumerable<ServiceError> errors = await _service.SetOpenState(id, isOpenDto.IsOpen, ct);
 
         if (!errors.Any())
         {
@@ -105,13 +107,15 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto)
+    public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto, CancellationToken ct)
     {
-        (IEnumerable<ServiceError> errors, UserInteraction? model) = await _service.Create(new()
+        UserInteraction newModel = new()
         {
             Description = newDto.Description,
             Deadline = newDto.Deadline,
-        });
+        };
+
+        (IEnumerable<ServiceError> errors, UserInteraction? model) = await _service.Create(newModel, ct);
 
         if (!errors.Any() && model is not null)
         {
@@ -134,6 +138,6 @@ public class UserInteractionsController : ControllerBase
 
         (_, _, Exception?[]? exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
 
-        throw exceptions?.First() ?? new Exception(_noExceptionInErrorMessage);
+        throw new AggregateException("Multiple internal exceptions thrown.", exceptions) ?? new Exception(_noExceptionInErrorMessage);
     }
 }

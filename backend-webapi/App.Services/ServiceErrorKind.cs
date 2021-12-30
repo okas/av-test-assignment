@@ -22,4 +22,9 @@ public enum ServiceErrorKind
     /// Something unknown and serious happened result.
     /// </summary>
     InternalError,
+
+    /// <summary>
+    /// Operation cancellation was requested by <see cref="CancellationToken.IsCancellationRequested"/>.
+    /// </summary>
+    OperationCancellationRequested,
 }

@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Backend.WebApi.App.Services;
+﻿using Backend.WebApi.App.Services;
 using Backend.WebApi.CrossCutting.Extensions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
@@ -8,75 +7,55 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 
-public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)>
+public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)>
 {
     private static readonly string _queryingErrorMessage;
     private readonly ApiDbContext _dbContext;
 
-    static UserInteractionGetHandler()
-    {
-        _queryingErrorMessage = $"{nameof(UserInteractionService)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
-    }
+    static UserInteractionGetHandler() =>
+        _queryingErrorMessage = $"{nameof(UserInteractionGetHandler<Tout>)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
 
     public UserInteractionGetHandler(ApiDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)> Handle(
+    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)> Handle(
         UserInteractionGetQuery<Tout> request,
         CancellationToken ct)
+    {
+        IQueryable<Tout> query = BuildQuery(request);
+
+        try
+        {
+            List<Tout> models = await query.ToListAsync(ct);
+            int totalCount = await _dbContext.UserInteraction.CountAsync(ct);
+
+            return (Enumerable.Empty<ServiceError>(), models.AsReadOnly(), totalCount);
+        }
+        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        {
+            // TODO Log it
+            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
+
+            return (errors, models: Enumerable.Empty<Tout>(), totalCount: default);
+        }
+        catch (Exception ex)
+        {
+            // TODO Log it
+            ServiceError[] errors = { new(ServiceErrorKind.InternalError, _queryingErrorMessage, ex) };
+
+            return (errors, models: Enumerable.Empty<Tout>(), totalCount: default);
+        }
+    }
+
+    private IQueryable<Tout> BuildQuery(UserInteractionGetQuery<Tout> request)
     {
         IQueryable<UserInteraction> filteredQuery = _dbContext.UserInteraction
             .AsNoTracking()
             .AppendFiltersToQuery(request.Filters);
 
-        (IEnumerable<ServiceError> errors, IEnumerable<Tout>? models) =
-            await TryGetList(filteredQuery, request.Projection, ct);
+        IQueryable<Tout> filteredAndProjectedQuery = request.Projection is null
+            ? filteredQuery.Cast<Tout>() // required, because in case of null projection, typeof(Tout) is not known for result.
+            : filteredQuery.Select(request.Projection);
 
-        int total = errors.Any()
-            ? 0
-            : await _dbContext.UserInteraction.CountAsync(ct);
-
-        return (errors, models, total);
-    }
-
-    private static async Task<(IEnumerable<ServiceError>, IEnumerable<Tout>?)> TryGetList(
-        IQueryable<UserInteraction> query,
-        Expression<Func<UserInteraction, Tout>>? projection,
-        CancellationToken ct)
-    {
-        try
-        {
-            IEnumerable<Tout> models = await RetreiveListFrom(query, projection, ct);
-
-            return (Enumerable.Empty<ServiceError>(), models);
-        }
-        catch (Exception ex)
-        {
-            // TODO Log here.
-            ServiceError[] errors = { new(ServiceErrorKind.InternalError, _queryingErrorMessage, ex) };
-
-            return (errors, default);
-        }
-    }
-
-    /// <summary>
-    /// </summary>
-    /// <remarks>
-    /// It is considered "dangerous code", because it can throw variuos exceptions due to using <see cref="Expression{T}"/> types that might not be supported by EF Core. For example if predicates (filter or projection) contains methods that cannot be translated to SQL. <see href="https://docs.microsoft.com/en-us/ef/core/querying/client-eval">Client vs. Server Evaluation</see> for more info.
-    /// </remarks>
-    /// <param name="query"></param>
-    /// <param name="projection"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    private static async Task<IEnumerable<Tout>> RetreiveListFrom(
-        IQueryable<UserInteraction> query,
-        Expression<Func<UserInteraction, Tout>>? projection,
-        CancellationToken ct)
-    {
-        IQueryable<Tout> modelsQuery = projection is null
-                    ? query.Cast<Tout>() // required, because in case of null projection, typeof(T) is not known
-                    : query.Select(projection);
-
-        // TODO refactor .AsReadOnly() call to public API method of service: clearer responsibilities and allows to return Tak<> instead.
-        return (await modelsQuery.ToListAsync(ct)).AsReadOnly();
+        return filteredAndProjectedQuery;
     }
 }

@@ -43,7 +43,7 @@ public sealed class UserInteractionGetQueryTests : IDisposable
         UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler = new(_sutDbContext);
 
         // Act
-        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
+        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int? totalCount) =
             await _sutCommandHandler.Handle(
                 query,
                 ct: default
@@ -57,7 +57,7 @@ public sealed class UserInteractionGetQueryTests : IDisposable
             dtos.Should().OnlyContain(d => d.IsOpen == isOpenTestValue);
         };
 
-        totalCount.Should().BeGreaterThanOrEqualTo(
+        totalCount.Should().NotBeNull().And.BeGreaterThanOrEqualTo(
             _knownEntitesIdIsOpen.Length,
             _becauseKnownOrMoreEntitiesExpected
             );

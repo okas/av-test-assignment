@@ -37,7 +37,7 @@ public sealed class UserInteractionOpenStateChangeTests : IDisposable
         UserInteractionIsOpenDto isOpenDto = new() { Id = _entityId, IsOpen = false };
 
         // Act
-        var response = await _sutController.PatchUserInteraction(_entityId, isOpenDto);
+        var response = await _sutController.PatchUserInteraction(_entityId, isOpenDto, ct: default);
 
         // Assert
         response.Should().BeOfType<NoContentResult>().And.NotBeNull();

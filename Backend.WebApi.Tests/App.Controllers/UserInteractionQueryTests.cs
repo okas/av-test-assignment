@@ -38,7 +38,7 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions();
+        var response = await _sutController.GetUserInteractions(isOpen: default, ct: default);
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -53,7 +53,7 @@ public sealed class UserInteractionQueryTests : IDisposable
         Guid knownId = _knownEntitesIdIsOpen.First().Id;
 
         // Act
-        var response = await _sutController.GetUserInteraction(knownId);
+        var response = await _sutController.GetUserInteraction(knownId, ct: default);
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -68,7 +68,7 @@ public sealed class UserInteractionQueryTests : IDisposable
         Guid knownId = _knownEntitesIdIsOpen.First(known => known.IsOpen).Id;
 
         // Act
-        var response = await _sutController.GetUserInteraction(knownId);
+        var response = await _sutController.GetUserInteraction(knownId, ct: default);
 
         // Assert
         response.Result.As<OkObjectResult>().Value.As<UserInteractionDto>()
@@ -80,7 +80,7 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteraction(Guid.NewGuid());
+        var response = await _sutController.GetUserInteraction(Guid.NewGuid(), ct: default);
 
         // Assert
         response.Result.Should().BeOfType<NotFoundResult>();
@@ -91,7 +91,7 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions();
+        var response = await _sutController.GetUserInteractions(isOpen: default, ct: default);
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -105,7 +105,7 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions(true);
+        var response = await _sutController.GetUserInteractions(true, ct: default);
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -119,7 +119,7 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions(false);
+        var response = await _sutController.GetUserInteractions(false, ct: default);
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();

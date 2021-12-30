@@ -5,10 +5,15 @@ using MediatR;
 
 namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 
-public record struct UserInteractionGetQuery<Tout> : IRequest<(IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)>
+public record struct UserInteractionGetQuery<Tout> : IRequest<(IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)>
 {
-    public UserInteractionGetQuery(Expression<Func<UserInteraction, Tout>>? projection = default,
-        params Expression<Func<UserInteraction, bool>>?[]? filters)
+    public UserInteractionGetQuery(params Expression<Func<UserInteraction, bool>>[] filters)
+    {
+        Projection = default;
+        Filters = filters;
+    }
+
+    public UserInteractionGetQuery(Expression<Func<UserInteraction, Tout>> projection, params Expression<Func<UserInteraction, bool>>[] filters)
     {
         Projection = projection;
         Filters = filters;

@@ -48,6 +48,7 @@ public sealed class UserInteractionServiceTests : IDisposable
         // Act
         (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? modelsDto, int totalCount) =
              await _sutService.Get(
+                 ct: default,
                  projection: UserInteractionDto.Projection,
                  filters: filter
                  );
@@ -76,7 +77,8 @@ public sealed class UserInteractionServiceTests : IDisposable
         IEnumerable<ServiceError> errors =
             await _sutService.SetOpenState(
                 id,
-                false
+                false,
+                ct: default
                 );
 
         // Assert
@@ -96,7 +98,8 @@ public sealed class UserInteractionServiceTests : IDisposable
         IEnumerable<ServiceError> errors =
             await _sutService.SetOpenState(
                 unknownId,
-                true
+                true,
+                ct: default
                 );
 
         // Assert
@@ -118,7 +121,8 @@ public sealed class UserInteractionServiceTests : IDisposable
         // Act
         (IEnumerable<ServiceError> errors, UserInteraction? createdModel) =
             await _sutService.Create(
-                correctNewModel
+                correctNewModel,
+                ct: default
                 );
 
         // Assert
@@ -147,7 +151,8 @@ public sealed class UserInteractionServiceTests : IDisposable
         // Act
         (IEnumerable<ServiceError> errors, UserInteraction? existingModel) =
             await _sutService.Create(
-                attemptedModel
+                attemptedModel,
+                ct: default
                 );
 
         // Assert
