@@ -52,10 +52,9 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
             .AsNoTracking()
             .AppendFiltersToQuery(request.Filters);
 
-        IQueryable<Tout> filteredAndProjectedQuery = request.Projection is null
+        return request.Projection is null
             ? filteredQuery.Cast<Tout>() // required, because in case of null projection, typeof(Tout) is not known for result.
             : filteredQuery.Select(request.Projection);
 
-        return filteredAndProjectedQuery;
     }
 }

@@ -177,10 +177,9 @@ public class UserInteractionService
             .AsNoTracking()
             .AppendFiltersToQuery(filters);
 
-        IQueryable<Tout> filteredAndProjectedQuery = projection is null
+        return projection is null
             ? filteredQuery.Cast<Tout>() // required, because in case of null projection, typeof(Tout) is not known for result.
             : filteredQuery.Select(projection);
 
-        return filteredAndProjectedQuery;
     }
 }
