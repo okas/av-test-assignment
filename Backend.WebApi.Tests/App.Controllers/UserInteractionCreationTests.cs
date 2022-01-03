@@ -2,30 +2,30 @@
 using System.Threading.Tasks;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Dto;
-using Backend.WebApi.App.Services;
-using Backend.WebApi.Infrastructure.Data.EF;
+using Backend.WebApi.App.Operations.UserInteractionCommands;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Backend.WebApi.Tests.App.Controllers;
 
-[Collection("ApiLocalDbFixture")]
-public sealed class UserInteractionCreationTests : IDisposable
+[Collection("IntegrationTestFixture")]
+
+public sealed class UserInteractionCreationTests
 {
-    private readonly UserInteractionNewDto _knownCorrectDto;
-    private readonly ApiDbContext _sutDbContext;
+    private readonly UserInteractionCreateCommand _knownCorrectCommand;
     private readonly UserInteractionsController _sutController;
 
-    public UserInteractionCreationTests(ApiLocalDbFixture dbFixture)
+    public UserInteractionCreationTests(IntegrationTestFixture fixture)
     {
-        _knownCorrectDto = new()
+        _knownCorrectCommand = new()
         {
             Deadline = DateTime.Now.AddDays(1),
             Description = "Non-empty",
         };
-        _sutDbContext = dbFixture.CreateContext();
-        _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
+
+        _sutController = fixture.ScopedServiceProvider!.GetService<UserInteractionsController>()!;
     }
 
     [Fact]
@@ -33,7 +33,11 @@ public sealed class UserInteractionCreationTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.PostUserInteraction(_knownCorrectDto, ct: default);
+        ActionResult<UserInteractionDto> response =
+            await _sutController.PostUserInteraction(
+                _knownCorrectCommand,
+                ct: default
+                );
 
         // Assert
         response.Result.As<CreatedAtActionResult>().Value.As<UserInteractionDto>().Should().NotBeNull();
@@ -44,19 +48,20 @@ public sealed class UserInteractionCreationTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.PostUserInteraction(_knownCorrectDto, ct: default);
-        var dto = response.Result.As<CreatedAtActionResult>()
+        ActionResult<UserInteractionDto> response =
+            await _sutController.PostUserInteraction(
+                _knownCorrectCommand,
+                ct: default
+                );
+
+        UserInteractionDto dto = response.Result.As<CreatedAtActionResult>()
                           .Value.As<UserInteractionDto>();
 
         // Assert
         dto.Id.Should().NotBeEmpty();
         dto.Created.Should().BeOnOrAfter(DateTime.Now.AddSeconds(-5)).And.NotBeAfter(DateTime.Now);
         dto.IsOpen.Should().BeTrue();
-        dto.Description.Should().BeEquivalentTo(_knownCorrectDto.Description);
+        dto.Description.Should().BeEquivalentTo(_knownCorrectCommand.Description);
     }
 
-    /// <summary>
-    /// Clean up test class level arrangements.
-    /// </summary>
-    public void Dispose() => _sutDbContext.Dispose();
 }

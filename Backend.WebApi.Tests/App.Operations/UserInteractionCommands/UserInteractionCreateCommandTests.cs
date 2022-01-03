@@ -29,7 +29,7 @@ public sealed class UserInteractionCreateCommandTests : IDisposable
         UserInteractionCreateCommand correctCommand = new()
         {
             Deadline = DateTime.Now.AddDays(1),
-            Description = "Non-empty"
+            Description = "Non-empty",
         };
 
         DateTime serviceQueryTime = DateTime.Now;

@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.App.Services;
 using Backend.WebApi.App.Swagger;
 using Backend.WebApi.Infrastructure.Data.EF;
@@ -10,15 +12,13 @@ namespace Backend.WebApi;
 
 public static class ProgramDependencyInjection
 {
-    public static WebApplicationBuilder AddServicesToContainer(this WebApplicationBuilder builder)
-    {
-        return builder.EntityFrameworkCoreSetup()
+    public static WebApplicationBuilder AddServicesToContainer(this WebApplicationBuilder builder) =>
+        builder.EntityFrameworkCoreSetup()
             .AspNetCoreRoutingSetup()
             .ApplicationSetup()
             .MediatRSetup()
-            .ODataSetup()
+            .ControllersAndODataSetup()
             .SwaggerSetup();
-    }
 
     private static WebApplicationBuilder EntityFrameworkCoreSetup(this WebApplicationBuilder builder)
     {
@@ -47,6 +47,11 @@ public static class ProgramDependencyInjection
     private static WebApplicationBuilder ApplicationSetup(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<UserInteractionService>();
+        builder.Services.AddTransient<
+            IRequestHandler<UserInteractionGetQuery<UserInteractionDto>,
+                (IEnumerable<ServiceError>, IEnumerable<UserInteractionDto>, int?)>,
+            UserInteractionGetHandler<UserInteractionDto>
+            >();
 
         return builder;
     }
@@ -58,7 +63,7 @@ public static class ProgramDependencyInjection
         return builder;
     }
 
-    private static WebApplicationBuilder ODataSetup(this WebApplicationBuilder builder)
+    private static WebApplicationBuilder ControllersAndODataSetup(this WebApplicationBuilder builder)
     {
         builder.Services.AddControllers().AddOData(c =>
         {

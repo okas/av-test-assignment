@@ -11,6 +11,10 @@
     <PackageReference Include="FluentAssertions" Version="6.2.0" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.13.0" />
     <PackageReference Include="FluentAssertions.AssertMultiple" Version="0.0.4" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.687">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -25,6 +29,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\backend-webapi\Backend.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

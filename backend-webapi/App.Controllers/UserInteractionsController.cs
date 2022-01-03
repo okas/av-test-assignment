@@ -1,7 +1,9 @@
-using System.Linq.Expressions;
 using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Operations.UserInteractionCommands;
+using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.App.Services;
 using Backend.WebApi.Domain.Model;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.WebApi.App.Controllers;
@@ -14,17 +16,17 @@ namespace Backend.WebApi.App.Controllers;
 [Produces("application/json")]
 public class UserInteractionsController : ControllerBase
 {
-    private static readonly string _noExceptionInErrorMessage;
-    private readonly UserInteractionService _service;
+    private static readonly string _unhandledErrorsOrExceptionsMessage;
+    private readonly IMediator _mediator;
 
     static UserInteractionsController()
     {
-        _noExceptionInErrorMessage = $"For developer: {nameof(UserInteractionService)} returned error result, but exception is not found.";
+        _unhandledErrorsOrExceptionsMessage = "For developer: Unhandled errors and/or exceptions encountered.";
     }
 
-    public UserInteractionsController(UserInteractionService service)
+    public UserInteractionsController(IMediator mediator)
     {
-        _service = service;
+        _mediator = mediator;
     }
 
     /// <summary>
@@ -33,14 +35,17 @@ public class UserInteractionsController : ControllerBase
     /// <param name="isOpen">Ommiting this parameter will return all User interactions.</param>
     /// <returns>All or filtered by `IsOpen` collection of interactions.</returns>
     /// <param name="ct"></param>
-    [HttpGet()]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen, CancellationToken ct)
     {
-        Expression<Func<UserInteraction, bool>> filters = model => !isOpen.HasValue || model.IsOpen == isOpen;
+        UserInteractionGetQuery<UserInteractionDto> request = new(
+            UserInteractionDto.Projection,
+            filters: model => !isOpen.HasValue || model.IsOpen == isOpen
+            );
 
-        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int totalCount) =
-            await _service.Get(ct, UserInteractionDto.Projection, filters);
+        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto> dtos, int? totalCount) =
+            await _mediator.Send(request, ct);
 
         return Ok(dtos);
     }
@@ -48,14 +53,14 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Get Userinteraction by ID.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="query"></param>
     /// <param name="ct"></param>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id, CancellationToken ct)
+    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(UserInteractionGetByIdQuery query, CancellationToken ct)
     {
-        (_, UserInteraction? model) = await _service.GetOne(id, ct);
+        (_, UserInteraction? model) = await _mediator.Send(query, ct);
 
         if (model is not null)
         {
@@ -76,14 +81,14 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionIsOpenDto isOpenDto, CancellationToken ct)
+    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct)
     {
-        if (id != isOpenDto.Id)
+        if (id != command.Id)
         {
             return BadRequest();
         }
 
-        IEnumerable<ServiceError> errors = await _service.SetOpenState(id, isOpenDto.IsOpen, ct);
+        IEnumerable<ServiceError> errors = await _mediator.Send(command, ct);
 
         if (!errors.Any())
         {
@@ -95,9 +100,7 @@ public class UserInteractionsController : ControllerBase
             return NotFound();
         }
 
-        (_, _, Exception?[]? exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
-
-        throw exceptions?.First() ?? new Exception(_noExceptionInErrorMessage);
+        throw new Exception(_unhandledErrorsOrExceptionsMessage);
     }
 
     /// <summary>
@@ -107,15 +110,9 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionNewDto newDto, CancellationToken ct)
+    public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionCreateCommand command, CancellationToken ct)
     {
-        UserInteraction newModel = new()
-        {
-            Description = newDto.Description,
-            Deadline = newDto.Deadline,
-        };
-
-        (IEnumerable<ServiceError> errors, UserInteraction? model) = await _service.Create(newModel, ct);
+        (IEnumerable<ServiceError> errors, UserInteraction? model) = await _mediator.Send(command, ct);
 
         if (!errors.Any() && model is not null)
         {
@@ -136,8 +133,6 @@ public class UserInteractionsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, error2.Message);
         }
 
-        (_, _, Exception?[]? exceptions) = errors.First(err => err.Exceptions?.Any() ?? false);
-
-        throw new AggregateException("Multiple internal exceptions thrown.", exceptions) ?? new Exception(_noExceptionInErrorMessage);
+        throw new Exception(_unhandledErrorsOrExceptionsMessage);
     }
 }

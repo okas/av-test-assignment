@@ -15,7 +15,7 @@ namespace Backend.WebApi.Tests.App.Operations.UserInteractionQueries;
 [Collection("ApiLocalDbFixture")]
 public sealed class UserInteractionGetQueryTests : IDisposable
 {
-    private static readonly string _becauseKnownOrMoreEntitiesExpected;
+    private readonly static string _becauseKnownOrMoreEntitiesExpected;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
 
@@ -37,8 +37,10 @@ public sealed class UserInteractionGetQueryTests : IDisposable
     public async Task Get_FilterByIsClosed_ReturnsFilteredCollection(bool isOpenTestValue)
     {
         // Arrange
-        UserInteractionGetQuery<UserInteractionDto> query =
-            new(UserInteractionDto.Projection, model => model.IsOpen == isOpenTestValue);
+        UserInteractionGetQuery<UserInteractionDto> query = new(
+            UserInteractionDto.Projection,
+            model => model.IsOpen == isOpenTestValue
+            );
 
         UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler = new(_sutDbContext);
 
@@ -55,7 +57,7 @@ public sealed class UserInteractionGetQueryTests : IDisposable
             errors.Should().BeNullOrEmpty();
             dtos.Should().NotBeNullOrEmpty();
             dtos.Should().OnlyContain(d => d.IsOpen == isOpenTestValue);
-        };
+        }
 
         totalCount.Should().NotBeNull().And.BeGreaterThanOrEqualTo(
             _knownEntitesIdIsOpen.Length,

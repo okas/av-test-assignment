@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.App.Services;
@@ -34,7 +33,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
         // Arrange
         UserInteractionGetByIdQuery correctQuery = new()
         {
-            Id = _knownEntitesIdIsOpen.First().Id
+            Id = _knownEntitesIdIsOpen[0].Id,
         };
 
         // Act

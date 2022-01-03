@@ -77,7 +77,7 @@ public sealed class UserInteractionServiceTests : IDisposable
         IEnumerable<ServiceError> errors =
             await _sutService.SetOpenState(
                 id,
-                false,
+                newState: false,
                 ct: default
                 );
 
@@ -98,7 +98,7 @@ public sealed class UserInteractionServiceTests : IDisposable
         IEnumerable<ServiceError> errors =
             await _sutService.SetOpenState(
                 unknownId,
-                true,
+                newState: true,
                 ct: default
                 );
 
@@ -114,7 +114,7 @@ public sealed class UserInteractionServiceTests : IDisposable
         UserInteraction correctNewModel = new()
         {
             Deadline = DateTime.Now.AddDays(1),
-            Description = "Non-empty"
+            Description = "Non-empty",
         };
         DateTime serviceQueryTime = DateTime.Now;
 
@@ -143,9 +143,9 @@ public sealed class UserInteractionServiceTests : IDisposable
         // Arrange+
         UserInteraction attemptedModel = new()
         {
-            Id = _knownEntitesIdIsOpen.First().Id,
+            Id = _knownEntitesIdIsOpen[0].Id,
             Deadline = DateTime.Now.AddDays(1),
-            Description = "Non-empty"
+            Description = "Non-empty",
         };
 
         // Act

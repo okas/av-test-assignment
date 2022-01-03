@@ -1,36 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Dto;
-using Backend.WebApi.App.Services;
-using Backend.WebApi.Infrastructure.Data.EF;
+using Backend.WebApi.App.Operations.UserInteractionQueries;
 using FluentAssertions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using static Backend.WebApi.Tests.UserInteractionUtilities;
 
-
 namespace Backend.WebApi.Tests.App.Controllers;
 
-[Collection("ApiLocalDbFixture")]
-public sealed class UserInteractionQueryTests : IDisposable
+[Collection("IntegrationTestFixture")]
+public sealed class UserInteractionQueryTests
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
-    private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionsController _sutController;
 
     /// <summary>
     /// Uses DbTransaction to roll back changes after each test
     /// </summary>
-    /// <param name="dbFixture"></param>
-    public UserInteractionQueryTests(ApiLocalDbFixture dbFixture)
+    /// <param name="fixture"></param>
+    public UserInteractionQueryTests(IntegrationTestFixture fixture)
     {
         _knownEntitesIdIsOpen = GenerateKnownData(5);
-        _sutDbContext = dbFixture.CreateContext();
-        SeedData(dbFixture, _knownEntitesIdIsOpen);
-        _sutController = new UserInteractionsController(new UserInteractionService(_sutDbContext));
+        SeedData(fixture, _knownEntitesIdIsOpen);
+        _sutController = new UserInteractionsController(
+            fixture.ScopedServiceProvider!.GetService<IMediator>()!);
     }
 
     [Fact]
@@ -38,7 +36,11 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions(isOpen: default, ct: default);
+        ActionResult<IEnumerable<UserInteractionDto>> response =
+            await _sutController.GetUserInteractions(
+                isOpen: default,
+                ct: default
+                );
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -50,10 +52,17 @@ public sealed class UserInteractionQueryTests : IDisposable
     public async Task Get_CanGetSingleById_ReturnOkObjectResultAndNonNullValue()
     {
         // Arrange+
-        Guid knownId = _knownEntitesIdIsOpen.First().Id;
+        UserInteractionGetByIdQuery query = new()
+        {
+            Id = _knownEntitesIdIsOpen[0].Id,
+        };
 
         // Act
-        var response = await _sutController.GetUserInteraction(knownId, ct: default);
+        ActionResult<UserInteractionDto> response =
+            await _sutController.GetUserInteraction(
+                query: query,
+                ct: default
+                );
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
@@ -65,22 +74,38 @@ public sealed class UserInteractionQueryTests : IDisposable
     public async Task Get_CanGetSingleById_ReturnDtoWithCorrectId()
     {
         // Arrange+
-        Guid knownId = _knownEntitesIdIsOpen.First(known => known.IsOpen).Id;
+        UserInteractionGetByIdQuery query = new()
+        {
+            Id = _knownEntitesIdIsOpen[0].Id,
+        };
 
         // Act
-        var response = await _sutController.GetUserInteraction(knownId, ct: default);
+        ActionResult<UserInteractionDto> response =
+            await _sutController.GetUserInteraction(
+                query,
+                ct: default
+                );
 
         // Assert
         response.Result.As<OkObjectResult>().Value.As<UserInteractionDto>()
-                .Id.Should().Be(knownId);
+                .Id.Should().Be(query.Id);
     }
 
     [Fact]
     public async Task Get_CannotGetUsingNonExistingId_ReturnNotFoundResult()
     {
         // Arrange
+        UserInteractionGetByIdQuery query = new()
+        {
+            Id = Guid.NewGuid(),
+        };
+
         // Act
-        var response = await _sutController.GetUserInteraction(Guid.NewGuid(), ct: default);
+        ActionResult<UserInteractionDto> response =
+            await _sutController.GetUserInteraction(
+                query,
+                ct: default
+                );
 
         // Assert
         response.Result.Should().BeOfType<NotFoundResult>();
@@ -91,10 +116,15 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions(isOpen: default, ct: default);
+        ActionResult<IEnumerable<UserInteractionDto>> response =
+            await _sutController.GetUserInteractions(
+                isOpen: default,
+                ct: default
+                );
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
+
         response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
                  .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
                  .Which.Should().HaveCountGreaterThan(0);
@@ -105,10 +135,15 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions(true, ct: default);
+        ActionResult<IEnumerable<UserInteractionDto>> response =
+            await _sutController.GetUserInteractions(
+                isOpen: true,
+                ct: default
+                );
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
+
         response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
                  .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
                  .Which.Should().HaveCountGreaterThan(0);
@@ -119,17 +154,17 @@ public sealed class UserInteractionQueryTests : IDisposable
     {
         // Arrange
         // Act
-        var response = await _sutController.GetUserInteractions(false, ct: default);
+        ActionResult<IEnumerable<UserInteractionDto>> response =
+            await _sutController.GetUserInteractions(
+                isOpen: false,
+                ct: default
+                );
 
         // Assert
         response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
+
         response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
                  .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
                  .Which.Should().HaveCountGreaterThan(0);
     }
-
-    /// <summary>
-    /// Clean up test class level arrangements.
-    /// </summary>
-    public void Dispose() => _sutDbContext.Dispose();
 }
