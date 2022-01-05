@@ -98,7 +98,6 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
 }
 
 [CollectionDefinition("IntegrationTestFixture")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0048:File name must match type name", Justification = "<Pending>")]
 public class IoCFixtureCollection : ICollectionFixture<IntegrationTestFixture>
 {
     // This class has no code, and is never created. Its purpose is simply

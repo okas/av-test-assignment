@@ -110,7 +110,6 @@ public class ApiLocalDbFixture : IDisposable
 }
 
 [CollectionDefinition("ApiLocalDbFixture")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0048:File name must match type name", Justification = "<Pending>")]
 public class ApiLocalDbCollection : ICollectionFixture<ApiLocalDbFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
