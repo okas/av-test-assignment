@@ -21,8 +21,9 @@ public static class SwaggerGenExtensionMethods
     public static void IncludeXmlCommentsOfCurrentProject(this SwaggerGenOptions options,
         bool includeControllerXmlComments = true)
     {
-        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        string? xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        string? xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
         options.IncludeXmlComments(xmlPath, includeControllerXmlComments);
     }
 
@@ -34,8 +35,9 @@ public static class SwaggerGenExtensionMethods
     {
         options.CustomOperationIds(apiDesc =>
         {
-            var controller = apiDesc.ActionDescriptor.RouteValues["controller"];
-            var action = apiDesc.ActionDescriptor.RouteValues["action"];
+            string? controller = apiDesc.ActionDescriptor.RouteValues["controller"];
+            string? action = apiDesc.ActionDescriptor.RouteValues["action"];
+
             return StringUtilities.ToCamelCase($"{controller}{action}");
         });
     }
@@ -52,8 +54,13 @@ public static class SwaggerGenExtensionMethods
     {
         options.CustomOperationIds(apiDesc =>
         {
-            string input = $@"{apiDesc.HttpMethod}_{apiDesc.RelativePath}";
-            return new Regex(@"[\W]").Replace(input.ToLowerInvariant(), "_");
+            string? input = $@"{apiDesc.HttpMethod}_{apiDesc.RelativePath}";
+
+            return new Regex
+                (@"[\W]",
+                RegexOptions.ExplicitCapture,
+                TimeSpan.FromSeconds(1)).Replace(input.ToLowerInvariant(), "_"
+                );
         });
     }
 }

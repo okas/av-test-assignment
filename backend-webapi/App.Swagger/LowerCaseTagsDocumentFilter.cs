@@ -13,13 +13,17 @@ public class LowerCaseTagsDocumentFilter : IDocumentFilter
 {
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
-        var pathTags = swaggerDoc.Paths.SelectMany(p => p.Value.Operations.SelectMany(o => o.Value.Tags));
+        IEnumerable<OpenApiTag>? pathTags = swaggerDoc.Paths
+            .SelectMany(p => p.Value.Operations
+                .SelectMany(o => o.Value.Tags)
+                );
+
         TagsToLower(pathTags.ToList());
         TagsToLower(swaggerDoc.Tags.ToList());
     }
 
     private static void TagsToLower(List<Microsoft.OpenApi.Models.OpenApiTag> list)
     {
-        list.ForEach(tag => tag.Name = tag.Name.ToLower());
+        list.ForEach(tag => tag.Name = tag.Name.ToLowerInvariant());
     }
 }

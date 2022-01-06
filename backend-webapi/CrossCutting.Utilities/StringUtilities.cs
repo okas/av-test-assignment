@@ -6,19 +6,29 @@ public static class StringUtilities
     /// <summary>
     /// Coneverts string to camelCase.
     /// </summary>
-    /// <permission href="https://newbedev.com/convert-string-to-camelcase-from-titlecase-c"></permission>
+    /// <remarks><seealso href="https://newbedev.com/convert-string-to-camelcase-from-titlecase-c"></seealso></remarks>
     public static string ToCamelCase(string s)
     {
-        var x = s.Replace("_", "");
+        string temp = s.Replace("_", "", StringComparison.InvariantCulture);
 
-        if (x.Length == 0)
+        if (temp.Length == 0)
         {
-            return "null";
+            return "";
         }
-        x = Regex.Replace(x, "([A-Z])([A-Z]+)($|[A-Z])",
-            m => $"{m.Groups[1].Value}{m.Groups[2].Value.ToLower()}{m.Groups[3].Value}"
+
+        Regex regexp = new(
+            @"([A-Z])([A-Z]+)($|[A-Z])",
+            RegexOptions.ExplicitCapture,
+            TimeSpan.FromSeconds(1)
             );
 
-        return $"{char.ToLower(x[0])}{x[1..]}";
+        temp = regexp.Replace(
+            temp,
+            m => $"{m.Groups[1].Value}{m.Groups[2].Value.ToLowerInvariant()}{m.Groups[3].Value}"
+            );
+
+        char lowFirst = char.ToLowerInvariant(temp[0]);
+
+        return $"{lowFirst}{temp[1..]}";
     }
 }
