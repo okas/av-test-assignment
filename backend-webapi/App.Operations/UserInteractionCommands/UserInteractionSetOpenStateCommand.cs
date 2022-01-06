@@ -16,17 +16,13 @@ public readonly record struct UserInteractionSetOpenStateCommand(
     )
     : IRequest
 {
-    public class Handler : IRequestHandler<UserInteractionSetOpenStateCommand>
+    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionSetOpenStateCommand>
     {
-        private readonly ApiDbContext _context;
-
         public const string NotFoundOnIsOpenChangeMessage = "User interaction not found, while attempting to set its Open state.";
-
-        public Handler(ApiDbContext context) => _context = context;
 
         public async Task<Unit> Handle(UserInteractionSetOpenStateCommand rq, CancellationToken ct)
         {
-            _context.Attach(new UserInteraction
+            Context.Attach(new UserInteraction
             {
                 Id = rq.Id,
                 IsOpen = rq.IsOpen,
@@ -35,7 +31,7 @@ public readonly record struct UserInteractionSetOpenStateCommand(
 
             try
             {
-                await _context.SaveChangesAsync(ct).ConfigureAwait(false);
+                await Context.SaveChangesAsync(ct).ConfigureAwait(false);
 
                 return Unit.Value;
             }
@@ -43,7 +39,7 @@ public readonly record struct UserInteractionSetOpenStateCommand(
             {
                 // TODO Log it
                 // TODO Analyze https://docs.microsoft.com/en-us/ef/core/saving/concurrency to implement better handling
-                if (!await _context.UserInteraction.AnyAsync(model => model.Id == rq.Id, ct).ConfigureAwait(false))
+                if (!await Context.UserInteraction.AnyAsync(model => model.Id == rq.Id, ct).ConfigureAwait(false))
                 {
                     throw new NotFoundException(NotFoundOnIsOpenChangeMessage, rq.Id);
                 }

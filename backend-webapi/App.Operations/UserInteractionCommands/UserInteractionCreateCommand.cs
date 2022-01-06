@@ -14,17 +14,14 @@ public readonly record struct UserInteractionCreateCommand(
     )
     : IRequest<UserInteraction>
 {
-    public class Handler : IRequestHandler<UserInteractionCreateCommand, UserInteraction>
+    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionCreateCommand, UserInteraction>
     {
-        private readonly ApiDbContext _context;
         private static readonly string _createNewModelErrorMessage;
 
         public const string AlreadyExists = "User interaction already exists.";
 
         static Handler() =>
             _createNewModelErrorMessage = $"Attempted to create new `{nameof(UserInteraction)}`, but operation was cancelled unexpectedly. See excpetion details.";
-
-        public Handler(ApiDbContext dbContext) => _context = dbContext;
 
         /// <inheritdoc />
         /// <exception cref="AlreadyExistsException" />
@@ -41,8 +38,8 @@ public readonly record struct UserInteractionCreateCommand(
 
             try
             {
-                await _context.UserInteraction.AddAsync(model, ct).ConfigureAwait(false); // TODO For single entity overhead is not justified.
-                await _context.SaveChangesAsync(ct).ConfigureAwait(false);
+                await Context.UserInteraction.AddAsync(model, ct).ConfigureAwait(false); // TODO For single entity overhead is not justified.
+                await Context.SaveChangesAsync(ct).ConfigureAwait(false);
 
                 return model;
             }

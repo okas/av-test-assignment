@@ -13,17 +13,13 @@ public readonly record struct UserInteractionGetByIdQuery(
     )
     : IRequest<UserInteraction>
 {
-    public class Handler : IRequestHandler<UserInteractionGetByIdQuery, UserInteraction>
+    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetByIdQuery, UserInteraction>
     {
-        private readonly ApiDbContext _context;
-
-        public Handler(ApiDbContext context) => _context = context;
-
         public async Task<UserInteraction> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
         {
             try
             {
-                UserInteraction? model = await _context.UserInteraction
+                UserInteraction? model = await Context.UserInteraction
                     .AsNoTracking()
                     .FirstOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
 
