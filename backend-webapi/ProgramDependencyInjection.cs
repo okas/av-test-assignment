@@ -34,7 +34,7 @@ public static class ProgramDependencyInjection
 
     private static WebApplicationBuilder AspNetCoreRoutingSetup(this WebApplicationBuilder builder)
     {
-        builder.Services.Configure<RouteOptions>(options =>
+        builder.Services.AddRouting(options =>
         {
             // Client tooling feels less errorprone this way. Other than lowercase URLs are not nice.
             options.LowercaseUrls = true;
@@ -48,8 +48,7 @@ public static class ProgramDependencyInjection
     {
         builder.Services.AddScoped<UserInteractionService>();
         builder.Services.AddTransient<
-            IRequestHandler<UserInteractionGetQuery<UserInteractionDto>,
-                (IEnumerable<ServiceError>, IEnumerable<UserInteractionDto>, int?)>,
+            IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
             UserInteractionGetHandler<UserInteractionDto>
             >();
 

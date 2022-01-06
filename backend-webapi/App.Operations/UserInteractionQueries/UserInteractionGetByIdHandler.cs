@@ -1,4 +1,4 @@
-﻿using Backend.WebApi.App.Services;
+﻿using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
@@ -6,35 +6,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 
-public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetByIdQuery, (IEnumerable<ServiceError> errors, UserInteraction? model)>
+public class UserInteractionGetByIdHandler : IRequestHandler<UserInteractionGetByIdQuery, UserInteraction>
 {
     private readonly ApiDbContext _context;
 
     public UserInteractionGetByIdHandler(ApiDbContext context) => _context = context;
 
-    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
+    public async Task<UserInteraction> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
     {
         try
         {
-            UserInteraction? foundModel = await _context.UserInteraction
+            UserInteraction? model = await _context.UserInteraction
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
 
-            return (Enumerable.Empty<ServiceError>(), model: foundModel);
+            return model ?? throw new NotFoundException("User interaction not found", rq.Id);
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch
         {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-
-            return (errors, model: default);
-        }
-        catch (Exception ex)
-        {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.InternalError, Exceptions: ex) };
-
-            return (errors, model: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
     }
 }

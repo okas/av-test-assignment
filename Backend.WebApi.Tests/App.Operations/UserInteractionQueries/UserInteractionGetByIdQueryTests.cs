@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
@@ -28,7 +26,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
     }
 
     [Fact]
-    public async Task GetOne_ByCorrectId_ReturnModelWithNoerrors()
+    public async Task GetOne_ByCorrectId_ReturnModel()
     {
         // Arrange
         UserInteractionGetByIdQuery correctQuery = new()
@@ -37,15 +35,13 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
         };
 
         // Act
-        (IEnumerable<ServiceError> errors, UserInteraction? model) =
-           await _sutCommandHandler.Handle(
-               correctQuery,
+        UserInteraction model =
+            await _sutCommandHandler.Handle(
+                correctQuery,
                 ct: default
-               );
+                );
 
         // Assert
-        errors.Should().BeNullOrEmpty();
-
         using AssertionScope _ = new();
         model.Should().NotBeNull();
         model!.Id.Should().Be(correctQuery.Id);

@@ -1,4 +1,4 @@
-﻿using Backend.WebApi.App.Services;
+﻿using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
@@ -7,17 +7,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
-public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreateCommand, (IEnumerable<ServiceError> errors, UserInteraction? model)>
+public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreateCommand, UserInteraction>
 {
     private readonly ApiDbContext _context;
     private static readonly string _createNewModelErrorMessage;
+
+    public const string AlreadyExists = "User interaction already exists.";
 
     static UserInteractionCreateHandler() =>
         _createNewModelErrorMessage = $"Attempted to create new `{nameof(UserInteraction)}`, but operation was cancelled unexpectedly. See excpetion details.";
 
     public UserInteractionCreateHandler(ApiDbContext dbContext) => _context = dbContext;
 
-    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Handle(UserInteractionCreateCommand rq, CancellationToken ct)
+    /// <inheritdoc />
+    /// <exception cref="AlreadyExistsException" />
+    /// <exception cref="DbUpdateConcurrencyException" />
+    public async Task<UserInteraction> Handle(UserInteractionCreateCommand rq, CancellationToken ct)
     {
         UserInteraction model = new()
         {
@@ -29,31 +34,27 @@ public class UserInteractionCreateHandler : IRequestHandler<UserInteractionCreat
 
         try
         {
-            await _context.UserInteraction.AddAsync(model, ct).ConfigureAwait(false);
+            await _context.UserInteraction.AddAsync(model, ct).ConfigureAwait(false); // TODO For single entity overhead is not justified.
             await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
-            return (Enumerable.Empty<ServiceError>(), model);
+            return model;
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
         {
             // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.AlreadyExistsOnCreate) };
-
-            return (errors, model: default);
+            // TODO Current workflow, where entity instance is created in this handler, should exclude this situation.
+            // As of now it should be thrown when Id generation outside of server fails somehow (e.g. default value is attempted).
+            throw new AlreadyExistsException(AlreadyExists, model.Id, ex);
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch (DbUpdateConcurrencyException)
         {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-
-            return (errors, model: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
-        catch (Exception ex)
+        catch
         {
-            // TODO Log it
-            ServiceError[] errors = new ServiceError[] { new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex) };
-
-            return (errors, model: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
     }
 }

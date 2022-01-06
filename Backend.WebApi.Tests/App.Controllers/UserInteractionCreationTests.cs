@@ -19,11 +19,7 @@ public sealed class UserInteractionCreationTests
 
     public UserInteractionCreationTests(IntegrationTestFixture fixture)
     {
-        _knownCorrectCommand = new()
-        {
-            Deadline = DateTime.Now.AddDays(1),
-            Description = "Non-empty",
-        };
+        _knownCorrectCommand = new(DateTime.Now.AddDays(1), "Non-empty");
 
         _sutController = fixture.ScopedServiceProvider!.GetService<UserInteractionsController>()!;
     }

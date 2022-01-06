@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
-using Backend.WebApi.App.Services;
+using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using Xunit;
@@ -20,57 +19,58 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 
     public UserInteractionSetOpenStateCommandTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = GenerateKnownData(4);
+        _knownEntitesIdIsOpen = GenerateKnownData(2);
         _sutDbContext = dbFixture.CreateContext();
         SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutCommandHandler = new(_sutDbContext);
     }
 
-    [Fact]
-    public async Task SetOpenState_CurrentlyOpenInteraction_WasSetToClosed()
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task SetOpenState_ExistingInteraction_Succeeds(bool existingValue, bool newValue)
     {
         // Arrange+
-        (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
+        (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen == existingValue);
 
         UserInteractionSetOpenStateCommand correctModelCommand = new()
         {
             Id = id,
-            IsOpen = false,
+            IsOpen = newValue,
         };
 
         // Act
-        IEnumerable<ServiceError> errors =
-            await _sutCommandHandler.Handle(
+        _ = await _sutCommandHandler.Handle(
                 correctModelCommand,
                 ct: default
                 );
 
         // Assert
-        errors.Should().BeNullOrEmpty();
-
-        _sutDbContext.UserInteraction.Should().Contain(model => !model.IsOpen);
+        _sutDbContext.UserInteraction.Should().ContainSingle(model => model.Id == id && model.IsOpen == newValue);
     }
 
     [Fact]
-    public async Task SetOpenState_NonExistingInteraction_ReturnNotFoundResultWithCorrectError()
+    public async Task SetOpenState_NonExistingInteraction_Throws()
     {
         // Arrange+
         UserInteractionSetOpenStateCommand notExistingModelCommand = new()
         {
             Id = Guid.NewGuid(),
-            IsOpen = true,
         };
 
         // Act
-        IEnumerable<ServiceError> errors =
-            await _sutCommandHandler.Handle(
+        var act = () =>
+            _sutCommandHandler.Handle(
                 notExistingModelCommand,
                 ct: default
                 );
 
         // Assert
-        errors.Should().NotBeNullOrEmpty();
-        errors!.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("User interaction not found, while attempting to set its Open state.")
+            .Where(ex => (Guid?)ex.Data["Id"] == notExistingModelCommand.Id);
     }
 
     /// <summary>

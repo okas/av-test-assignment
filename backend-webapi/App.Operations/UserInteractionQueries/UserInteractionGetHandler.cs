@@ -1,5 +1,4 @@
-﻿using Backend.WebApi.App.Services;
-using Backend.WebApi.CrossCutting.Extensions;
+﻿using Backend.WebApi.CrossCutting.Extensions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 
-public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)>
+public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)>
 {
     private static readonly string _queryingErrorMessage;
     private readonly ApiDbContext _dbContext;
@@ -17,7 +16,7 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
 
     public UserInteractionGetHandler(ApiDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout> models, int? totalCount)> Handle(UserInteractionGetQuery<Tout> rq, CancellationToken ct)
+    public async Task<(IEnumerable<Tout> models, int totalCount)> Handle(UserInteractionGetQuery<Tout> rq, CancellationToken ct)
     {
         IQueryable<Tout> query = BuildQuery(rq);
 
@@ -26,21 +25,12 @@ public class UserInteractionGetHandler<Tout> : IRequestHandler<UserInteractionGe
             List<Tout> models = await query.ToListAsync(ct).ConfigureAwait(false);
             int totalCount = await _dbContext.UserInteraction.CountAsync(ct).ConfigureAwait(false);
 
-            return (Enumerable.Empty<ServiceError>(), models.AsReadOnly(), totalCount);
+            return (models.AsReadOnly(), totalCount);
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch
         {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-
-            return (errors, models: Enumerable.Empty<Tout>(), totalCount: default);
-        }
-        catch (Exception ex)
-        {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.InternalError, _queryingErrorMessage, ex) };
-
-            return (errors, models: Enumerable.Empty<Tout>(), totalCount: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
     }
 

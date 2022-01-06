@@ -32,7 +32,11 @@ public sealed class UserInteractionOpenStateChangeTests
     public async Task Patch_CanMarkInteractionClosed_ReturnNoContentResultAndModelEntityIsClosedEqFalse()
     {
         // Arrange
-        UserInteractionSetOpenStateCommand command = new() { Id = _entityId, IsOpen = false };
+        UserInteractionSetOpenStateCommand command = new()
+        {
+            Id = _entityId,
+            IsOpen = false,
+        };
 
         // Act
         IActionResult response =

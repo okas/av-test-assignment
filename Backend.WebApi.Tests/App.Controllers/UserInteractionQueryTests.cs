@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Dto;
-using Backend.WebApi.App.Operations.UserInteractionQueries;
+using Backend.WebApi.Domain.Exceptions;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -43,91 +43,90 @@ public sealed class UserInteractionQueryTests
                 );
 
         // Assert
-        response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
-        response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
-                .And.BeAssignableTo<IEnumerable<UserInteractionDto>>();
+        response.Result.Should().NotBeNull()
+            .And.BeOfType<OkObjectResult>()
+            .Which.Value.Should().NotBeNull()
+            .And.BeAssignableTo<IEnumerable<UserInteractionDto>>();
     }
 
     [Fact]
     public async Task Get_CanGetSingleById_ReturnOkObjectResultAndNonNullValue()
     {
-        // Arrange+
-        UserInteractionGetByIdQuery query = new()
-        {
-            Id = _knownEntitesIdIsOpen[0].Id,
-        };
+        // Arrange
+        Guid id = _knownEntitesIdIsOpen[0].Id;
 
         // Act
         ActionResult<UserInteractionDto> response =
             await _sutController.GetUserInteraction(
-                query: query,
+                id,
                 ct: default
                 );
 
         // Assert
-        response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
-        response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
-                .And.BeOfType<UserInteractionDto>();
+        response.Result.Should().NotBeNull()
+            .And.BeOfType<OkObjectResult>()
+            .Which.Value.Should().NotBeNull()
+            .And.BeOfType<UserInteractionDto>();
     }
 
     [Fact]
     public async Task Get_CanGetSingleById_ReturnDtoWithCorrectId()
     {
-        // Arrange+
-        UserInteractionGetByIdQuery query = new()
-        {
-            Id = _knownEntitesIdIsOpen[0].Id,
-        };
+        // Arrange
+        Guid id = _knownEntitesIdIsOpen[0].Id;
 
         // Act
         ActionResult<UserInteractionDto> response =
             await _sutController.GetUserInteraction(
-                query,
+                id,
                 ct: default
                 );
 
         // Assert
-        response.Result.As<OkObjectResult>().Value.As<UserInteractionDto>()
-                .Id.Should().Be(query.Id);
+        response.Result.Should().NotBeNull()
+            .And.BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<UserInteractionDto>()
+            .Which.Id.Should().Be(id);
     }
 
     [Fact]
-    public async Task Get_CannotGetUsingNonExistingId_ReturnNotFoundResult()
+    public async Task Get_CannotGetUsingNonExistingId_ThrowsWithExpectedMessage()
     {
         // Arrange
-        UserInteractionGetByIdQuery query = new()
-        {
-            Id = Guid.NewGuid(),
-        };
+        Guid id = Guid.NewGuid();
 
         // Act
-        ActionResult<UserInteractionDto> response =
-            await _sutController.GetUserInteraction(
-                query,
+        Func<Task<ActionResult<UserInteractionDto>>> act = () =>
+            _sutController.GetUserInteraction(
+                id,
                 ct: default
                 );
 
         // Assert
-        response.Result.Should().BeOfType<NotFoundResult>();
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("User interaction not found");
     }
 
-    [Fact]
-    public async Task Get_CanGetUnFiltered_ReturnSome()
+    [Theory]
+    [InlineData(null)]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_CanGetUnFiltered_ReturnSome(bool? filterValue)
     {
         // Arrange
         // Act
         ActionResult<IEnumerable<UserInteractionDto>> response =
             await _sutController.GetUserInteractions(
-                isOpen: default,
+                isOpen: filterValue,
                 ct: default
                 );
 
         // Assert
-        response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
-
-        response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
-                 .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
-                 .Which.Should().HaveCountGreaterThan(0);
+        response.Result.Should().NotBeNull()
+            .And.BeOfType<OkObjectResult>()
+            .Which.Value.Should().NotBeNull()
+            .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
+            .Which.Should().HaveCountGreaterThan(0);
     }
 
     [Fact]
@@ -142,11 +141,11 @@ public sealed class UserInteractionQueryTests
                 );
 
         // Assert
-        response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
-
-        response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
-                 .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
-                 .Which.Should().HaveCountGreaterThan(0);
+        response.Result.Should().NotBeNull()
+            .And.BeOfType<OkObjectResult>()
+            .Which.Value.Should().NotBeNull()
+            .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
+            .Which.Should().HaveCountGreaterThan(0);
     }
 
     [Fact]
@@ -161,10 +160,10 @@ public sealed class UserInteractionQueryTests
                 );
 
         // Assert
-        response.Result.Should().NotBeNull().And.BeOfType<OkObjectResult>();
-
-        response.Result.As<OkObjectResult>().Value.Should().NotBeNull()
-                 .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
-                 .Which.Should().HaveCountGreaterThan(0);
+        response.Result.Should().NotBeNull()
+            .And.BeOfType<OkObjectResult>()
+            .Which.Value.Should().NotBeNull()
+            .And.BeAssignableTo<IEnumerable<UserInteractionDto>>()
+            .Which.Should().HaveCountGreaterThan(0);
     }
 }

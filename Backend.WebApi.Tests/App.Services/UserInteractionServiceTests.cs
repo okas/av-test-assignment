@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Services;
+using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
@@ -18,7 +19,6 @@ namespace Backend.WebApi.Tests.App.Services;
 public sealed class UserInteractionServiceTests : IDisposable
 {
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
-    private readonly ApiLocalDbFixture _dbFixture;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionService _sutService;
@@ -30,7 +30,6 @@ public sealed class UserInteractionServiceTests : IDisposable
 
     public UserInteractionServiceTests(ApiLocalDbFixture dbFixture)
     {
-        _dbFixture = dbFixture;
         _knownEntitesIdIsOpen = GenerateKnownData(4);
         SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutDbContext = dbFixture.CreateContext();
@@ -42,11 +41,11 @@ public sealed class UserInteractionServiceTests : IDisposable
     [InlineData(false)]
     public async Task Get_FilteredByIsOpenWithProjectToDto_ReturnsFilteredProjectedCollection(bool isOpenTestValue)
     {
-        // Arrange+
+        // Arrange
         Expression<Func<UserInteraction, bool>> filter = model => model.IsOpen == isOpenTestValue;
 
         // Act
-        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? modelsDto, int totalCount) =
+        (IEnumerable<UserInteractionDto> modelsDto, int totalCount) =
              await _sutService.Get(
                  ct: default,
                  projection: UserInteractionDto.Projection,
@@ -56,9 +55,8 @@ public sealed class UserInteractionServiceTests : IDisposable
         // Assert
         using (new AssertionScope())
         {
-            errors.Should().BeNullOrEmpty();
-            modelsDto.Should().NotBeNullOrEmpty();
-            modelsDto.Should().OnlyContain(d => d.IsOpen == isOpenTestValue);
+            modelsDto.Should().NotBeNullOrEmpty()
+                .And.OnlyContain(d => d.IsOpen == isOpenTestValue);
         }
 
         totalCount.Should().BeGreaterThanOrEqualTo(
@@ -67,44 +65,46 @@ public sealed class UserInteractionServiceTests : IDisposable
             );
     }
 
-    [Fact]
-    public async Task SetOpenState_CurrentlyOpenInteraction_WasSetToClosed()
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task SetOpenState_ExistingInteraction_Succeeds(bool existingValue, bool newValue)
     {
-        // Arrange+
-        (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen);
+        // Arrange
+        (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen == existingValue);
 
         // Act
-        IEnumerable<ServiceError> errors =
-            await _sutService.SetOpenState(
+        await _sutService.SetOpenState(
                 id,
-                newState: false,
+                newState: newValue,
                 ct: default
                 );
 
         // Assert
-        errors.Should().BeNullOrEmpty();
-
-        using ApiDbContext context = _dbFixture.CreateContext();
-        context.UserInteraction.Should().Contain(model => !model.IsOpen);
+        _sutDbContext.UserInteraction.Should().NotBeNullOrEmpty()
+            .And.ContainSingle(model => model.Id == id && model.IsOpen == newValue);
     }
 
     [Fact]
-    public async Task SetOpenState_NonExistingInteraction_ReturnNotFoundResultWithCorrectError()
+    public async Task SetOpenState_NonExistingInteraction_Throws()
     {
-        // Arrange+
+        // Arrange
         Guid unknownId = Guid.NewGuid();
 
         // Act
-        IEnumerable<ServiceError> errors =
-            await _sutService.SetOpenState(
+        var act = () =>
+             _sutService.SetOpenState(
                 unknownId,
                 newState: true,
                 ct: default
                 );
 
         // Assert
-        errors.Should().NotBeNullOrEmpty();
-        errors.Select(error => error.Kind).Should().Contain(ServiceErrorKind.NotFoundOnChange);
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("User interaction not found, while attempting to set its Open state.")
+            .Where(ex => (Guid?)ex.Data["Id"] == unknownId);
     }
 
     [Fact]
@@ -116,18 +116,17 @@ public sealed class UserInteractionServiceTests : IDisposable
             Deadline = DateTime.Now.AddDays(1),
             Description = "Non-empty",
         };
+
         DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        (IEnumerable<ServiceError> errors, UserInteraction? createdModel) =
+        UserInteraction createdModel =
             await _sutService.Create(
                 correctNewModel,
                 ct: default
                 );
 
         // Assert
-        errors.Should().BeNullOrEmpty();
-
         using AssertionScope _ = new();
         createdModel.Should().NotBeNull();
         createdModel!.Deadline.Should().Be(correctNewModel.Deadline);
@@ -138,9 +137,9 @@ public sealed class UserInteractionServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateNew_ModelAlreadyExists_ReturnsErrorOfAlreadyExistingAndNullModel()
+    public async Task CreateNew_ModelAlreadyExists_Throws()
     {
-        // Arrange+
+        // Arrange
         UserInteraction attemptedModel = new()
         {
             Id = _knownEntitesIdIsOpen[0].Id,
@@ -149,15 +148,17 @@ public sealed class UserInteractionServiceTests : IDisposable
         };
 
         // Act
-        (IEnumerable<ServiceError> errors, UserInteraction? existingModel) =
-            await _sutService.Create(
-                attemptedModel,
-                ct: default
-                );
+        Func<Task<UserInteraction>> act = () =>
+              _sutService.Create(
+                 attemptedModel,
+                 ct: default
+                 );
 
         // Assert
-        errors.Should().ContainSingle(error => error.Kind == ServiceErrorKind.AlreadyExistsOnCreate);
-        existingModel.Should().BeNull();
+        await act.Should().ThrowAsync<AlreadyExistsException>()
+            .WithMessage("User interaction already exists.")
+            .Where(ex => (Guid?)ex.Data["Id"] == _knownEntitesIdIsOpen[0].Id);
+
     }
 
     /// <summary>

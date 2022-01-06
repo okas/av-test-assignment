@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -35,15 +33,13 @@ public sealed class UserInteractionCreateCommandTests : IDisposable
         DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        (IEnumerable<ServiceError> errors, Backend.WebApi.Domain.Model.UserInteraction? createdModel) =
-            await _sutCommandHandler.Handle(
-                correctCommand,
-                ct: default
-                );
+        Backend.WebApi.Domain.Model.UserInteraction createdModel =
+             await _sutCommandHandler.Handle(
+                 correctCommand,
+                 ct: default
+                 );
 
         // Assert
-        errors.Should().BeNullOrEmpty();
-
         using AssertionScope _ = new();
         createdModel.Should().NotBeNull();
         createdModel!.Deadline.Should().Be(correctCommand.Deadline);

@@ -1,12 +1,13 @@
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.WebApi.App.Controllers;
+
+// TODO Add Actionmethod for PUT method and respond with HTTP405 method not allowed.
 
 /// <summary>
 /// Endpoint of Userinteractions.
@@ -16,13 +17,7 @@ namespace Backend.WebApi.App.Controllers;
 [Produces("application/json")]
 public class UserInteractionsController : ControllerBase
 {
-    private static readonly string _unhandledErrorsOrExceptionsMessage;
     private readonly IMediator _mediator;
-
-    static UserInteractionsController()
-    {
-        _unhandledErrorsOrExceptionsMessage = "For developer: Unhandled errors and/or exceptions encountered.";
-    }
 
     public UserInteractionsController(IMediator mediator)
     {
@@ -30,7 +25,7 @@ public class UserInteractionsController : ControllerBase
     }
 
     /// <summary>
-    /// Get User interactions. By default, all Interactions. Allows filtering by `IsOpen` property in query string.
+    /// Get User interactions. By default, all Interactions. Allows filtering by <c>IsOpen</c> property in query string.
     /// </summary>
     /// <param name="isOpen">Ommiting this parameter will return all User interactions.</param>
     /// <returns>All or filtered by `IsOpen` collection of interactions.</returns>
@@ -41,11 +36,10 @@ public class UserInteractionsController : ControllerBase
     {
         UserInteractionGetQuery<UserInteractionDto> request = new(
             UserInteractionDto.Projection,
-            filters: model => !isOpen.HasValue || model.IsOpen == isOpen
+            model => !isOpen.HasValue || model.IsOpen == isOpen
             );
 
-        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto> dtos, int? totalCount) =
-            await _mediator.Send(request, ct);
+        (IEnumerable<UserInteractionDto> dtos, int totalCount) = await _mediator.Send(request, ct);
 
         return Ok(dtos);
     }
@@ -53,27 +47,22 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Get Userinteraction by ID.
     /// </summary>
-    /// <param name="query"></param>
+    /// <param name="id"></param>
     /// <param name="ct"></param>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(UserInteractionGetByIdQuery query, CancellationToken ct)
+    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id, CancellationToken ct)
     {
-        (_, UserInteraction? model) = await _mediator.Send(query, ct);
+        UserInteraction model = await _mediator.Send(new UserInteractionGetByIdQuery(id), ct);
 
-        if (model is not null)
-        {
-            return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
-        }
-
-        return NotFound();
+        return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
     }
 
     /// <summary>
-    /// Patch UserInteraction model: change `IsOpen` state.
+    /// Patch UserInteraction model: change <c>IsOpen</c> state.
     /// </summary>
-    /// <remarks>Patching is constrainted to set `IsOpen` property only,
+    /// <remarks>Patching is constrainted to set <c>IsOpen</c> property only,
     /// other props are ignored even if sent.
     /// </remarks>
     [HttpPatch("{id}")]
@@ -87,20 +76,9 @@ public class UserInteractionsController : ControllerBase
         {
             return BadRequest();
         }
+        _ = await _mediator.Send(command, ct);
 
-        IEnumerable<ServiceError> errors = await _mediator.Send(command, ct);
-
-        if (!errors.Any())
-        {
-            return NoContent();
-        }
-
-        if (errors.Any(err => err.Kind == ServiceErrorKind.NotFoundOnChange))
-        {
-            return NotFound();
-        }
-
-        throw new Exception(_unhandledErrorsOrExceptionsMessage);
+        return NoContent();
     }
 
     /// <summary>
@@ -112,27 +90,10 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionCreateCommand command, CancellationToken ct)
     {
-        (IEnumerable<ServiceError> errors, UserInteraction? model) = await _mediator.Send(command, ct);
+        UserInteraction model = await _mediator.Send(command, ct);
 
-        if (!errors.Any() && model is not null)
-        {
-            UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(model);
+        UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(model);
 
-            return CreatedAtAction(nameof(GetUserInteraction), new { id = model.Id }, dto);
-        }
-
-        if (errors.First(err => err.Kind == ServiceErrorKind.AlreadyExistsOnCreate) is ServiceError error1)
-        {
-            ModelState.AddModelError("", error1.Message ?? "Duplicate entity error.");
-
-            return BadRequest(ModelState);
-        }
-
-        if (errors.First(err => err.Kind == ServiceErrorKind.InternalError) is ServiceError error2)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, error2.Message);
-        }
-
-        throw new Exception(_unhandledErrorsOrExceptionsMessage);
+        return CreatedAtAction(nameof(GetUserInteraction), new { id = model.Id }, dto);
     }
 }

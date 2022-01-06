@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -15,9 +14,10 @@ namespace Backend.WebApi.Tests.App.Operations.UserInteractionQueries;
 [Collection("ApiLocalDbFixture")]
 public sealed class UserInteractionGetQueryTests : IDisposable
 {
-    private readonly static string _becauseKnownOrMoreEntitiesExpected;
+    private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
+    private readonly UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler;
 
     static UserInteractionGetQueryTests()
     {
@@ -29,6 +29,7 @@ public sealed class UserInteractionGetQueryTests : IDisposable
         _knownEntitesIdIsOpen = GenerateKnownData(4);
         _sutDbContext = dbFixture.CreateContext();
         SeedData(dbFixture, _knownEntitesIdIsOpen);
+        _sutCommandHandler = new(_sutDbContext);
     }
 
     [Theory]
@@ -42,10 +43,8 @@ public sealed class UserInteractionGetQueryTests : IDisposable
             model => model.IsOpen == isOpenTestValue
             );
 
-        UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler = new(_sutDbContext);
-
         // Act
-        (IEnumerable<ServiceError> errors, IEnumerable<UserInteractionDto>? dtos, int? totalCount) =
+        (IEnumerable<UserInteractionDto> dtos, int totalCount) =
             await _sutCommandHandler.Handle(
                 query,
                 ct: default
@@ -54,12 +53,11 @@ public sealed class UserInteractionGetQueryTests : IDisposable
         // Assert
         using (new AssertionScope())
         {
-            errors.Should().BeNullOrEmpty();
-            dtos.Should().NotBeNullOrEmpty();
-            dtos.Should().OnlyContain(d => d.IsOpen == isOpenTestValue);
+            dtos.Should().NotBeNullOrEmpty()
+                .And.OnlyContain(d => d.IsOpen == isOpenTestValue);
         }
 
-        totalCount.Should().NotBeNull().And.BeGreaterThanOrEqualTo(
+        totalCount.Should().BeGreaterThanOrEqualTo(
             _knownEntitesIdIsOpen.Length,
             _becauseKnownOrMoreEntitiesExpected
             );

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Backend.WebApi.CrossCutting.Extensions;
+using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using Microsoft.Data.SqlClient;
@@ -14,6 +15,10 @@ public class UserInteractionService
     private readonly ApiDbContext _context;
     private readonly DbSet<UserInteraction> _interactionsRepo;
 
+    public const string NotFoundOnIsOpenChangeMessage = "User interaction not found, while attempting to set its Open state.";
+    public const string NotFoundOnQueryingMessage = "User interaction not found.";
+    public const string AlreadyExists = "User interaction already exists.";
+
     static UserInteractionService()
     {
         _queryingErrorMessage = $"{nameof(UserInteractionService)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
@@ -26,7 +31,7 @@ public class UserInteractionService
         _interactionsRepo = dbContext.UserInteraction;
     }
 
-    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> GetOne(Guid id, CancellationToken ct)
+    public async Task<UserInteraction> GetOne(Guid id, CancellationToken ct)
     {
         try
         {
@@ -34,21 +39,12 @@ public class UserInteractionService
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id, ct).ConfigureAwait(false);
 
-            return (errors: Array.Empty<ServiceError>(), model);
+            return model ?? throw new NotFoundException(NotFoundOnQueryingMessage, id);
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch
         {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-
-            return (errors, default);
-        }
-        catch (Exception ex)
-        {
-            // TODO Log it
-            ServiceError[] errors = new ServiceError[] { new(ServiceErrorKind.InternalError, Exceptions: ex) };
-
-            return (errors, model: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
     }
 
@@ -63,7 +59,7 @@ public class UserInteractionService
     /// <param name="projection"></param>
     /// <param name="filters"></param>
     /// <returns></returns>
-    public async Task<(IEnumerable<ServiceError> errors, IEnumerable<Tout>? models, int totalCount)> Get<Tout>(
+    public async Task<(IEnumerable<Tout> models, int totalCount)> Get<Tout>(
         CancellationToken ct,
         Expression<Func<UserInteraction, Tout>>? projection = default,
         params Expression<Func<UserInteraction, bool>>?[]? filters)
@@ -75,23 +71,16 @@ public class UserInteractionService
             List<Tout> models = await query.ToListAsync(ct).ConfigureAwait(false);
             int totalCount = await _interactionsRepo.CountAsync(ct).ConfigureAwait(false);
 
-            return (Enumerable.Empty<ServiceError>(), models.AsReadOnly(), totalCount);
+            return (models.AsReadOnly(), totalCount);
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch
         {
-            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-
-            return (errors, models: Enumerable.Empty<Tout>(), totalCount: default);
-        }
-        catch (Exception ex)
-        {
-            ServiceError[] errors = { new(ServiceErrorKind.InternalError, _queryingErrorMessage, ex) };
-
-            return (errors, models: Enumerable.Empty<Tout>(), totalCount: default);
+            // TODO Log domain exception
+            throw;
         }
     }
 
-    public async Task<IEnumerable<ServiceError>> SetOpenState(Guid id, bool newState, CancellationToken ct)
+    public async Task SetOpenState(Guid id, bool newState, CancellationToken ct)
     {
         _context.Attach(new UserInteraction
         {
@@ -104,27 +93,22 @@ public class UserInteractionService
         {
             await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
-            return Enumerable.Empty<ServiceError>();
+            return;
         }
         catch (DbUpdateConcurrencyException)
         {
             // TODO Log it
-            if (await _context.UserInteraction.AnyAsync(model => model.Id == id, ct).ConfigureAwait(false))
+            // TODO Analyze https://docs.microsoft.com/en-us/ef/core/saving/concurrency to implement better handling
+            if (!await _context.UserInteraction.AnyAsync(model => model.Id == id, ct).ConfigureAwait(false))
             {
-                throw;
+                throw new NotFoundException(NotFoundOnIsOpenChangeMessage, id);
             }
-
-            return new ServiceError[] { new(ServiceErrorKind.NotFoundOnChange) };
+            throw;
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch
         {
-            // TODO Log it
-            return new ServiceError[] { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-        }
-        catch (Exception ex)
-        {
-            // TODO Log it
-            return new ServiceError[] { new(ServiceErrorKind.InternalError, Exceptions: ex) };
+            // TODO Whether and what should be logged here?
+            throw;
         }
     }
 
@@ -133,7 +117,9 @@ public class UserInteractionService
     /// </summary>
     /// <param name="newModel"></param>
     /// <param name="ct"></param>
-    public async Task<(IEnumerable<ServiceError> errors, UserInteraction? model)> Create(UserInteraction newModel, CancellationToken ct)
+    /// <exception cref="AlreadyExistsException"></exception>
+    /// <exception cref="DbUpdateConcurrencyException"></exception>
+    public async Task<UserInteraction> Create(UserInteraction newModel, CancellationToken ct)
     {
         // These values setup is system's responsibility, thus doing it here.
         newModel.IsOpen = true;
@@ -141,31 +127,27 @@ public class UserInteractionService
 
         try
         {
-            await _interactionsRepo.AddAsync(newModel, ct).ConfigureAwait(false);
+            await _interactionsRepo.AddAsync(newModel, ct).ConfigureAwait(false); // TODO For single entity overhead is not justified.
             await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
-            return (Enumerable.Empty<ServiceError>(), newModel);
+            return newModel;
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
         {
             // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.AlreadyExistsOnCreate) };
-
-            return (errors, model: default);
+            // TODO Current workflow, where entity instance is created in this handler, should exclude this situation.
+            // As of now it should be thrown when Id generation outside of server fails somehow (e.g. default value is attempted).
+            throw new AlreadyExistsException(AlreadyExists, newModel.Id, ex);
         }
-        catch (OperationCanceledException ocex) when (ocex.CancellationToken.IsCancellationRequested)
+        catch (DbUpdateConcurrencyException)
         {
-            // TODO Log it
-            ServiceError[] errors = { new(ServiceErrorKind.OperationCancellationRequested, Exceptions: ocex) };
-
-            return (errors, model: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
-        catch (Exception ex)
+        catch
         {
-            // TODO Log it
-            ServiceError[] errors = new ServiceError[] { new(ServiceErrorKind.InternalError, _createNewModelErrorMessage, ex) };
-
-            return (errors, model: default);
+            // TODO Whether and what should be logged here?
+            throw;
         }
     }
 
