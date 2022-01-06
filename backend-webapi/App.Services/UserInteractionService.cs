@@ -10,20 +10,12 @@ namespace Backend.WebApi.App.Services;
 
 public class UserInteractionService
 {
-    private static readonly string _queryingErrorMessage;
-    private static readonly string _createNewModelErrorMessage;
     private readonly ApiDbContext _context;
     private readonly DbSet<UserInteraction> _interactionsRepo;
 
     public const string NotFoundOnIsOpenChangeMessage = "User interaction not found, while attempting to set its Open state.";
     public const string NotFoundOnQueryingMessage = "User interaction not found.";
     public const string AlreadyExists = "User interaction already exists.";
-
-    static UserInteractionService()
-    {
-        _queryingErrorMessage = $"{nameof(UserInteractionService)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
-        _createNewModelErrorMessage = $"Attempted to create new `{nameof(UserInteraction)}`, but operation was cancelled unexpectedly. See excpetion details.";
-    }
 
     public UserInteractionService(ApiDbContext dbContext)
     {
