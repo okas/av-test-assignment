@@ -15,8 +15,6 @@ public readonly record struct UserInteractionGetByIdQuery(
 {
     public class Handler : IRequestHandler<UserInteractionGetByIdQuery, UserInteraction>
     {
-
-
         private readonly ApiDbContext _context;
 
         public Handler(ApiDbContext context) => _context = context;
