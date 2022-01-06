@@ -15,7 +15,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
-    private readonly UserInteractionGetByIdHandler _sutCommandHandler;
+    private readonly UserInteractionGetByIdQuery.Handler _sutCommandHandler;
 
     public UserInteractionGetByIdQueryTests(ApiLocalDbFixture dbFixture)
     {

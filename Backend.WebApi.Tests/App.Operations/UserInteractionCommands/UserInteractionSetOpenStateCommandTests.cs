@@ -15,7 +15,7 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
-    private readonly UserInteractionSetOpenStateHandler _sutCommandHandler;
+    private readonly UserInteractionSetOpenStateCommand.Handler _sutCommandHandler;
 
     public UserInteractionSetOpenStateCommandTests(ApiLocalDbFixture dbFixture)
     {

@@ -17,7 +17,7 @@ public sealed class UserInteractionGetQueryTests : IDisposable
     private static readonly string _becauseKnownOrMoreEntitiesExpected;
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
-    private readonly UserInteractionGetHandler<UserInteractionDto> _sutCommandHandler;
+    private readonly UserInteractionGetQuery<UserInteractionDto>.Handler _sutCommandHandler;
 
     static UserInteractionGetQueryTests()
     {

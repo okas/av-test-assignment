@@ -49,7 +49,7 @@ public static class ProgramDependencyInjection
         builder.Services.AddScoped<UserInteractionService>();
         builder.Services.AddTransient<
             IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
-            UserInteractionGetHandler<UserInteractionDto>
+            UserInteractionGetQuery<UserInteractionDto>.Handler
             >();
 
         return builder;

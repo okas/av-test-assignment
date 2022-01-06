@@ -51,7 +51,7 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
         services.AddScoped<UserInteractionService>();
         services.AddTransient<
             IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
-            UserInteractionGetHandler<UserInteractionDto>
+            UserInteractionGetQuery<UserInteractionDto>.Handler
             >();
     }
 

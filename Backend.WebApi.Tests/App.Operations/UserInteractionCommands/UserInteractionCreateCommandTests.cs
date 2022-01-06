@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
+using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -12,7 +13,7 @@ namespace Backend.WebApi.Tests.App.Operations.UserInteractionCommands;
 public sealed class UserInteractionCreateCommandTests : IDisposable
 {
     private readonly ApiDbContext _sutDbContext;
-    private readonly UserInteractionCreateHandler _sutCommandHandler;
+    private readonly UserInteractionCreateCommand.Handler _sutCommandHandler;
 
     public UserInteractionCreateCommandTests(ApiLocalDbFixture dbFixture)
     {
@@ -33,7 +34,7 @@ public sealed class UserInteractionCreateCommandTests : IDisposable
         DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        Backend.WebApi.Domain.Model.UserInteraction createdModel =
+        UserInteraction createdModel =
              await _sutCommandHandler.Handle(
                  correctCommand,
                  ct: default
