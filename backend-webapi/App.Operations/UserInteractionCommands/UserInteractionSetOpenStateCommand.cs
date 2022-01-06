@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
 [StructLayout(LayoutKind.Auto)]
-
 public readonly record struct UserInteractionSetOpenStateCommand(
     [property: Required, NotDefault] Guid Id,
     [property: Required] bool IsOpen
