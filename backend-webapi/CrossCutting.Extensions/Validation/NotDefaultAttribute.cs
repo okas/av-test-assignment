@@ -10,6 +10,7 @@ namespace Backend.WebApi.CrossCutting.Extensions.Validation;
 /// Use with <see cref="RequiredAttribute"/> to invalidate <see langword="null"/> of <see cref="Nullable{T}"/> values.
 /// See <seealso href="https://andrewlock.net/creating-an-empty-guid-validation-attribute/">source</seealso>.
 /// </remarks>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.Field)]
 public class NotDefaultAttribute : ValidationAttribute
 {
     public const string DefaultErrorMessage = "The {0} field must not have the default value";
