@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.CrossCutting.Extensions.Validation;
 using MediatR;
 
@@ -8,17 +7,8 @@ namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
 [StructLayout(LayoutKind.Auto)]
 
-public record struct UserInteractionSetOpenStateCommand : IRequest<IEnumerable<ServiceError>>
-{
-    public UserInteractionSetOpenStateCommand(Guid id, bool isOpen)
-    {
-        Id = id;
-        IsOpen = isOpen;
-    }
-
-    [NotDefault]
-    public Guid Id { get; init; }
-
-    [Required]
-    public bool IsOpen { get; init; }
-}
+public readonly record struct UserInteractionSetOpenStateCommand(
+    [property: Required, NotDefault] Guid Id,
+    [property: Required] bool IsOpen
+    )
+    : IRequest;
