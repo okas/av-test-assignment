@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.App.Swagger;
 using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
@@ -46,7 +45,6 @@ public static class ProgramDependencyInjection
 
     private static WebApplicationBuilder ApplicationSetup(this WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<UserInteractionService>();
         builder.Services.AddTransient<
             IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
             UserInteractionGetQuery<UserInteractionDto>.Handler

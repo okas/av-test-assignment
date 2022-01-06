@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Reflection;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.App.Services;
 using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +47,6 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
 
     private static void SetupApplication(ServiceCollection services)
     {
-        services.AddScoped<UserInteractionService>();
         services.AddTransient<
             IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
             UserInteractionGetQuery<UserInteractionDto>.Handler
