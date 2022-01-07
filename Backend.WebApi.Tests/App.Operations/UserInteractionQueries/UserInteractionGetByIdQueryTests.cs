@@ -35,7 +35,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
         };
 
         // Act
-        UserInteraction model =
+        UserInteraction? model =
             await _sutCommandHandler.Handle(
                 correctQuery,
                 ct: default
@@ -45,6 +45,26 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
         using AssertionScope _ = new();
         model.Should().NotBeNull();
         model!.Id.Should().Be(correctQuery.Id);
+    }
+
+    [Fact]
+    public async Task GetOne_ByNotExistingId_ReturnNull()
+    {
+        // Arrange
+        UserInteractionGetByIdQuery correctQuery = new()
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        // Act
+        UserInteraction? model =
+            await _sutCommandHandler.Handle(
+                correctQuery,
+                ct: default
+                );
+
+        // Assert
+        model.Should().BeNull();
     }
 
     /// <summary>

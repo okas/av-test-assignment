@@ -1,6 +1,7 @@
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
+using Backend.WebApi.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,8 +49,9 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id, CancellationToken ct) =>
-        Ok(UserInteractionDto.Projection.Compile().Invoke(
-        await _mediator.Send(new UserInteractionGetByIdQuery(id), ct)));
+        await _mediator.Send(new UserInteractionGetByIdQuery(id), ct) is UserInteraction model
+            ? Ok(UserInteractionDto.Projection.Compile().Invoke(model))
+            : NotFound();
 
     /// <summary>
     /// Patch UserInteraction model: change <c>IsOpen</c> state.
@@ -62,8 +64,8 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct) =>
-        id == command.Id
-            ? await _mediator.Send(command, ct).ContinueWith(_ => NoContent())
+        id == command.Id && await _mediator.Send(command, ct) == default
+            ? NoContent()
             : BadRequest();
 
     /// <summary>

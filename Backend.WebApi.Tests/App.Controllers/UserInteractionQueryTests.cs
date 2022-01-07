@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Dto;
-using Backend.WebApi.Domain.Exceptions;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -90,21 +89,21 @@ public sealed class UserInteractionQueryTests
     }
 
     [Fact]
-    public async Task Get_CannotGetUsingNonExistingId_ThrowsWithExpectedMessage()
+    public async Task Get_CannotGetUsingNonExistingId_ReturnsNotFoundResult()
     {
         // Arrange
         Guid id = Guid.NewGuid();
 
         // Act
-        Func<Task<ActionResult<UserInteractionDto>>> act = () =>
-            _sutController.GetUserInteraction(
+        ActionResult<UserInteractionDto> act =
+            await _sutController.GetUserInteraction(
                 id,
                 ct: default
                 );
 
         // Assert
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("User interaction not found");
+        act.Result.Should().NotBeNull()
+           .And.BeOfType<NotFoundResult>();
     }
 
     [Theory]

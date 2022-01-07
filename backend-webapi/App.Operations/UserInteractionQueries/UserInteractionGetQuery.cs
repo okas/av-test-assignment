@@ -13,6 +13,10 @@ public readonly record struct UserInteractionGetQuery<Tout>(
     )
     : IRequest<(IEnumerable<Tout> models, int totalCount)>
 {
+    /// <summary>
+    /// Handles <see cref="UserInteractionGetQuery{Tout}"/> command.
+    /// </summary>
+    /// <param name="Context">Dependency.</param>
     public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)>
     {
         private static readonly string _queryingErrorMessage;

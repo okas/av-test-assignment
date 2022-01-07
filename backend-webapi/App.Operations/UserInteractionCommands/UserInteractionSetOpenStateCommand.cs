@@ -16,6 +16,10 @@ public readonly record struct UserInteractionSetOpenStateCommand(
     )
     : IRequest
 {
+    /// <summary>
+    /// Handles <see cref="UserInteractionSetOpenStateCommand" /> command.
+    /// </summary>
+    /// <param name="Context">Dependency.</param>
     public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionSetOpenStateCommand>
     {
         public const string NotFoundOnIsOpenChangeMessage = "User interaction not found, while attempting to set its Open state.";

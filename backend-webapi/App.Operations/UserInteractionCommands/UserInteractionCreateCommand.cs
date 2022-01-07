@@ -14,6 +14,10 @@ public readonly record struct UserInteractionCreateCommand(
     )
     : IRequest<UserInteraction>
 {
+    /// <summary>
+    /// Handles <see cref="UserInteractionCreateCommand" /> command.
+    /// </summary>
+    /// <param name="Context">Dependency.</param>
     public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionCreateCommand, UserInteraction>
     {
         private static readonly string _createNewModelErrorMessage;
