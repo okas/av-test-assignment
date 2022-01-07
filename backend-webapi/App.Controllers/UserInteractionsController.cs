@@ -7,14 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.WebApi.App.Controllers;
 
-// TODO Add Actionmethod for PUT method and respond with HTTP405 method not allowed.
-
 /// <summary>
 /// Endpoint of Userinteractions.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
 public class UserInteractionsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -67,7 +66,6 @@ public class UserInteractionsController : ControllerBase
     /// </remarks>
     [HttpPatch("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct)
@@ -86,7 +84,6 @@ public class UserInteractionsController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionCreateCommand command, CancellationToken ct)
     {
