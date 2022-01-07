@@ -5,9 +5,9 @@ namespace Backend.WebApi.App.Extensions;
 
 public class OperationCancelledExceptionFilterAttribute : ExceptionFilterAttribute
 {
-    private readonly ILogger<OperationCancelledExceptionFilterAttribute> _logger;
+    //private readonly ILogger<OperationCancelledExceptionFilterAttribute> _logger;
 
-    public OperationCancelledExceptionFilterAttribute(ILoggerFactory loggerFactory) => _logger = loggerFactory.CreateLogger<OperationCancelledExceptionFilterAttribute>();
+    //public OperationCancelledExceptionFilterAttribute(ILoggerFactory loggerFactory) => _logger = loggerFactory.CreateLogger<OperationCancelledExceptionFilterAttribute>();
 
     public override void OnException(ExceptionContext context)
     {
@@ -16,7 +16,7 @@ public class OperationCancelledExceptionFilterAttribute : ExceptionFilterAttribu
             return;
         }
 
-        _logger.LogWarning(ocEx, "Operation cancellation was requested.");
+        //_logger.LogWarning(ocEx, "Operation cancellation was requested.");
 
         context.ExceptionHandled = true;
         context.Result = new StatusCodeResult(499);

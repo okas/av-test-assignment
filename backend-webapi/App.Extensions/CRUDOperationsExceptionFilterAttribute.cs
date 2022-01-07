@@ -6,7 +6,7 @@ namespace Backend.WebApi.App.Extensions;
 
 public class CRUDOperationsExceptionFilterAttribute : ExceptionFilterAttribute
 {
-    public new void OnException(ExceptionContext context)
+    public override void OnException(ExceptionContext context)
     {
         context.Result = context.Exception switch
         {
