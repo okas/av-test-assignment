@@ -23,7 +23,9 @@ namespace Backend.WebApi.App.Controllers
         /// <returns></returns>
         [HttpGet(Name = "getWeatherForecast")]
         [EnableQuery]
+#pragma warning disable MA0038 // Make method static
         public IEnumerable<WeatherForecast> Get()
+#pragma warning restore MA0038 // Make method static
         {
             return Enumerable.Range(1, 50).Select(index => new WeatherForecast
             {
