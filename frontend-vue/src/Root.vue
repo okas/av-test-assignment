@@ -4,7 +4,7 @@
       <router-link to="/">Algus</router-link> |
       <router-link to="/about">Rakendusest</router-link> |
       <router-link to="/userinteractions">Kasutaja pöördumised</router-link> |
-      <a class="external" href="https://localhost:5003/swagger" target="_blank">Swagger</a>
+      <a class="external" href="https://localhost:5001/swagger" target="_blank">Swagger</a>
     </nav>
     <div class="global-loader-icon" v-if="this.$store.state.loading" />
   </header>
