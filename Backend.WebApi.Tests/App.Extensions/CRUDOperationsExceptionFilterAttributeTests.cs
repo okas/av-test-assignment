@@ -12,7 +12,7 @@ namespace Backend.WebApi.Tests.App.Extensions;
 [Collection("ActionFilterFixture")]
 public class CRUDOperationsExceptionFilterAttributeTests
 {
-    private readonly CRUDOperationsExceptionFilterAttribute _sutExceptionFilter;
+    private readonly CUDOperationsExceptionFilterAttribute _sutExceptionFilter;
     private readonly ExceptionContext _exceptionContext;
 
     public CRUDOperationsExceptionFilterAttributeTests(ActionFilterFixture fixture)

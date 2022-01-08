@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Backend.WebApi.App.Extensions;
 
-public class CRUDOperationsExceptionFilterAttribute : ExceptionFilterAttribute
+/// <summary>
+/// Create, Update, Delete domain operations exceptions handling filter.
+/// </summary>
+public class CUDOperationsExceptionFilterAttribute : ExceptionFilterAttribute
 {
     public override void OnException(ExceptionContext context)
     {
