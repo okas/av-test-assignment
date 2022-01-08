@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Design", "MA0048:File name must match type name", Justification = "<Pending>", Scope = "type", Target = "~T:Backend.WebApi.Tests.IoCFixtureCollection")]
 [assembly: SuppressMessage("Design", "MA0048:File name must match type name", Justification = "<Pending>", Scope = "type", Target = "~T:Backend.WebApi.Tests.ApiLocalDbCollection")]
+[assembly: SuppressMessage("Design", "MA0048:File name must match type name", Justification = "<Pending>", Scope = "type", Target = "~T:Backend.WebApi.Tests.ActionFilterFixtureCollection")]

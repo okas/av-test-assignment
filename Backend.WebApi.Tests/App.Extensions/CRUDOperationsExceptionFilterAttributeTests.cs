@@ -9,7 +9,8 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.App.Extensions;
 
-public class CRUDOperationsExceptionFilterAttributeTests : IClassFixture<ActionFilterFixture>
+[Collection("ActionFilterFixture")]
+public class CRUDOperationsExceptionFilterAttributeTests
 {
     private readonly CRUDOperationsExceptionFilterAttribute _sutExceptionFilter;
     private readonly ExceptionContext _exceptionContext;
