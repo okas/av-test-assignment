@@ -24,8 +24,8 @@ public class UserInteractionsController : ControllerBase
     /// Get User interactions. By default, all Interactions. Allows filtering by <c>IsOpen</c> property in query string.
     /// </summary>
     /// <param name="isOpen">Ommiting this parameter will return all User interactions.</param>
-    /// <returns>All or filtered by `IsOpen` collection of interactions.</returns>
     /// <param name="ct"></param>
+    /// <returns>All or filtered by `IsOpen` collection of interactions.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserInteractionDto>>> GetUserInteractions(bool? isOpen, CancellationToken ct)
@@ -43,15 +43,17 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Get Userinteraction by ID.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="ct"></param>
-    [HttpGet("{id}")]
+    [HttpGet("{Id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction(Guid id, CancellationToken ct) =>
-        await _mediator.Send(new UserInteractionGetByIdQuery(id), ct) is UserInteraction model
-            ? Ok(UserInteractionDto.Projection.Compile().Invoke(model))
-            : NotFound();
+    public async Task<ActionResult<UserInteractionDto>> GetUserInteraction([FromRoute] UserInteractionGetByIdQuery query, CancellationToken ct)
+    {
+        if (await _mediator.Send(query, ct) is UserInteraction model)
+        {
+            return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
+        }
+        return NotFound();
+    }
 
     /// <summary>
     /// Patch UserInteraction model: change <c>IsOpen</c> state.

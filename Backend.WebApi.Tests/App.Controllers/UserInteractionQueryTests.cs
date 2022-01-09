@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Operations.UserInteractionQueries;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -52,12 +53,12 @@ public sealed class UserInteractionQueryTests
     public async Task Get_CanGetSingleById_ReturnOkObjectResultAndNonNullValue()
     {
         // Arrange
-        Guid id = _knownEntitesIdIsOpen[0].Id;
+        UserInteractionGetByIdQuery query = new(_knownEntitesIdIsOpen[0].Id);
 
         // Act
         ActionResult<UserInteractionDto> response =
             await _sutController.GetUserInteraction(
-                id,
+                query,
                 ct: default
                 );
 
@@ -72,12 +73,12 @@ public sealed class UserInteractionQueryTests
     public async Task Get_CanGetSingleById_ReturnDtoWithCorrectId()
     {
         // Arrange
-        Guid id = _knownEntitesIdIsOpen[0].Id;
+        UserInteractionGetByIdQuery query = new(_knownEntitesIdIsOpen[0].Id);
 
         // Act
         ActionResult<UserInteractionDto> response =
             await _sutController.GetUserInteraction(
-                id,
+                query,
                 ct: default
                 );
 
@@ -85,19 +86,19 @@ public sealed class UserInteractionQueryTests
         response.Result.Should().NotBeNull()
             .And.BeOfType<OkObjectResult>()
             .Which.Value.Should().BeOfType<UserInteractionDto>()
-            .Which.Id.Should().Be(id);
+            .Which.Id.Should().Be(query.Id);
     }
 
     [Fact]
     public async Task Get_CannotGetUsingNonExistingId_ReturnsNotFoundResult()
     {
         // Arrange
-        Guid id = Guid.NewGuid();
+        UserInteractionGetByIdQuery query = new(Guid.NewGuid());
 
         // Act
         ActionResult<UserInteractionDto> act =
             await _sutController.GetUserInteraction(
-                id,
+                query,
                 ct: default
                 );
 

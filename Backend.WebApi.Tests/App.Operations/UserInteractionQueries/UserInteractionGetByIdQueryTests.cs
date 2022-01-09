@@ -29,10 +29,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
     public async Task GetOne_ByCorrectId_ReturnModel()
     {
         // Arrange
-        UserInteractionGetByIdQuery correctQuery = new()
-        {
-            Id = _knownEntitesIdIsOpen[0].Id,
-        };
+        UserInteractionGetByIdQuery correctQuery = new(_knownEntitesIdIsOpen[0].Id);
 
         // Act
         UserInteraction? model =
@@ -51,10 +48,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
     public async Task GetOne_ByNotExistingId_ReturnNull()
     {
         // Arrange
-        UserInteractionGetByIdQuery correctQuery = new()
-        {
-            Id = Guid.NewGuid(),
-        };
+        UserInteractionGetByIdQuery correctQuery = new(Guid.NewGuid());
 
         // Act
         UserInteraction? model =

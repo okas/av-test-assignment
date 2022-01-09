@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 
-public readonly record struct UserInteractionGetByIdQuery(
-    [property: Required, NotDefault] Guid Id
+public record UserInteractionGetByIdQuery(
+    [Required, NotDefault] Guid Id
     )
     : IRequest<UserInteraction?>
 {
