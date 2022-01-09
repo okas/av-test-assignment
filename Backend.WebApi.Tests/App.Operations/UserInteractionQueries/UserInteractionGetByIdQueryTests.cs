@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Xunit;
 using static Backend.WebApi.Tests.UserInteractionUtilities;
 
@@ -26,22 +25,21 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
     }
 
     [Fact]
-    public async Task GetOne_ByCorrectId_ReturnModel()
+    public async Task GetOne_ByCorrectId_ReturnDtol()
     {
         // Arrange
         UserInteractionGetByIdQuery correctQuery = new(_knownEntitesIdIsOpen[0].Id);
 
         // Act
-        UserInteraction? model =
+        UserInteractionDto? dto =
             await _sutCommandHandler.Handle(
                 correctQuery,
                 ct: default
                 );
 
         // Assert
-        using AssertionScope _ = new();
-        model.Should().NotBeNull();
-        model!.Id.Should().Be(correctQuery.Id);
+        dto.Should().NotBeNull();
+        dto.Value.Id.Should().Be(correctQuery.Id);
     }
 
     [Fact]
@@ -51,14 +49,14 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
         UserInteractionGetByIdQuery correctQuery = new(Guid.NewGuid());
 
         // Act
-        UserInteraction? model =
+        UserInteractionDto? dto =
             await _sutCommandHandler.Handle(
                 correctQuery,
                 ct: default
                 );
 
         // Assert
-        model.Should().BeNull();
+        dto.Should().BeNull();
     }
 
     /// <summary>

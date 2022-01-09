@@ -1,7 +1,6 @@
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
-using Backend.WebApi.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,9 +47,9 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction([FromRoute] UserInteractionGetByIdQuery query, CancellationToken ct)
     {
-        if (await _mediator.Send(query, ct) is UserInteraction model)
+        if (await _mediator.Send(query, ct) is UserInteractionDto dto)
         {
-            return Ok(UserInteractionDto.Projection.Compile().Invoke(model));
+            return Ok(dto);
         }
         return NotFound();
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.CrossCutting.Extensions.Validation;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
@@ -10,21 +11,24 @@ namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 public record UserInteractionGetByIdQuery(
     [Required, NotDefault] Guid Id
     )
-    : IRequest<UserInteraction?>
+    : IRequest<UserInteractionDto?>
 {
     /// <summary>
     /// Handles <see cref="UserInteractionGetByIdQuery"/> command.
     /// </summary>
     /// <param name="Context">Dependency.</param>
-    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetByIdQuery, UserInteraction?>
+    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetByIdQuery, UserInteractionDto?>
     {
-        public async Task<UserInteraction?> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
+        public async Task<UserInteractionDto?> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
         {
             try
             {
-                return await Context.UserInteraction
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
+                UserInteraction? model = await Context.UserInteraction.AsNoTracking()
+                    .SingleOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
+
+                return model is not null
+                    ? UserInteractionDto.Projection.Compile().Invoke(model)
+                    : null;
             }
             catch
             {
