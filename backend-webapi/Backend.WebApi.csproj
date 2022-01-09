@@ -7,6 +7,8 @@
     <RootNamespace>Backend.WebApi</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
