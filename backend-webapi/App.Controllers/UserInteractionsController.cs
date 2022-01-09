@@ -63,19 +63,22 @@ public class UserInteractionsController : ControllerBase
     /// </remarks>
     [HttpPatch("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct) =>
-        id == command.Id && await _mediator.Send(command, ct) == default
-            ? NoContent()
-            : BadRequest();
+    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct)
+    {
+        if (id == command.Id && await _mediator.Send(command, ct) == default)
+        {
+            return NoContent();
+        }
+        return BadRequest();
+    }
 
     /// <summary>
     /// Create Userinteraction.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionCreateCommand command, CancellationToken ct)
     {
         UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(
