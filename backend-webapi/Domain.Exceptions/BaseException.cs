@@ -1,32 +1,16 @@
 ﻿namespace Backend.WebApi.Domain.Exceptions;
 
 /// <summary>
-/// Provides <see cref="Exception.Data"/> property populating when (<c>constructor</c>) <see cref="BaseException(string?, object?, Exception?)"/> is used.
+/// Populates <see cref="Exception.Data"/> property, see (<c>constructor</c>) <see cref="BaseException(string?, string?, object?, Exception?)"/>.
 /// </summary>
 public abstract class BaseException : Exception
 {
-    protected BaseException() { }
-
-    protected BaseException(string? message) : base(message) { }
-
-    protected BaseException(string? message, Exception? innerException) : base(message, innerException) { }
-
-    /// <inheritdoc cref="BaseException(string?, object?, Exception?)"/>
-    protected BaseException(string? message, object? id) : this(message, id, default) { }
-
     /// <summary>
-    /// Populates <see cref="Exception.Data"/> property by menas of: <code>Exception.Data["Id"] = id;</code>
+    /// Populates <see cref="Exception.Data"/> property by menas of: <code><see cref="Exception.Data"/>[<paramref name="key"/>] = <paramref name="value"/>;</code>
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="id">If is not null then value to be used: <code>Exception.Data["Id"] = id;</code></param>
-    /// <param name="innerException"></param>
-    protected BaseException(string? message, object? id, Exception? innerException) : base(message, innerException)
-    {
-        if (id is not null)
-        {
-            InitData(id);
-        }
-    }
+    protected BaseException(string? message, string key, object value, Exception? innerException)
+        : base(message, innerException) =>
+        InitData(key, value);
 
-    private void InitData(object id) => Data["Id"] = id;
+    private void InitData(string key, object value) => Data.Add(key, value);
 }

@@ -7,7 +7,7 @@ namespace Backend.WebApi.App.Extensions;
 /// <summary>
 /// Create, Update, Delete domain operations exceptions handling filter.
 /// </summary>
-public class CUDOperationsExceptionFilterAttribute : ExceptionFilterAttribute
+public class CUDOperationsExceptionFilter : ExceptionFilterAttribute
 {
     public override void OnException(ExceptionContext context)
     {

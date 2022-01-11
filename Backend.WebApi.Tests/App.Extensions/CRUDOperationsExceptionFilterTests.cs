@@ -10,12 +10,12 @@ using Xunit;
 namespace Backend.WebApi.Tests.App.Extensions;
 
 [Collection("ActionFilterFixture")]
-public class CRUDOperationsExceptionFilterAttributeTests
+public class CRUDOperationsExceptionFilterTests
 {
-    private readonly CUDOperationsExceptionFilterAttribute _sutExceptionFilter;
+    private readonly CUDOperationsExceptionFilter _sutExceptionFilter;
     private readonly ExceptionContext _exceptionContext;
 
-    public CRUDOperationsExceptionFilterAttributeTests(ActionFilterFixture fixture)
+    public CRUDOperationsExceptionFilterTests(ActionFilterFixture fixture)
     {
         _sutExceptionFilter = new();
         _exceptionContext = fixture.CreateExceptionContext();
@@ -71,7 +71,7 @@ public class CRUDOperationsExceptionFilterAttributeTests
             },
         };
 
-        _exceptionContext.Exception = new AlreadyExistsException(errorMessage, id);
+        _exceptionContext.Exception = new AlreadyExistsException(errorMessage, "Id", id);
 
         // Act
         _sutExceptionFilter.OnException(

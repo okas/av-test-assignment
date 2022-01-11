@@ -52,7 +52,7 @@ public readonly record struct UserInteractionCreateCommand(
                 // TODO Log it
                 // TODO Current workflow, where entity instance is created in this handler, should exclude this situation.
                 // As of now it should be thrown when Id generation outside of server fails somehow (e.g. default value is attempted).
-                throw new AlreadyExistsException(AlreadyExists, model.Id, ex);
+                throw new AlreadyExistsException(AlreadyExists, "Id", model.Id, ex);
             }
             catch (DbUpdateConcurrencyException)
             {
