@@ -1,16 +1,42 @@
 ﻿namespace Backend.WebApi.Domain.Exceptions;
 
 /// <summary>
-/// Populates <see cref="Exception.Data"/> property, see (<c>constructor</c>) <see cref="BaseException(string?, string?, object?, Exception?)"/>.
+/// Populates <see cref="Exception.Data"/> property, see (<c>constructor</c>) <see cref="BaseException(string?, object?, string?, Exception?)"/>.
 /// </summary>
 public abstract class BaseException : Exception
 {
-    /// <summary>
-    /// Populates <see cref="Exception.Data"/> property by menas of: <code><see cref="Exception.Data"/>[<paramref name="key"/>] = <paramref name="value"/>;</code>
-    /// </summary>
-    protected BaseException(string? message, string key, object value, Exception? innerException)
-        : base(message, innerException) =>
-        InitData(key, value);
+    private string _category = "default";
 
-    private void InitData(string key, object value) => Data.Add(key, value);
+    public const string ModelDataKey = "model";
+
+    /// <summary>
+    /// Populates <see cref="Category"/>; and <see cref="Exception.Data"/> properties by menas of: <code><see cref="Exception.Data"/>[<see cref="ModelDataKey"/>] = <paramref name="model"/>;</code>
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="model"></param>
+    /// <param name="category">Initializes <see cref="Category"/>, but if omited, then value <c>"default" will be used.</c></param>
+    /// <param name="innerException"></param>
+    protected BaseException(string? message, object? model, string category = "", Exception? innerException = default)
+        : base(message, innerException)
+    {
+        Category = category;
+
+        if (model is null)
+        {
+            return;
+        }
+
+        InitData(ModelDataKey, model);
+    }
+
+    public string Category
+    {
+        get => _category;
+
+        init => _category = string.IsNullOrWhiteSpace(value)
+            ? throw new ArgumentOutOfRangeException(nameof(Category), value, "Should not be null, empty, or whitespace string.")
+            : value;
+    }
+
+    private void InitData(string key, object? value) => Data.Add(key, value);
 }

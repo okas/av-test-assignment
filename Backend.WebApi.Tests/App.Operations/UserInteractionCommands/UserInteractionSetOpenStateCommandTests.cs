@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
+using FluentAssertions.Execution;
+using MediatR;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
+using static Backend.WebApi.App.Operations.UserInteractionCommands.UserInteractionSetOpenStateCommand;
 using static Backend.WebApi.Tests.UserInteractionUtilities;
 
 namespace Backend.WebApi.Tests.App.Operations.UserInteractionCommands;
@@ -15,14 +20,14 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 {
     private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
-    private readonly UserInteractionSetOpenStateCommand.Handler _sutCommandHandler;
+    private readonly Handler _sutCommandHandler;
 
     public UserInteractionSetOpenStateCommandTests(ApiLocalDbFixture dbFixture)
     {
         _knownEntitesIdIsOpen = GenerateKnownData(2);
         _sutDbContext = dbFixture.CreateContext();
         SeedData(dbFixture, _knownEntitesIdIsOpen);
-        _sutCommandHandler = new(_sutDbContext);
+        _sutCommandHandler = new(_sutDbContext, new NullLogger<Handler>());
     }
 
     [Theory]
@@ -51,26 +56,27 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
         _sutDbContext.UserInteraction.Should().ContainSingle(model => model.Id == id && model.IsOpen == newValue);
     }
 
-    [Fact]
-    public async Task SetOpenState_NonExistingInteraction_Throws()
+    [Theory]
+    [AutoData]
+    public async Task SetOpenState_NonExistingInteraction_Throws(
+        // Arrange
+        [Frozen] Guid Id,
+        UserInteractionSetOpenStateCommand notExistingModelCommand)
     {
-        // Arrange+
-        UserInteractionSetOpenStateCommand notExistingModelCommand = new()
-        {
-            Id = Guid.NewGuid(),
-        };
+        var exceptionDataModel = new { Id };
+
+        Func<Task<Unit>> act = () =>
+        _sutCommandHandler.Handle(
+           notExistingModelCommand,
+           ct: default
+           );
 
         // Act
-        var act = () =>
-            _sutCommandHandler.Handle(
-                notExistingModelCommand,
-                ct: default
-                );
-
         // Assert
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("User interaction not found, while attempting to set its Open state.")
-            .Where(ex => (Guid?)ex.Data["Id"] == notExistingModelCommand.Id);
+        using AssertionScope _ = new();
+        (await act.Should().ThrowAsync<NotFoundException>()
+             .WithMessage("Operation cancelled."))
+             .Which.Data[BaseException.ModelDataKey].Should().BeEquivalentTo(exceptionDataModel);
     }
 
     /// <summary>

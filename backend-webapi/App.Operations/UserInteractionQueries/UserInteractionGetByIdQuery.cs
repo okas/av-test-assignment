@@ -17,7 +17,7 @@ public record UserInteractionGetByIdQuery(
     /// Handles <see cref="UserInteractionGetByIdQuery"/> command.
     /// </summary>
     /// <param name="Context">Dependency.</param>
-    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetByIdQuery, UserInteractionDto?>
+    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetByIdQuery, UserInteractionDto?> // TODO To class, cause no record features used
     {
         public async Task<UserInteractionDto?> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
         {

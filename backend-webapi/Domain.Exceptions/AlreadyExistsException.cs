@@ -4,6 +4,7 @@
 public class AlreadyExistsException : BaseException
 {
     /// <inheritdoc />
-    public AlreadyExistsException(string? message, string key, object value, Exception? innerException = default)
-        : base(message, key, value, innerException) { }
+    public AlreadyExistsException(string? message = default, object? model = default, string category = "", Exception? innerException = default)
+        : base(message, model, category, innerException)
+    { }
 }

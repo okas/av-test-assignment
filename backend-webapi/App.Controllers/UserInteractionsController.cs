@@ -1,4 +1,5 @@
 using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Extensions;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using MediatR;
@@ -64,6 +65,7 @@ public class UserInteractionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ServiceFilter(typeof(CUDOperationsExceptionFilter))]
     public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct)
     {
         if (id == command.Id && await _mediator.Send(command, ct) == default)
@@ -78,11 +80,11 @@ public class UserInteractionsController : ControllerBase
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ServiceFilter(typeof(CUDOperationsExceptionFilter))]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionCreateCommand command, CancellationToken ct)
     {
         UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(
-            await _mediator.Send(command, ct
-            ));
+            await _mediator.Send(command, ct));
 
         return CreatedAtAction(nameof(GetUserInteraction), new { id = dto.Id }, dto);
     }

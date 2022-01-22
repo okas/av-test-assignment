@@ -22,16 +22,13 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
 
     public new const string DefaultConnectionString = "ApiDbContext-IoC";
 
-
-    static IntegrationTestFixture()
-    {
-        _apiAssembly = typeof(ProgramDependencyInjection).Assembly;
-    }
+    static IntegrationTestFixture() => _apiAssembly = typeof(ProgramDependencyInjection).Assembly;
 
     public IntegrationTestFixture() : base(DefaultConnectionString)
     {
         ServiceCollection services = new();
 
+        SetupLogger(services);
         SetupEntityFrameworkCore(services, Connection!);
         SetupApplication(services);
         SetupMediator(services);
@@ -41,6 +38,8 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
         _scope = RootServiceProvider!.CreateScope();
         ScopedServiceProvider = _scope.ServiceProvider;
     }
+
+    private static void SetupLogger(ServiceCollection services) => services.AddLogging();
 
     private static void SetupEntityFrameworkCore(ServiceCollection services, DbConnection dbConn) =>
         services.AddDbContext<ApiDbContext>(builder => { builder.UseSqlServer(dbConn); });

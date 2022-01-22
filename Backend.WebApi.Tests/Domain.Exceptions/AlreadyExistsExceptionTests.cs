@@ -1,26 +1,25 @@
-﻿using AutoFixture.Xunit2;
+﻿using System;
 using Backend.WebApi.Domain.Exceptions;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using Xunit;
+using static FluentAssertions.FluentActions;
 
 namespace Backend.WebApi.Tests.Domain.Exceptions;
 
 public class AlreadyExistsExceptionTests
 {
     [Theory]
-    [AutoData]
-    public void Initialized_WithKnownParameters_ThrowsCorrectInstance(
-         // Arrange
-         [Frozen(Matching.ParameterName)] string? message,
-         [Frozen(Matching.ParameterName)] string key,
-         [Frozen] object value,
-         // Act
-         AlreadyExistsException sutEx)
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void Initialized_TryInitInvalidCategoryValue_ThrowsArgumentOutOfRange(
+    // Arrange
+    string? testValue)
     {
-        //Assert
-        using AssertionScope _ = new();
-        sutEx.Message.Should().Be(message);
-        sutEx.Data[key].Should().Be(value);
+        // Act
+        Func<AlreadyExistsException> act = Invoking(
+            () => new AlreadyExistsException() { Category = testValue! });
+
+        // Assert
+        act.Should().ThrowOnBadCategory();
     }
 }

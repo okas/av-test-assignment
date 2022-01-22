@@ -17,7 +17,7 @@ public readonly record struct UserInteractionGetQuery<Tout>(
     /// Handles <see cref="UserInteractionGetQuery{Tout}"/> command.
     /// </summary>
     /// <param name="Context">Dependency.</param>
-    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)>
+    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)> // TODO To class, cause no record features used
     {
         private static readonly string _queryingErrorMessage;
 

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Extensions;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.App.Swagger;
 using Backend.WebApi.Infrastructure.Data.EF;
@@ -45,10 +46,11 @@ public static class ProgramDependencyInjection
 
     private static WebApplicationBuilder ApplicationSetup(this WebApplicationBuilder builder)
     {
-        builder.Services.AddTransient<
-            IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
-            UserInteractionGetQuery<UserInteractionDto>.Handler
-            >();
+        builder.Services
+            .AddTransient<
+                IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
+                UserInteractionGetQuery<UserInteractionDto>.Handler>()
+            .AddTransient<CUDOperationsExceptionFilter>();
 
         return builder;
     }
