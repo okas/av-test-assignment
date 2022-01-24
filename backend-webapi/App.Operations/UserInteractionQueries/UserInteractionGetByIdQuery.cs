@@ -16,14 +16,17 @@ public record UserInteractionGetByIdQuery(
     /// <summary>
     /// Handles <see cref="UserInteractionGetByIdQuery"/> command.
     /// </summary>
-    /// <param name="Context">Dependency.</param>
-    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetByIdQuery, UserInteractionDto?> // TODO To class, cause no record features used
+    public class Handler : IRequestHandler<UserInteractionGetByIdQuery, UserInteractionDto?>
     {
+        private readonly ApiDbContext _context;
+
+        public Handler(ApiDbContext context) => _context = context;
+
         public async Task<UserInteractionDto?> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
         {
             try
             {
-                UserInteraction? model = await Context.UserInteraction.AsNoTracking()
+                UserInteraction? model = await _context.UserInteraction.AsNoTracking()
                     .SingleOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
 
                 return model is not null

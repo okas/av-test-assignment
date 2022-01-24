@@ -16,10 +16,12 @@ public readonly record struct UserInteractionGetQuery<Tout>(
     /// <summary>
     /// Handles <see cref="UserInteractionGetQuery{Tout}"/> command.
     /// </summary>
-    /// <param name="Context">Dependency.</param>
-    public record Handler(ApiDbContext Context) : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)> // TODO To class, cause no record features used
+    public record Handler : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)>
     {
+        private readonly ApiDbContext _context;
         private static readonly string _queryingErrorMessage;
+
+        public Handler(ApiDbContext context) => _context = context;
 
         static Handler() =>
             _queryingErrorMessage = $"{nameof(Handler)} encountered error while querying database. Probbably caused by bad WebApi code. Operation was stopped.";
@@ -31,7 +33,7 @@ public readonly record struct UserInteractionGetQuery<Tout>(
             try
             {
                 List<Tout> models = await query.ToListAsync(ct).ConfigureAwait(false);
-                int totalCount = await Context.UserInteraction.CountAsync(ct).ConfigureAwait(false);
+                int totalCount = await _context.UserInteraction.CountAsync(ct).ConfigureAwait(false);
 
                 return (models.AsReadOnly(), totalCount);
             }
@@ -44,7 +46,7 @@ public readonly record struct UserInteractionGetQuery<Tout>(
 
         private IQueryable<Tout> BuildQuery(UserInteractionGetQuery<Tout> rq)
         {
-            IQueryable<UserInteraction> filteredQuery = Context.UserInteraction
+            IQueryable<UserInteraction> filteredQuery = _context.UserInteraction
                 .AsNoTracking()
                 .AppendFiltersToQuery(rq.Filters);
 
