@@ -19,7 +19,6 @@ public class CUDOperationsExceptionFilterTests
         _exceptionContext = fixture.CreateExceptionContext();
     }
 
-    //[Fact]
     [Theory]
     [AutoMoqData]
     public void OnException_NotFoundException_ShouldSetConflictObjectResultWithCorrectValueObject(

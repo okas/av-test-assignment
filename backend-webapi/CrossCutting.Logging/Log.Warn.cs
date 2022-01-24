@@ -13,4 +13,10 @@ public static partial class Log
         LogLevel.Warning,
         "Already exists: {Model}.")]
     public static partial void WarnAlreadyExists(this ILogger logger, object Model, Exception? ex);
+
+    [LoggerMessage(
+    3999,
+     LogLevel.Warning,
+    "Operation was cancelled wtih reason {Reason}.")]
+    public static partial void WarnOperationCancelledWithReason(this ILogger logger, string Reason, Exception? ex);
 }

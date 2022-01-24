@@ -10,28 +10,29 @@ using Xunit;
 namespace Backend.WebApi.Tests.App.Extensions;
 
 [Collection("ActionFilterFixture")]
-public class OperationCancelledExceptionFilterAttributeTests
+public class OperationCancelledExceptionFilterTests
 {
-    private readonly OperationCancelledExceptionFilterAttribute _sutExceptionFilter;
     private readonly ExceptionContext _exceptionContext;
 
-    public OperationCancelledExceptionFilterAttributeTests(ActionFilterFixture fixture)
+    public OperationCancelledExceptionFilterTests(ActionFilterFixture fixture)
     {
-        _sutExceptionFilter = new();
         _exceptionContext = fixture.CreateExceptionContext();
     }
 
-    [Fact]
-    public void OnException_TokenIsCancelled_ShouldReturnStatusCodeResultWith499()
+    [Theory]
+    [AutoMoqData]
+    public void OnException_TokenIsCancelled_ShouldReturnStatusCodeResultWith499(
+         // Arrange
+         OperationCancelledExceptionFilter sutExceptionFilter)
     {
-        // Arrange
+
         int expectedStatusCode = 499;
         CancellationToken cancelledToken = new(canceled: true);
 
         _exceptionContext.Exception = new OperationCanceledException(cancelledToken);
 
         // Act
-        _sutExceptionFilter.OnException(
+        sutExceptionFilter.OnException(
             _exceptionContext
             );
 
@@ -45,16 +46,18 @@ public class OperationCancelledExceptionFilterAttributeTests
 
     }
 
-    [Fact]
-    public void OnException_TokenIsNotCancelled_ShouldReturnNullResultAndExceptionNotHandeled()
+    [Theory]
+    [AutoMoqData]
+    public void OnException_TokenIsNotCancelled_ShouldReturnNullResultAndExceptionNotHandeled(
+         // Arrange
+         OperationCancelledExceptionFilter sutExceptionFilter)
     {
-        // Arrange
         CancellationToken notCancelledToken = new(canceled: false);
 
         _exceptionContext.Exception = new OperationCanceledException(notCancelledToken);
 
         // Act
-        _sutExceptionFilter.OnException(
+        sutExceptionFilter.OnException(
             _exceptionContext
             );
 

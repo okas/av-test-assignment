@@ -12,8 +12,11 @@ namespace Backend.WebApi.App.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[ServiceFilter(typeof(OperationCancelledExceptionFilter))]
 [Produces("application/json")]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(499)]
+
 public class UserInteractionsController : ControllerBase
 {
     private readonly IMediator _mediator;
