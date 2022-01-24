@@ -59,7 +59,6 @@ public class CUDOperationsExceptionFilter : IExceptionFilter
         {
             Title = title,
             Detail = ex.Message,
-            // TODO others?
         };
 
         details.Extensions[BaseException.ModelDataKey] = ex.Data[BaseException.ModelDataKey];
@@ -67,5 +66,3 @@ public class CUDOperationsExceptionFilter : IExceptionFilter
         return details;
     }
 }
-
-// TODO "Internal Exceptions" Should be logged in middleware

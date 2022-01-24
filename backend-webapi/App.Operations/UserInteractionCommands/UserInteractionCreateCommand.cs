@@ -50,15 +50,7 @@ public readonly record struct UserInteractionCreateCommand(
             }
             catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
             {
-                // TODO Log it
-                // TODO Current workflow, where entity instance is created in this handler, should exclude this situation.
-                // As of now it should be thrown when Id generation outside of server fails somehow (e.g. default value is attempted).
                 throw new AlreadyExistsException("Operation cancelled.", new { model.Id }, typeof(Handler).FullName!, ex);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // TODO This exception is not expected in current operation, but is a reminder to implement middleware to handle this kind of exceptions.
-                throw;
             }
         }
     }
