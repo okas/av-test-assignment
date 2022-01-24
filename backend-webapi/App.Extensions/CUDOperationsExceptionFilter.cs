@@ -67,5 +67,3 @@ public class CUDOperationsExceptionFilter : IExceptionFilter
         return details;
     }
 }
-
-// TODO "Internal Exceptions" Should be logged in middleware

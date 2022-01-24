@@ -24,20 +24,13 @@ public record UserInteractionGetByIdQuery(
 
         public async Task<UserInteractionDto?> Handle(UserInteractionGetByIdQuery rq, CancellationToken ct)
         {
-            try
-            {
-                UserInteraction? model = await _context.UserInteraction.AsNoTracking()
-                    .SingleOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
 
-                return model is not null
-                    ? UserInteractionDto.Projection.Compile().Invoke(model)
-                    : null;
-            }
-            catch
-            {
-                // TODO Whether and what should be logged here?
-                throw;
-            }
+            UserInteraction? model = await _context.UserInteraction.AsNoTracking()
+                .SingleOrDefaultAsync(m => m.Id == rq.Id, ct).ConfigureAwait(false);
+
+            return model is not null
+                ? UserInteractionDto.Projection.Compile().Invoke(model)
+                : null;
         }
     }
 }

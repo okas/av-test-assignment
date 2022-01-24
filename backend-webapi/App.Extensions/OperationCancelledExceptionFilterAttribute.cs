@@ -22,7 +22,3 @@ public class OperationCancelledExceptionFilterAttribute : ExceptionFilterAttribu
         context.Result = new StatusCodeResult(499);
     }
 }
-
-
-// TODO "Internal Exceptions" Should be logged in middleware
-// TODO Domain level logging should take place in operations or service layer.
