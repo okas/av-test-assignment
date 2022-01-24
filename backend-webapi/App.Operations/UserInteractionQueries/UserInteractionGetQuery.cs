@@ -16,7 +16,7 @@ public readonly record struct UserInteractionGetQuery<Tout>(
     /// <summary>
     /// Handles <see cref="UserInteractionGetQuery{Tout}"/> command.
     /// </summary>
-    public record Handler : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)>
+    public class Handler : IRequestHandler<UserInteractionGetQuery<Tout>, (IEnumerable<Tout> models, int totalCount)>
     {
         private readonly ApiDbContext _context;
 
