@@ -1,7 +1,9 @@
 using Backend.WebApi;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args).AddServicesToContainer();
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+builder.AddServices();
 
-WebApplication app = builder.Build().ConfigureHttpRequestPipeline();
+WebApplication app = builder.Build();
+app.SetupRequestPipeline();
 
 await app.RunAsync().ConfigureAwait(false);

@@ -22,7 +22,7 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
 
     public new const string DefaultConnectionString = "ApiDbContext-IoC";
 
-    static IntegrationTestFixture() => _apiAssembly = typeof(ProgramDependencyInjection).Assembly;
+    static IntegrationTestFixture() => _apiAssembly = typeof(ServicesConfiguration).Assembly;
 
     public IntegrationTestFixture() : base(DefaultConnectionString)
     {
@@ -48,8 +48,7 @@ public class IntegrationTestFixture : ApiLocalDbFixture, IDisposable
     {
         services.AddTransient<
             IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
-            UserInteractionGetQuery<UserInteractionDto>.Handler
-            >();
+            UserInteractionGetQuery<UserInteractionDto>.Handler>();
     }
 
     private static void SetupMediator(ServiceCollection services) =>

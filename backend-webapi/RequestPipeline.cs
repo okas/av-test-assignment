@@ -1,8 +1,8 @@
 ﻿namespace Backend.WebApi;
 
-public static class ProgramHttpRequestPipeline
+public static class RequestPipeline
 {
-    public static WebApplication ConfigureHttpRequestPipeline(this WebApplication app)
+    public static WebApplication SetupRequestPipeline(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {

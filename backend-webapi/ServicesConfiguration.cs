@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi;
 
-public static class ProgramDependencyInjection
+public static class ServicesConfiguration
 {
-    public static WebApplicationBuilder AddServicesToContainer(this WebApplicationBuilder builder) =>
+    public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder) =>
         builder.EntityFrameworkCoreSetup()
             .AspNetCoreRoutingSetup()
             .ApplicationSetup()
