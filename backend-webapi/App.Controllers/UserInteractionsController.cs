@@ -83,8 +83,7 @@ public class UserInteractionsController : ControllerBase
     [ServiceFilter(typeof(CUDOperationsExceptionFilter))]
     public async Task<ActionResult<UserInteractionDto>> PostUserInteraction(UserInteractionCreateCommand command, CancellationToken ct)
     {
-        UserInteractionDto dto = UserInteractionDto.Projection.Compile().Invoke(
-            await _mediator.Send(command, ct));
+        UserInteractionDto dto = await _mediator.Send(command, ct);
 
         return CreatedAtAction(nameof(GetUserInteraction), new { id = dto.Id }, dto);
     }

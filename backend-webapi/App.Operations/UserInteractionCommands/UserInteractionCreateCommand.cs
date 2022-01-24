@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.CrossCutting.Logging;
 using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
@@ -12,12 +13,12 @@ namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 public readonly record struct UserInteractionCreateCommand(
     [property: Required] DateTime Deadline,
     [property: Required, MinLength(2)] string? Description)
-    : IRequest<UserInteraction> // TODO Respond with DTO, instead of Domain.Model.
+    : IRequest<UserInteractionDto>
 {
     /// <summary>
     /// Handles <see cref="UserInteractionCreateCommand" /> command.
     /// </summary>
-    public class Handler : IRequestHandler<UserInteractionCreateCommand, UserInteraction>
+    public class Handler : IRequestHandler<UserInteractionCreateCommand, UserInteractionDto>
     {
         private readonly ApiDbContext _context;
         private readonly ILogger<Handler> _logger;
@@ -27,7 +28,7 @@ public readonly record struct UserInteractionCreateCommand(
         /// <inheritdoc />
         /// <exception cref="AlreadyExistsException" />
         /// <exception cref="DbUpdateConcurrencyException" />
-        public async Task<UserInteraction> Handle(UserInteractionCreateCommand rq, CancellationToken ct)
+        public async Task<UserInteractionDto> Handle(UserInteractionCreateCommand rq, CancellationToken ct)
         {
             UserInteraction model = new()
             {
@@ -44,7 +45,7 @@ public readonly record struct UserInteractionCreateCommand(
 
                 _logger.InformCreated(new { model.Id });
 
-                return model;
+                return UserInteractionDto.Projection.Compile().Invoke(model);
             }
             catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
             {

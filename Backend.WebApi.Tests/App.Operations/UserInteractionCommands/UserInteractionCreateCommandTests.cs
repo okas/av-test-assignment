@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.Domain.Exceptions;
-using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -37,7 +37,7 @@ public sealed class UserInteractionCreateCommandTests : IDisposable
         DateTime serviceQueryTime = DateTime.Now;
 
         // Act
-        UserInteraction createdModel =
+        UserInteractionDto createdModel =
              await _sutCommandHandler.Handle(
                  _correctCommand,
                  ct: default
