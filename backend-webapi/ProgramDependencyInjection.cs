@@ -50,7 +50,8 @@ public static class ProgramDependencyInjection
             .AddTransient<
                 IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
                 UserInteractionGetQuery<UserInteractionDto>.Handler>()
-            .AddTransient<CUDOperationsExceptionFilter>();
+            .AddTransient<CUDOperationsExceptionFilter>()
+            .AddTransient<OperationCancelledExceptionFilter>();
 
         return builder;
     }

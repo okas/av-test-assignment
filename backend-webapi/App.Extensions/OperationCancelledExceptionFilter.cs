@@ -6,9 +6,9 @@ namespace Backend.WebApi.App.Extensions;
 
 public class OperationCancelledExceptionFilter : IExceptionFilter
 {
-    private readonly Logger<OperationCancelledExceptionFilter> _logger;
+    private readonly ILogger<OperationCancelledExceptionFilter> _logger;
 
-    public OperationCancelledExceptionFilter(Logger<OperationCancelledExceptionFilter> logger) => _logger = logger;
+    public OperationCancelledExceptionFilter(ILogger<OperationCancelledExceptionFilter> logger) => _logger = logger;
 
     public void OnException(ExceptionContext context)
     {
