@@ -9,14 +9,17 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+    <ErrorReport>queue</ErrorReport>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <ItemGroup>

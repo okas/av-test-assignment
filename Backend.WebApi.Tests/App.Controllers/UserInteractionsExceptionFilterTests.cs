@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Extensions;
 using FluentAssertions;

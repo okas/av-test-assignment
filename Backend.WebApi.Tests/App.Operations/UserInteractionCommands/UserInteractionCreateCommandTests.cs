@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Backend.WebApi.App.Dto;
+﻿using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Infrastructure.Data.EF;

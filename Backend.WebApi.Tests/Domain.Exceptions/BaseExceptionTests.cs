@@ -1,5 +1,4 @@
-﻿using System;
-using AutoFixture.Xunit2;
+﻿using AutoFixture.Xunit2;
 using Backend.WebApi.Domain.Exceptions;
 using Xunit;
 using static FluentAssertions.FluentActions;

@@ -1,5 +1,4 @@
-﻿using System;
-using Backend.WebApi.Domain.Exceptions;
+﻿using Backend.WebApi.Domain.Exceptions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;

@@ -1,5 +1,4 @@
-﻿using System;
-using Backend.WebApi.Domain.Exceptions;
+﻿using Backend.WebApi.Domain.Exceptions;
 using Xunit;
 using static FluentAssertions.FluentActions;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Backend.WebApi.App.Controllers;
+﻿using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using FluentAssertions;

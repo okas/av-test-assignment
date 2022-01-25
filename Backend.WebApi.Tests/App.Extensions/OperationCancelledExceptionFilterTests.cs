@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using Backend.WebApi.App.Extensions;
+﻿using Backend.WebApi.App.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Mvc;

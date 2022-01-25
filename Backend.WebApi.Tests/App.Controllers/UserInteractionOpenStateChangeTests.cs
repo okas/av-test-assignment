@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Backend.WebApi.App.Controllers;
+﻿using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using Backend.WebApi.Infrastructure.Data.EF;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;

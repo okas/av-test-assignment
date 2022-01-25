@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture.Xunit2;
+﻿using AutoFixture.Xunit2;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Infrastructure.Data.EF;
