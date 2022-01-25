@@ -39,19 +39,20 @@ public readonly record struct UserInteractionCreateCommand(
                 Deadline = rq.Deadline,
             };
 
+            _context.UserInteraction.Add(model);
+
             try
             {
-                _context.UserInteraction.Add(model);
                 await _context.SaveChangesAsync(ct).ConfigureAwait(false);
-
-                _logger.InformCreated(new { model.Id });
-
-                return UserInteractionDto.Projection.Compile().Invoke(model);
             }
             catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
             {
                 throw new AlreadyExistsException("Operation cancelled.", new { model.Id }, typeof(Handler).FullName!, ex);
             }
+
+            _logger.InformCreated(new { model.Id });
+
+            return UserInteractionDto.Projection.Compile().Invoke(model);
         }
     }
 }
