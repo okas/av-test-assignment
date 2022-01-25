@@ -38,10 +38,6 @@ public readonly record struct UserInteractionSetOpenStateCommand(
             try
             {
                 await _context.SaveChangesAsync(ct).ConfigureAwait(false);
-
-                _logger.InformChanged(rq);
-
-                return Unit.Value;
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -52,6 +48,10 @@ public readonly record struct UserInteractionSetOpenStateCommand(
                 }
                 throw;
             }
+
+            _logger.InformChanged(rq);
+
+            return Unit.Value;
         }
     }
 }
