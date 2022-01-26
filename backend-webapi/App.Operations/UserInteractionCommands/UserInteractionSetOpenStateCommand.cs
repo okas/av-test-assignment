@@ -28,7 +28,7 @@ public readonly record struct UserInteractionSetOpenStateCommand(
 
         public async Task<Unit> Handle(UserInteractionSetOpenStateCommand rq, CancellationToken ct)
         {
-            _context.Attach(new UserInteraction
+            _context.Attach(new UserInteraction // TODO needs revision, because RowVersion is added to entity and it needs to be in context to update.
             {
                 Id = rq.Id,
                 IsOpen = rq.IsOpen,
@@ -46,6 +46,7 @@ public readonly record struct UserInteractionSetOpenStateCommand(
             catch (DbUpdateConcurrencyException ex)
             {
                 // TODO Analyze https://docs.microsoft.com/en-us/ef/core/saving/concurrency to implement better handling
+                // TODO tests fail here
                 if (!await _context.UserInteraction.AnyAsync(model => model.Id == rq.Id, ct).ConfigureAwait(false))
                 {
                     throw new NotFoundException("Operation cancelled.", rq, typeof(Handler).FullName!, ex);
