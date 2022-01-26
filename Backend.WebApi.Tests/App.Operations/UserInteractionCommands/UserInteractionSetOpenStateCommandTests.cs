@@ -21,7 +21,7 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 
     public UserInteractionSetOpenStateCommandTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = GenerateKnownData(2);
+        _knownEntitesIdIsOpen = GenerateWithKnownIdIsOpen(2);
         _sutDbContext = dbFixture.CreateContext();
         SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutCommandHandler = new(_sutDbContext, new NullLogger<Handler>());

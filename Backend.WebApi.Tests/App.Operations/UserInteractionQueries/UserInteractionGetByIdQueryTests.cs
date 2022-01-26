@@ -16,7 +16,7 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
 
     public UserInteractionGetByIdQueryTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = GenerateKnownData(1);
+        _knownEntitesIdIsOpen = GenerateWithKnownIdIsOpen(1);
         _sutDbContext = dbFixture.CreateContext();
         SeedData(dbFixture, _knownEntitesIdIsOpen);
         _sutCommandHandler = new(_sutDbContext);
