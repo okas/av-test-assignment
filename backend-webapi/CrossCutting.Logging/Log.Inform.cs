@@ -13,4 +13,10 @@ public static partial class Log
         LogLevel.Information,
         "State changed: {Model}")]
     public static partial void InformChanged(this ILogger logger, object Model);
+
+    [LoggerMessage(
+        1003,
+        LogLevel.Information,
+        "Updated: {Model}")]
+    public static partial void InformUpdated(this ILogger logger, object Model);
 }
