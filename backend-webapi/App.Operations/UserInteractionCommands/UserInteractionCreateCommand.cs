@@ -12,7 +12,7 @@ namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
 public readonly record struct UserInteractionCreateCommand(
     [property: Required] DateTime Deadline,
-    [property: Required, MinLength(2)] string? Description)
+    [property: Required, MinLength(2)] string Description)
     : IRequest<UserInteractionDto>
 {
     /// <summary>
