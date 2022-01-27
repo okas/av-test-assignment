@@ -37,22 +37,21 @@ public readonly record struct UserInteractionCreateCommand(
                 Description = rq.Description,
                 Deadline = rq.Deadline,
             };
-
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
+            _context.UserInteraction.Add(model);
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
             try
             {
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-                _context.UserInteraction.Add(model);
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
                 await _context.SaveChangesAsync(ct).ConfigureAwait(false);
-
-                _logger.InformCreated(new { model.Id });
-
-                return UserInteractionDto.Projection.Compile().Invoke(model);
             }
             catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2627)
             {
                 throw new AlreadyExistsException("Operation cancelled.", new { model.Id }, typeof(Handler).FullName!, ex);
             }
+
+            _logger.InformCreated(new { model.Id });
+
+            return UserInteractionDto.Projection.Compile().Invoke(model);
         }
     }
 }
