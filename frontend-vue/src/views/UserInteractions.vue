@@ -1,5 +1,3 @@
-// eslint-disable-next-line
-
 <template>
   <article class="user-interaction">
     <header>
@@ -30,18 +28,29 @@
         <thead>
           <tr>
             <th>Kirjeldus</th>
-            <th>Sisestatud</th>
             <th>Tähtaeg</th>
+            <th>Sisestatud</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in interactions" :key="item.id" :class="{ 'due-problem': isProblematic(item) }">
-            <td class="item-description">{{ item.description }}</td>
-            <td>{{ formatDateTimeShortDateShortTime(item.created) }}</td>
-            <td>{{ formatDateTimeShortDateShortTime(item.deadline) }}</td>
-            <td class="item-open">
-              <button id="checkbox" @click="markInteractionClosed(item)">✔</button>
+            <td class="item-description">
+              <span v-text="item.description" />&nbsp;
+              <input type="text" :placeholder="item.description" v-model="item.description"
+                     style="border: none; font-size: inherit;" />
+            </td>
+            <td>
+              <span v-text="formatDateTimeShortDateShortTime(item.deadline)" />
+              <DateTimeLocalEditor v-model:datevalue="item.deadline"
+                                   style="border: none; font-size: inherit; " />
+            </td>
+            <td>
+              <span  v-text="formatDateTimeShortDateShortTime(item.created)"/>
+            </td>
+            <td class="item-action">
+              <button @click="markInteractionClosed(item)">✔</button>
+              <button>↪</button>
             </td>
           </tr>
         </tbody>
@@ -51,10 +60,12 @@
 </template>
 
 <script>
+import DateTimeLocalEditor from "../components/datetime-local-editor.vue"
 import formatDateMixin from "../mixins/formatDateMixin";
 
 export default {
   name: "UserInteractions",
+  components: { DateTimeLocalEditor },
   mixins: [formatDateMixin],
   data: () => ({
     interactions: [],
@@ -133,7 +144,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 table {
   table-layout: auto;
@@ -141,7 +151,6 @@ table {
   border: 1px #42b983 solid;
   width: 100%;
 }
-
 td,
 th {
   padding: 0.75rem 0.5rem;
@@ -149,41 +158,32 @@ th {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
 td {
   text-align: right;
 }
-
 th {
   border-bottom: 1px #42b983 solid;
 }
-
 tbody tr:nth-child(even) {
   background-color: #f2f2f2;
 }
-
 tbody tr:hover {
   background: #daf1f1;
   outline: 1px solid black;
 }
-
 .item-description {
   text-align: justify;
 }
-
-.item-open {
+.item-action {
   text-align: center;
 }
-
 tbody tr.due-problem {
   outline: 1px solid red;
   background-color: #ffe6e6;
 }
-
 tbody tr.due-problem:hover {
   outline: 1px solid black;
 }
-
 .form-container {
   display: flex;
   flex-direction: row;
@@ -191,12 +191,10 @@ tbody tr.due-problem:hover {
   align-items: center;
   gap: 1rem;
 }
-
 .control {
   align-self: auto;
   flex-grow: 4;
 }
-
 .refresh-icon {
   font-weight: 700;
   font-size: 1rem;
