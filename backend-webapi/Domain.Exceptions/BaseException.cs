@@ -29,7 +29,7 @@ public abstract class BaseException : Exception
         InitData(ModelDataKey, model);
     }
 
-    public string Category
+    public string Category // TODO Why not use ILogger<> instead?
     {
         get => _category;
 

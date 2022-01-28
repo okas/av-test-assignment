@@ -17,8 +17,8 @@ public static partial class Log
     [LoggerMessage(
         3003,
         LogLevel.Warning,
-        "Operation detected optimistic concurrency during saving updates; now trying to resolve by {Remedy}, retry: {Retry}. Attempted changes: {Model}")]
-    public static partial void WarnOptimisticConcurrencyDetection(this ILogger logger, string Remedy, int Retry, object Model, Exception? ex);
+        "Operation detected optimistic concurrency during saving updates for {Model}. Operation cancelled.")]
+    public static partial void WarnOptimisticConcurrencyDetection(this ILogger logger, object Model, Exception? ex);
 
     [LoggerMessage(
         3999,

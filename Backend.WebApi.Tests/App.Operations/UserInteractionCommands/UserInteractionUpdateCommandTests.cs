@@ -6,7 +6,6 @@ using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 using static Backend.WebApi.App.Operations.UserInteractionCommands.UserInteractionUpdateCommand;
@@ -47,7 +46,7 @@ public sealed class UserInteractionUpdateCommandTests : IDisposable
         using AssertionScope _ = new();
 
         (await result.Should().ThrowAsync<NotFoundException>()
-             .WithMessage("Operation cancelled.")
+             .WithMessage("Update operation cancelled.")
              .Where(ex => ex.InnerException == null))
              .Which.Data[BaseException.ModelDataKey].Should().BeEquivalentTo(new { Id });
     }
@@ -81,11 +80,10 @@ public sealed class UserInteractionUpdateCommandTests : IDisposable
 
     [Theory]
     [AutoData]
-    public async Task Update_HandleConcurrentEntityDeletion_ThrowsNotFoundWithInnerException(
+    public async Task Update_HandleConcurrentEntityDeletion_ThrowsNotFound(
         // Arrange
         [Frozen(Matching.PropertyName)] Guid Id,
-        UserInteractionUpdateCommand correctModelCommand
-    )
+        UserInteractionUpdateCommand correctModelCommand)
     {
         SeedData(_dbFixture, Id);
 
@@ -108,25 +106,23 @@ public sealed class UserInteractionUpdateCommandTests : IDisposable
         // Assert
         using AssertionScope s = new();
 
-        await result.Should().ThrowExactlyAsync<NotFoundException>()
-            .WithMessage("Operation cancelled, during concurrency handling.")
-            .WithInnerExceptionExactly<NotFoundException, DbUpdateConcurrencyException>();
+        (await result.Should().ThrowExactlyAsync<NotFoundException>()
+            .WithMessage("Concurrency detected, operation cancelled."))
+            .Which.Data[BaseException.ModelDataKey].Should().BeEquivalentTo(new { Id });
     }
 
     [Theory]
     [AutoData]
-    public async Task Update_HandleConcurrencyChange_ShouldSucceedByForcingCommandValue(
+    public async Task Update_HandleConcurrencyChange_ThrowsConcurrentUpdateException(
         // Arrange
         [Frozen(Matching.PropertyName)] Guid Id,
         [Frozen(Matching.PropertyName)] DateTime Deadline,
-        [Frozen(Matching.PropertyName)] string Description,
         [Frozen(Matching.PropertyName)] bool IsOpen,
         string concurrentChangeDescription,
-        UserInteractionUpdateCommand correctModelCommand
-        )
+        UserInteractionUpdateCommand correctModelCommand)
     {
         SeedData(_dbFixture, Id);
-        // The concurrent delete: just after entity should be loadad into SUT DbContext and before saving its changes.
+        // The concurrent change: just after entity should be loadad into SUT DbContext and before saving its changes.
         _sutDbContext.SavingChanges += (sender, e) =>
         {
             using ApiDbContext otherContext = _dbFixture.CreateContext();
@@ -137,19 +133,18 @@ public sealed class UserInteractionUpdateCommandTests : IDisposable
             otherContext.SaveChanges();
         };
 
-        // Act
-        _ = await _sutCommandHandler.Handle(
+        Task<Unit> act() => _sutCommandHandler.Handle(
                  correctModelCommand,
                  ct: default
                  );
 
+        // Act
+        Func<Task<Unit>> result = Invoking(act);
+
         // Assert
-        _sutDbContext.UserInteraction.Find(Id).Should().BeEquivalentTo(new
-        {
-            Deadline,
-            Description,
-            IsOpen,
-        });
+        (await result.Should().ThrowAsync<ConcurrentUpdateException>()
+             .WithMessage("Concurrency detected, operation cancelled."))
+             .Which.Data[BaseException.ModelDataKey].Should().BeEquivalentTo(new { Id });
     }
 
     // TODO add cancellable operation testing: 1) "Request Abort", 2) "to many retries", for operation type internal cancellation.

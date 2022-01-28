@@ -31,50 +31,46 @@ public readonly record struct UserInteractionUpdateCommand(
         public Handler(ApiDbContext context, ILogger<Handler> logger) => (_context, _logger) = (context, logger);
 
         /// <inheritdoc />
-        /// <exception cref="NotFoundException" />
-        /// <exception cref="DbUpdateConcurrencyException" />
+        /// <inheritdoc cref="GetModelAsync"/>
+        /// <inheritdoc cref="TrySaveAsync"/>
         public async Task<Unit> Handle(UserInteractionUpdateCommand rq, CancellationToken ct)
         {
-            UserInteraction model = await _context.UserInteraction
-                .FindAsync(new object?[] { rq.Id }, ct).ConfigureAwait(false)
-                ?? throw new NotFoundException(
-                    "Operation cancelled.",
-                    new { rq.Id },
-                    _logCategory);
+            UserInteraction model = await GetModelAsync(rq, ct).ConfigureAwait(false);
 
             EntityEntry<UserInteraction> entry = _context.Entry(model);
 
             entry.CurrentValues.SetValues(rq);
 
-            await TrySaveChanges(entry, ct).ConfigureAwait(false); // TODO Add cancellation to limit concurrency handling retries. With logging!
+            await TrySaveAsync(entry, ct).ConfigureAwait(false);
 
             _logger.InformUpdated(new { model.Id });
 
             return Unit.Value;
         }
 
-        private async ValueTask TrySaveChanges(EntityEntry<UserInteraction> entry, CancellationToken ct)
-        {
-            int retry = 1;// TODO or from param if recursion is opted-out.
+        /// <exception cref="NotFoundException" />
+        private async Task<UserInteraction> GetModelAsync(UserInteractionUpdateCommand rq, CancellationToken ct) =>
+            await _context.UserInteraction.FindAsync(new object[] { rq.Id }, ct).ConfigureAwait(false)
+                ?? throw new NotFoundException("Update operation cancelled.", new { rq.Id }, _logCategory);
 
+        /// <exception cref="NotFoundException" />
+        /// <exception cref="ConcurrentUpdateException" />
+        /// <exception cref="OperationCanceledException" />
+        /// <exception cref="DbUpdateException" />
+        private async Task TrySaveAsync(EntityEntry<UserInteraction> entry, CancellationToken ct)
+        {
             try
             {
                 await _context.SaveChangesAsync(ct).ConfigureAwait(false);
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
-                _logger.WarnOptimisticConcurrencyDetection("forcing request updates again to be saved", retry++, entry.Entity, ex);
+                const string message = "Concurrency detected, operation cancelled.";
+                var model = new { entry.Entity.Id };
 
-                PropertyValues databaseValues = await entry.GetDatabaseValuesAsync(ct).ConfigureAwait(false)
-                    ?? throw new NotFoundException(
-                        "Operation cancelled, during concurrency handling.",
-                        new { entry.Entity.Id },
-                        _logCategory,
-                        ex);
-
-                entry.OriginalValues.SetValues(databaseValues);
-
-                await TrySaveChanges(entry, ct).ConfigureAwait(false);
+                throw await _context.UserInteraction.AnyAsync(e => e.Id == entry.Entity.Id, CancellationToken.None).ConfigureAwait(false)
+                    ? new ConcurrentUpdateException(message, model, _logCategory)
+                    : new NotFoundException(message, model, _logCategory);
             }
         }
     }

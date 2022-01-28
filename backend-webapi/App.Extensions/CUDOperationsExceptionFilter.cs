@@ -29,6 +29,7 @@ public class CUDOperationsExceptionFilter : IExceptionFilter
     {
         NotFoundException ex => HandleNotFoundException(ex),
         AlreadyExistsException ex => HandleAlreadyExistsException(ex),
+        ConcurrentUpdateException ex => HandleConcurrentUpdateException(ex),
         _ => null
     };
 
@@ -46,6 +47,15 @@ public class CUDOperationsExceptionFilter : IExceptionFilter
         GetLogger(ex).WarnAlreadyExists(ex.Data[BaseException.ModelDataKey]!, ex);
 
         ProblemDetails detailsObject = GenerateBaseProblemDetails(ex, "Already exists.");
+
+        return new(detailsObject);
+    }
+
+    private ConflictObjectResult HandleConcurrentUpdateException(ConcurrentUpdateException ex)
+    {
+        GetLogger(ex).WarnOptimisticConcurrencyDetection(ex.Data[BaseException.ModelDataKey]!, ex);
+
+        ProblemDetails detailsObject = GenerateBaseProblemDetails(ex, "Concurrency conflict.");
 
         return new(detailsObject);
     }
