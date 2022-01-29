@@ -60,90 +60,101 @@
 </template>
 
 <script>
-import DateTimeLocalEditor from "../components/datetime-local-editor.vue"
-import formatDateMixin from "../mixins/formatDateMixin";
+import { reactive, ref, watch, onBeforeMount } from "vue";
+import DateTimeLocalEditor from "../components/datetime-local-editor.vue";
+import { useApiClient } from "../plugins/swaggerClientPlugin";
+import useFormatDateTime from "../utils/formatDateTime";
 
 export default {
   name: "UserInteractions",
   components: { DateTimeLocalEditor },
-  mixins: [formatDateMixin],
-  data: () => ({
-    interactions: [],
-    newInteraction: { description: "", deadline: "" },
-  }),
-  beforeMount() {
-    this.getInteractions();
-  },
-  methods: {
-    async getInteractions() {
-      const resp = await this.$api.then((client) =>
+
+  setup() {
+    const interactions = ref([]);
+    const newInteraction = reactive({ description: "", deadline: "" });
+    const api = useApiClient();
+
+    const { formatDateTimeShortDateShortTime } = useFormatDateTime();
+
+    async function getInteractions() {
+      const resp = await api.then((client) =>
         client.execute({
           operationId: "get_api_userinteractions",
           parameters: { isOpen: true },
         })
       );
       if (resp.ok) {
-        this.interactions = resp.body.map(this.convertToVM);
+        interactions.value = resp.body.map(convertToVM);
       }
-    },
-    async markInteractionClosed(itnteraction) {
+    }
+
+    async function markInteractionClosed(interaction) {
       if (!confirm("Kinnita pöördumise sulgemine")) {
         return;
       }
-      const resp = await this.$api.then((client) =>
+      const resp = await api.then((client) =>
         client.execute({
           operationId: "patch_api_userinteractions__id_",
-          parameters: { id: itnteraction.id },
-          requestBody: { id: itnteraction.id, isOpen: false },
+          parameters: { id: interaction.id },
+          requestBody: { id: interaction.id, isOpen: false },
         })
       );
       if (resp.ok) {
-        this.interactions.splice(this.interactions.indexOf(itnteraction), 1);
+        interactions.value.splice(interactions.value.indexOf(interaction), 1);
       }
-    },
+    }
+
+    function isProblematic(interaction) {
+      let toCompare = new Date();
+      toCompare.setHours(toCompare.getHours() + 1);
+      return interaction.deadline < toCompare;
+    }
+
     /** Convert dates to JS Date instances from response. */
-    convertToVM({ created, deadline, ...rest }) {
+    function convertToVM({ created, deadline, ...rest }) {
       return {
         created: new Date(created),
         deadline: new Date(deadline),
         ...rest,
       };
-    },
-    isProblematic(interaction) {
-      let toCompare = new Date();
-      toCompare.setHours(toCompare.getHours() + 1);
-      return interaction.deadline < toCompare;
-    },
-    toYesNo(interaction) {
-      return interaction.isOpen ? "jah" : "ei";
-    },
-    async addNewInteraction({ description, deadline }) {
-      const resp = await this.$api.then((client) =>
+    }
+
+    async function addNewInteraction({ description, deadline }) {
+      const resp = await api.then((client) =>
         client.execute({
           operationId: "post_api_userinteractions",
           requestBody: { description, deadline: new Date(deadline) },
         })
       );
       if (resp.ok) {
-        this.interactions.push(this.convertToVM(resp.body));
-        this.newInteraction.description = "";
-        this.newInteraction.deadline = "";
+        interactions.value.push(convertToVM(resp.body));
+        newInteraction.description = "";
+        newInteraction.deadline = "";
       }
-    },
-  },
-  watch: {
+    }
+
+    onBeforeMount(getInteractions);
+
     /** Keep table sorted by deadline desc. always.*/
-    interactions: {
-      immediate: true,
-      deep: true,
-      /** Sort by deadline property/column */
-      handler() {
-        this.interactions.sort((a, b) => a.deadline - b.deadline);
-      },
-    },
+    watch( // TODO to watchPostEffect?
+      interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
+      () => interactions.value.sort((a, b) => a.deadline - b.deadline),
+      { immediate: true, deep: true }
+    );
+
+    return {
+      interactions,
+      newInteraction,
+      formatDateTimeShortDateShortTime,
+      getInteractions,
+      markInteractionClosed,
+      isProblematic,
+      addNewInteraction,
+    }
   },
-};
+}
 </script>
+
 <style scoped>
 table {
   table-layout: auto;

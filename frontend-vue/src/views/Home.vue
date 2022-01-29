@@ -9,12 +9,6 @@
   </article>
 </template>
 
-<script>
-// @ is an alias to /src
-import WeatherForecast from "@/components/weather-forecast.vue";
-
-export default {
-  name: "Home",
-  components: { WeatherForecast },
-};
+<script setup>
+import WeatherForecast from "../components/weather-forecast.vue";
 </script>

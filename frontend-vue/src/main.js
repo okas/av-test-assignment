@@ -1,15 +1,19 @@
 import { createApp } from "vue";
-import Root from "./Root.vue";
-import store from "./store/root";
-import router from "./router";
-import apiClient from "./plugins/swaggerClientPlugin";
-import { createInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
+import AppRoot from "./AppRoot.vue";
+import storeRoot from "./store/root";
+import appRouter from "./router";
+import apiClientPlugin from "./plugins/swaggerClientPlugin";
+import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
 
-const app = createApp(Root);
+const app = createApp(AppRoot);
 
 let swaggerOptions = Object.assign(
   { url: "/swagger/v1/swagger.json" },
-  createInterceptors(app)
+  createStoreInterceptors(storeRoot)
 );
 
-app.use(store).use(router).use(apiClient, swaggerOptions).mount("#app");
+app.use(storeRoot)
+  .use(appRouter)
+  .use(apiClientPlugin, swaggerOptions);
+
+app.mount("#app");

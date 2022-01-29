@@ -22,27 +22,25 @@
   </section>
 </template>
 
-<script>
-import formatDateMixin from "../mixins/formatDateMixin";
+<script setup>
+import { ref, onBeforeMount } from "vue";
+import useFormatDateTime from "../utils/formatDateTime";
+import { useApiClient } from "../plugins/swaggerClientPlugin";
 
-export default {
-  name: "WeatherForecast",
-  mixins: [formatDateMixin],
-  data: () => ({ forecasts: [] }),
-  beforeMount() {
-    this.getForecast();
-  },
-  methods: {
-    async getForecast() {
-      const resp = await this.$api.then((client) =>
-        client.execute({ operationId: "get_weatherforecast" })
-      );
-      if (resp.ok) {
-        this.forecasts = resp.body;
-      }
-    },
-  },
-};
+onBeforeMount(getForecast);
+
+const forecasts = ref([]);
+const api = useApiClient();
+const { formatDateShort } = useFormatDateTime(); // TODO can move to outter scope?
+  
+async function getForecast() {
+  const resp = await api.then((client) =>
+    client.execute({ operationId: "get_weatherforecast" })
+  );
+  if (resp.ok) {
+    forecasts.value = resp.body;
+  }
+}
 </script>
 
 <style scoped>
