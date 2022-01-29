@@ -59,100 +59,83 @@
   </article>
 </template>
 
-<script>
+<script setup>
 import { reactive, ref, watch, onBeforeMount } from "vue";
 import DateTimeLocalEditor from "../components/datetime-local-editor.vue";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 
-export default {
-  name: "UserInteractions",
-  components: { DateTimeLocalEditor },
+const interactions = ref([]);
+const newInteraction = reactive({ description: "", deadline: "" });
+const api = useApiClient();
 
-  setup() {
-    const interactions = ref([]);
-    const newInteraction = reactive({ description: "", deadline: "" });
-    const api = useApiClient();
+onBeforeMount(getInteractions);
 
-    const { formatDateTimeShortDateShortTime } = useFormatDateTime();
+const { formatDateTimeShortDateShortTime } = useFormatDateTime();
 
-    async function getInteractions() {
-      const resp = await api.then((client) =>
-        client.execute({
-          operationId: "get_api_userinteractions",
-          parameters: { isOpen: true },
-        })
-      );
-      if (resp.ok) {
-        interactions.value = resp.body.map(convertToVM);
-      }
-    }
-
-    async function markInteractionClosed(interaction) {
-      if (!confirm("Kinnita pöördumise sulgemine")) {
-        return;
-      }
-      const resp = await api.then((client) =>
-        client.execute({
-          operationId: "patch_api_userinteractions__id_",
-          parameters: { id: interaction.id },
-          requestBody: { id: interaction.id, isOpen: false },
-        })
-      );
-      if (resp.ok) {
-        interactions.value.splice(interactions.value.indexOf(interaction), 1);
-      }
-    }
-
-    function isProblematic(interaction) {
-      let toCompare = new Date();
-      toCompare.setHours(toCompare.getHours() + 1);
-      return interaction.deadline < toCompare;
-    }
-
-    /** Convert dates to JS Date instances from response. */
-    function convertToVM({ created, deadline, ...rest }) {
-      return {
-        created: new Date(created),
-        deadline: new Date(deadline),
-        ...rest,
-      };
-    }
-
-    async function addNewInteraction({ description, deadline }) {
-      const resp = await api.then((client) =>
-        client.execute({
-          operationId: "post_api_userinteractions",
-          requestBody: { description, deadline: new Date(deadline) },
-        })
-      );
-      if (resp.ok) {
-        interactions.value.push(convertToVM(resp.body));
-        newInteraction.description = "";
-        newInteraction.deadline = "";
-      }
-    }
-
-    onBeforeMount(getInteractions);
-
-    /** Keep table sorted by deadline desc. always.*/
-    watch( // TODO to watchPostEffect?
-      interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
-      () => interactions.value.sort((a, b) => a.deadline - b.deadline),
-      { immediate: true, deep: true }
-    );
-
-    return {
-      interactions,
-      newInteraction,
-      formatDateTimeShortDateShortTime,
-      getInteractions,
-      markInteractionClosed,
-      isProblematic,
-      addNewInteraction,
-    }
-  },
+async function getInteractions() {
+  const resp = await api.then((client) =>
+    client.execute({
+      operationId: "get_api_userinteractions",
+      parameters: { isOpen: true },
+    })
+  );
+  if (resp.ok) {
+    interactions.value = resp.body.map(convertToVM);
+  }
 }
+
+async function markInteractionClosed(interaction) {
+  if (!confirm("Kinnita pöördumise sulgemine")) {
+    return;
+  }
+  const resp = await api.then((client) =>
+    client.execute({
+      operationId: "patch_api_userinteractions__id_",
+      parameters: { id: interaction.id },
+      requestBody: { id: interaction.id, isOpen: false },
+    })
+  );
+  if (resp.ok) {
+    interactions.value.splice(interactions.value.indexOf(interaction), 1);
+  }
+}
+
+function isProblematic(interaction) {
+  let toCompare = new Date();
+  toCompare.setHours(toCompare.getHours() + 1);
+  return interaction.deadline < toCompare;
+}
+
+/** Convert dates to JS Date instances from response. */
+function convertToVM({ created, deadline, ...rest }) {
+  return {
+    created: new Date(created),
+    deadline: new Date(deadline),
+    ...rest,
+  };
+}
+
+async function addNewInteraction({ description, deadline }) {
+  const resp = await api.then((client) =>
+    client.execute({
+      operationId: "post_api_userinteractions",
+      requestBody: { description, deadline: new Date(deadline) },
+    })
+  );
+  if (resp.ok) {
+    interactions.value.push(convertToVM(resp.body));
+    newInteraction.description = "";
+    newInteraction.deadline = "";
+  }
+}
+
+/** Keep table sorted by deadline desc. always.*/
+watch( // TODO to watchPostEffect?
+  interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
+  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
+  { immediate: true, deep: true }
+);
 </script>
 
 <style scoped>
