@@ -23,36 +23,28 @@
   </section>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
-import formatDateMixin from "../mixins/formatDateMixin";
+import useFormatDateTime from "../utils/formatDateTime";
+import { useApiClient } from "../plugins/swaggerClientPlugin";
 import { useTranslator } from "../plugins/translatorPlugin";
 
-export default {
-  name: "WeatherForecast",
-  mixins: [formatDateMixin],
-  data: () => ({ forecasts: [] }),
-  setup() {
-    const translationVm = ref({ header: [], tableHeader: [] });
-    useTranslator()("components/weather-forecast").then(
-      (data) => (translationVm.value = data)
-    );
-    return { translationVm };
-  },
-  created() {
-    this.getForecast();
-  },
-  methods: {
-    async getForecast() {
-      const resp = await this.$api.then((client) =>
-        client.execute({ operationId: "get_weatherforecast" })
-      );
-      if (resp.ok) {
-        this.forecasts = resp.body;
-      }
-    },
-  },
-};
+const forecasts = ref([]);
+const translationVm = ref({ header: [], tableHeader: [] });
+
+const { formatDateShort } = useFormatDateTime();
+const api = useApiClient();
+
+useTranslator()("components/weather-forecast").then(
+  (data) => (translationVm.value = data)
+);
+
+api.then((client) =>
+  client.execute({ operationId: "get_weatherforecast" })
+)
+.then((resp) => {
+  if (resp.ok) forecasts.value = resp.body
+});
 </script>
 
 <style scoped>
