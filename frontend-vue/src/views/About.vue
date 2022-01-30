@@ -1,40 +1,24 @@
 <template>
   <article class="about">
     <header>
-      <h1>Test ülesande kirjeldus</h1>
+      <h1>{{ viewModel.header }}</h1>
     </header>
-    <p>
-      Ülesanne on teostada lihtne veebirakendus, mis võimaldaks hallata
-      kasutajatoele saadetud pöördumisi. Lihtsustatud süsteemi funktsionaalsus
-      oleks järgmine:
-    </p>
+    <p>{{ viewModel.p1 }}</p>
     <ol>
-      <li>Kasutaja saab sisestada pöördumise.</li>
-      <li>
-        Pöördumisel peab olema kirjeldus, sisestamise aeg, lahendamise tähtaeg.
-        Sisestamise ajaks märgitakse pöördumise sisestamise aeg, teised
-        kohustuslikud väljad täidab kasutaja.
-      </li>
-      <li>
-        Kasutajale kuvatakse aktiivsed pöördumised koos kõigi väljadega
-        nimekirjas sorteeritult kahanevalt lahendamise tähtaja järgi.
-      </li>
-      <li>
-        Pöördumised, mille lahendamise tähtajani on jäänud vähem kui 1 tund või
-        mis on juba ületanud lahendamise tähtaja, kuvatakse nimekirjas punasena.
-      </li>
-      <li>
-        Kasutaja saab nimekirjas pöördumisi lahendatuks märkida, mis kaotab
-        pöördumise nimekirjast.
-      </li>
+      <li v-for="(item, i) in viewModel.ol_items" :key="i">{{ item }}</li>
     </ol>
-    <p>
-      Võib eeldada modernse brauseri olemasolu (HTML5 jne). Andmeid ei ole vaja
-      andmebaasi salvestada, võib vabalt hoida neid ka mälus. Sooviksime töös
-      näha kindlasti ka üksusteste.
-    </p>
+    <p>{{ viewModel.p2 }}</p>
   </article>
 </template>
+
+<script setup>
+  import { computed } from "vue";
+  import { useStore } from 'vuex'
+
+  const store = useStore();
+
+  const viewModel = computed(() => store.getters.getAboutComponentModel(navigator.language));
+</script>
 
 <style scoped>
 .about {
