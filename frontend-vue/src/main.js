@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import Root from "./Root.vue";
-import store from "./store/root";
+import store from "./store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
 import { createInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
