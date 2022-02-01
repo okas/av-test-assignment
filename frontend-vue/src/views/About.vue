@@ -13,11 +13,9 @@
 
 <script setup>
   import { computed } from "vue";
-  import { useStore } from 'vuex'
+  import translation from "./about"
 
-  const store = useStore();
-
-  const viewModel = computed(() => store.getters.getAboutComponentModel(navigator.language));
+  const viewModel = computed(() => translation[navigator.language]);
 </script>
 
 <style scoped>
