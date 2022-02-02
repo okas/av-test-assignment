@@ -3,19 +3,28 @@
 <template>
   <article class="user-interaction">
     <header>
-      <h1>Kasutajate pöördumiste vaade</h1>
+      <h1>{{ trannslatedVm.header }}</h1>
     </header>
     <section>
       <div class="form-container">
         <div class="control">
-          <input type="text" id="new-description" placeholder="kirjeldus" size="50" v-model="newInteraction.description" />
+          <input type="text"
+                 id="new-description"
+                 :placeholder="trannslatedVm.section_form.description_placeholder"
+                 size="50"
+                 v-model="newInteraction.description"
+                 />
         </div>
         <div class="control">
-          <input id="new-deadline" type="datetime-local" v-model="newInteraction.deadline" />
-          <label for="new-deadline"> : tähtaeg</label>
+          <input type="datetime-local"
+                 id="new-deadline"
+                 v-model="newInteraction.deadline" 
+                 />
+          <label for="new-deadline"> : {{ trannslatedVm.section_form.deadline_label }}</label>
         </div>
         <div class="control">
-          <button @click="addNewInteraction(newInteraction)">lisa uus</button>
+          <button @click="addNewInteraction(newInteraction)"
+                  >{{ trannslatedVm.section_form.submit_text }}</button>
         </div>
         <div class="control">
           <button class="refresh-icon" @click="getInteractions">↻</button>
@@ -24,15 +33,12 @@
     </section>
     <section>
       <header>
-        <h4>Aktiivsed pöördumised</h4>
+        <h4>{{ trannslatedVm.section_list.header }}</h4>
       </header>
       <table>
         <thead>
           <tr>
-            <th>Kirjeldus</th>
-            <th>Sisestatud</th>
-            <th>Tähtaeg</th>
-            <th></th>
+            <th v-for="(item, i) in trannslatedVm.section_list.table_header" :key="i">{{ item }}</th>
           </tr>
         </thead>
         <tbody>
@@ -58,10 +64,26 @@ export default {
   mixins: [formatDateMixin],
   data: () => ({
     interactions: [],
-    newInteraction: { description: "", deadline: "" },
+    newInteraction: {
+      description: "",
+      deadline: ""
+    },
+    trannslatedVm: {
+      header: "",
+      section_form: {
+        description_placeholder: "" ,
+        deadline_label: "",
+        submit_text: ""
+      },
+      section_list: {
+        header: "",
+        table_header: [],
+      },
+    },
   }),
-  beforeMount() {
-    this.getInteractions();
+  async created() {
+    await this.getInteractions();
+    this.trannslatedVm = await this.$translatorResolverAsync("views/UserInteractions", navigator.language);
   },
   methods: {
     async getInteractions() {
