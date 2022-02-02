@@ -2,19 +2,17 @@
   <article>
     <img alt="Vue logo" src="../assets/logo.png" />
     <header>
-      <h1>'Hello world' leht</h1>
+      <h1>{{ translationVm.header }}</h1>
     </header>
-    <p>Kiire indikatsioon, et Web API käivitunud.</p>
+    <p>{{ translationVm.p1 }}</p>
     <WeatherForecast />
   </article>
 </template>
 
-<script>
-// @ is an alias to /src
-import WeatherForecast from "@/components/weather-forecast.vue";
-
-export default {
-  name: "Home",
-  components: { WeatherForecast },
-};
+<script setup>
+import { ref } from "vue";
+import WeatherForecast from "../components/weather-forecast.vue";
+import { useTranslatorAsync } from "../plugins/translatorPlugin";
+const translationVm = ref({});
+useTranslatorAsync("views/Home", navigator.language).then(data => translationVm.value = data);
 </script>
