@@ -1,13 +1,10 @@
 <template>
   <section class="weather-forecast">
-    <h2>Ilmaprognoosi info <sup>(API genereeritud)</sup></h2>
+    <h2>{{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup></h2>
     <table>
       <thead>
         <tr>
-          <th>Kuupäev</th>
-          <th>Temperatuur °C</th>
-          <th>Temperatuur °F</th>
-          <th>Kirjeldus</th>
+          <th v-for="(item, i) in translationVm.tableHeader" :key="i">{{ item }}</th>
         </tr>
       </thead>
       <tbody>
@@ -23,13 +20,20 @@
 </template>
 
 <script>
+import { ref } from "vue";
 import formatDateMixin from "../mixins/formatDateMixin";
+import { useTranslatorAsync } from "../plugins/translatorPlugin";
 
 export default {
   name: "WeatherForecast",
   mixins: [formatDateMixin],
   data: () => ({ forecasts: [] }),
-  beforeMount() {
+  setup() {
+    const translationVm = ref({ header: [], tableHeader: [] });
+    useTranslatorAsync("components/weather-forecast", navigator.language).then(data => translationVm.value = data);
+    return { translationVm };
+  },
+  created() {
     this.getForecast();
   },
   methods: {
