@@ -1,18 +1,17 @@
 <template>
   <header class="main-header">
-    <nav id="nav" class="app-menu">
-      <router-link to="/">Algus</router-link> |
-      <router-link to="/about">Rakendusest</router-link> |
-      <router-link to="/userinteractions">Kasutaja pöördumised</router-link> |
-      <a class="external" href="https://localhost:5001/swagger" target="_blank">Swagger</a>
-    </nav>
-    <div class="global-loader-icon" v-if="this.$store.state.loading" />
+    <MainNavigation />
+    <div class="global-loader-icon" v-if="$store.state.loading" />
   </header>
   <main>
     <router-view />
   </main>
   <aside></aside>
 </template>
+
+<script setup>
+import MainNavigation from "./components/main-navigation.vue";
+</script>
 
 <style>
 #app {
@@ -21,25 +20,6 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#nav {
-
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-a.external[target="_blank"]::after {
-  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
-  margin: 0px 3px 0px 5px;
 }
 
 .global-loader-icon {
