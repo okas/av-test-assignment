@@ -1,13 +1,25 @@
 <template>
   <article class="about">
-    <header>
-      <h1>{{ viewModel.header }}</h1>
-    </header>
-    <p>{{ viewModel.p1 }}</p>
-    <ol>
-      <li v-for="(item, i) in viewModel.list1" :key="i">{{ item }}</li>
-    </ol>
-    <p>{{ viewModel.p2 }}</p>
+    <section>
+      <header>
+        <h1>{{ viewModel.section[0].header }}</h1>
+      </header>
+      <p>{{ viewModel.section[0].p1 }}</p>
+      <ol>
+        <li v-for="(item, i) in viewModel.section[0].list1" :key="i">{{ item }}</li>
+      </ol>
+      <p>{{ viewModel.section[0].p2 }}</p>
+    </section>
+    <section>
+      <header>
+        <h1>{{ viewModel.section[1].header }}</h1>
+      </header>
+      <p>{{ viewModel.section[1].p1 }}</p>
+      <p>{{ viewModel.section[1].p2 }}</p>
+      <ol>
+        <li v-for="(item, i) in viewModel.section[1].list1" :key="i">{{ item }}</li>
+      </ol>
+    </section>
   </article>
 </template>
 
@@ -16,10 +28,20 @@
   import { useTranslatorAsync } from "../plugins/translatorPlugin";
 
   const viewModel = ref({
-    header: "",
-    p1: "",
-    list1: [],
-    p2: ""
+    section: [
+      {
+        header: "",
+        p1: "",
+        list1: [],
+        p2: ""
+      },
+      {
+        header: "",
+        p1: "",
+        p2: "",
+        list1: []
+      }
+    ]
   });
 
   useTranslatorAsync("views/about", navigator.language).then(data => viewModel.value = data);
