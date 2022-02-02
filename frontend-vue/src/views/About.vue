@@ -29,4 +29,7 @@
 .about {
   text-align: justify;
 }
+.about section:not(:last-of-type) {
+  margin-bottom: 2rem;
+}
 </style>

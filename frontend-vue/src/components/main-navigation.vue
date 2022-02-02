@@ -26,6 +26,7 @@ useTranslatorAsync("components/main-navigation", navigator.language).then(data =
 
 #main-navigation a.router-link-exact-active {
   color: #42b983;
+  filter: drop-shadow(0px 2px 6px #333300);
 }
 
 a.external[target="_blank"]::after {
