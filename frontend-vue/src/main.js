@@ -1,12 +1,12 @@
 import { createApp } from "vue";
-import Root from "./Root.vue";
+import AppRoot from "./AppRoot.vue";
 import store from "./store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
 import { createInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
 
-const app = createApp(Root);
+const app = createApp(AppRoot);
 
 let swaggerOptions = Object.assign(
   { url: "/swagger/v1/swagger.json" },
@@ -18,4 +18,4 @@ app.use(store)
   .use(apiClient, swaggerOptions)
   .use(translatorPlugin);
 
-app.mount("#app");
+app.mount("#app-root");

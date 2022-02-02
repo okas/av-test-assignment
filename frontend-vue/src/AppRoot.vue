@@ -14,7 +14,7 @@ import MainNavigation from "./components/main-navigation.vue";
 </script>
 
 <style>
-#app {
+body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -22,8 +22,14 @@ import MainNavigation from "./components/main-navigation.vue";
   color: #2c3e50;
 }
 
+.main-header{
+  position: relative;
+}
+
 .global-loader-icon {
   position: absolute;
+  left: 1.5rem;
+  top: 1.5rem;
   border: 0.5rem solid #f3f3f3;
   border-top: 0.5rem solid #42b983;
   border-radius: 100%;
@@ -32,7 +38,7 @@ import MainNavigation from "./components/main-navigation.vue";
   animation: spin 0.5s linear infinite;
 }
 
-@keyframes spin {
+  @keyframes spin {
   0% {
     transform: rotate(0deg);
   }
