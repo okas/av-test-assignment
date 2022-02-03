@@ -8,9 +8,7 @@ const state = {
 const getters = {};
 
 const mutations = {
-  SET_LOADING(state, payload) {
-    state.loading = payload;
-  },
+  SET_LOADING: (state, payload) => state.loading = payload,
   SET_LANGUAGE: (state, payload) => state.language = payload,
 };
 
