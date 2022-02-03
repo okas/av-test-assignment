@@ -19,6 +19,7 @@ import MainNavigation from "./components/main-navigation.vue";
     min-height: 100%;
   }
   body {
+    overflow-y: scroll;
     box-sizing: border-box;
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
