@@ -1,19 +1,28 @@
 <template>
   <article class="user-interaction">
     <header>
-      <h1>Kasutajate pöördumiste vaade</h1>
+      <h1>{{ translationVm.header }}</h1>
     </header>
     <section>
       <div class="form-container">
         <div class="control">
-          <input type="text" id="new-description" placeholder="kirjeldus" size="50" v-model="newInteraction.description" />
+          <input type="text"
+                 id="new-description"
+                 :placeholder="translationVm.section_form.description_placeholder"
+                 size="50"
+                 v-model="newInteraction.description"
+                 />
         </div>
         <div class="control">
-          <input id="new-deadline" type="datetime-local" v-model="newInteraction.deadline" />
-          <label for="new-deadline"> : tähtaeg</label>
+          <input type="datetime-local"
+                 id="new-deadline"
+                 v-model="newInteraction.deadline" 
+                 />
+          <label for="new-deadline"> : {{ translationVm.section_form.deadline_label }}</label>
         </div>
         <div class="control">
-          <button @click="addNewInteraction(newInteraction)">lisa uus</button>
+          <button @click="addNewInteraction(newInteraction)"
+                  >{{ translationVm.section_form.submit_text }}</button>
         </div>
         <div class="control">
           <button class="refresh-icon" @click="getInteractions">↻</button>
@@ -22,15 +31,12 @@
     </section>
     <section>
       <header>
-        <h4>Aktiivsed pöördumised</h4>
+        <h4>{{ translationVm.section_list.header }}</h4>
       </header>
       <table>
         <thead>
           <tr>
-            <th>Kirjeldus</th>
-            <th>Tähtaeg</th>
-            <th>Sisestatud</th>
-            <th></th>
+            <th v-for="(item, i) in translationVm.section_list.table_header" :key="i">{{ item }}</th>
           </tr>
         </thead>
         <tbody>
@@ -62,12 +68,27 @@
 <script setup>
 import { reactive, ref, watch, onBeforeMount } from "vue";
 import DateTimeLocalEditor from "../components/datetime-local-editor.vue";
+import { useTranslator } from "../plugins/translatorPlugin";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 
 const interactions = ref([]);
+const translationVm = ref({
+      header: "",
+      section_form: {
+        description_placeholder: "" ,
+        deadline_label: "",
+        submit_text: ""
+      },
+      section_list: {
+        header: "",
+        table_header: [],
+      },
+    });
 const newInteraction = reactive({ description: "", deadline: "" });
 const api = useApiClient();
+
+useTranslator()("views/UserInteractions").then(data => translationVm.value = data);
 
 onBeforeMount(getInteractions);
 

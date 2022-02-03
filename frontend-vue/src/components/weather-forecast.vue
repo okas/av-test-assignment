@@ -1,13 +1,10 @@
 <template>
   <section class="weather-forecast">
-    <h2>Ilmaprognoosi info <sup>(API genereeritud)</sup></h2>
+    <h2>{{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup></h2>
     <table>
       <thead>
         <tr>
-          <th>Kuupäev</th>
-          <th>Temperatuur °C</th>
-          <th>Temperatuur °F</th>
-          <th>Kirjeldus</th>
+          <th v-for="(item, i) in translationVm.tableHeader" :key="i">{{ item }}</th>
         </tr>
       </thead>
       <tbody>
@@ -23,24 +20,23 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref } from "vue";
 import useFormatDateTime from "../utils/formatDateTime";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
+import { useTranslator } from "../plugins/translatorPlugin";
 
-onBeforeMount(getForecast);
-
+const translationVm = ref({ header: [], tableHeader: [] });
 const forecasts = ref([]);
 const api = useApiClient();
-const { formatDateShort } = useFormatDateTime(); // TODO can move to outter scope?
-  
-async function getForecast() {
-  const resp = await api.then((client) =>
-    client.execute({ operationId: "get_weatherforecast" })
-  );
-  if (resp.ok) {
-    forecasts.value = resp.body;
-  }
-}
+const { formatDateShort } = useFormatDateTime();
+
+useTranslator()("components/weather-forecast").then(data => translationVm.value = data);
+
+api.then(client =>
+  client.execute({ operationId: "get_weatherforecast" })
+).then(resp => {
+  if (resp.ok) forecasts.value = resp.body;
+});
 </script>
 
 <style scoped>

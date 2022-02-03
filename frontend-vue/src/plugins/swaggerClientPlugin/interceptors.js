@@ -1,3 +1,6 @@
+/**
+ * @param {import("vuex").Store} store
+ */
 export function createStoreInterceptors(store) {
   const mutation = "SET_LOADING";
 

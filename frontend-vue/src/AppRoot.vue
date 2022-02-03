@@ -1,12 +1,7 @@
 <template>
   <header class="main-header">
-    <nav id="nav" class="app-menu">
-      <router-link to="/">Algus</router-link> |
-      <router-link to="/about">Rakendusest</router-link> |
-      <router-link to="/userinteractions">Kasutaja pöördumised</router-link> |
-      <a class="external" href="https://localhost:5001/swagger" target="_blank">Swagger</a>
-    </nav>
-    <div class="global-loader-icon" v-if="this.$store.state.loading" />
+    <MainNavigation />
+    <div class="global-loader-icon" v-if="$store.state.loading" />
   </header>
   <main>
     <router-view />
@@ -14,36 +9,50 @@
   <aside></aside>
 </template>
 
+<script setup>
+import MainNavigation from "./components/main-navigation.vue";
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  html, body {
+    margin: 0;
+    min-height: 100%;
+  }
+  body {
+    box-sizing: border-box;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
+  }
 
-#nav {
+  #app-root {
+    margin: 2rem;
+    padding: 1.5rem;
+    border-start-start-radius: 1.1rem 1.1rem;
+    border-start-end-radius: 1.1rem 1.1rem;
+    border-end-start-radius: 1.1rem 1.1rem;
+    border-end-end-radius: 1.1rem 1.1rem;
+    background-color: #eff5f5;
+  }
 
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-a.external[target="_blank"]::after {
-  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
-  margin: 0px 3px 0px 5px;
-}
+  .main-header {
+    position: relative;
+    border-start-start-radius: 0.8rem 0.8rem;
+    border-start-end-radius: 0.8rem 0.8rem;
+    border-end-start-radius: 0.25rem 0.25rem;
+    border-end-end-radius: 0.25rem 0.25rem;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.15) 100%), radial-gradient(at top center, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.40) 120%) #989898;
+    background-blend-mode: multiply,multiply;
+    /*background-image: linear-gradient(to top, lightgrey 0%, lightgrey 1%, #e0e0e0 26%, #efefef 48%, #d9d9d9 75%, #bcbcbc 100%);*/
+  }
 
 .global-loader-icon {
   position: absolute;
+  left: 1.5rem;
+  top: 1.5rem;
   border: 0.5rem solid #f3f3f3;
   border-top: 0.5rem solid #42b983;
   border-radius: 100%;
@@ -52,7 +61,7 @@ a.external[target="_blank"]::after {
   animation: spin 0.5s linear infinite;
 }
 
-@keyframes spin {
+  @keyframes spin {
   0% {
     transform: rotate(0deg);
   }
