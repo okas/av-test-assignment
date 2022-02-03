@@ -1,5 +1,5 @@
 <template>
-  <nav id="main-navigation" class="app-menu" v-once>
+  <nav id="main-navigation" class="app-menu">
     <template v-for="{path, name} in $router.options.routes" :key="path">
       <router-link :to="path">{{ routeNamesTranslated[name] }}</router-link> |
     </template>
@@ -8,10 +8,16 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useTranslatorAsync } from "../plugins/translatorPlugin";
+import { ref, watchEffect } from "vue";
+import { useStore } from "vuex";
+import { useTranslator } from "../plugins/translatorPlugin";
+
 const routeNamesTranslated = ref({});
-useTranslatorAsync("components/main-navigation", navigator.language).then(data => routeNamesTranslated.value = data);
+const store = useStore();
+
+const translatorAsync = useTranslator();
+
+watchEffect(async () => routeNamesTranslated.value = await translatorAsync("components/main-navigation", store.state.language));
 </script>
 
 <style scoped>

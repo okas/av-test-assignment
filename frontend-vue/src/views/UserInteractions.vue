@@ -83,7 +83,7 @@ export default {
   }),
   async created() {
     await this.getInteractions();
-    this.trannslatedVm = await this.$translatorResolverAsync("views/UserInteractions", navigator.language);
+    this.trannslatedVm = await this.$translatorResolverAsync("views/UserInteractions");
   },
   methods: {
     async getInteractions() {

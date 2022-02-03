@@ -22,7 +22,7 @@
 <script>
 import { ref } from "vue";
 import formatDateMixin from "../mixins/formatDateMixin";
-import { useTranslatorAsync } from "../plugins/translatorPlugin";
+import { useTranslator } from "../plugins/translatorPlugin";
 
 export default {
   name: "WeatherForecast",
@@ -30,7 +30,7 @@ export default {
   data: () => ({ forecasts: [] }),
   setup() {
     const translationVm = ref({ header: [], tableHeader: [] });
-    useTranslatorAsync("components/weather-forecast", navigator.language).then(data => translationVm.value = data);
+    useTranslator()("components/weather-forecast").then(data => translationVm.value = data);
     return { translationVm };
   },
   created() {

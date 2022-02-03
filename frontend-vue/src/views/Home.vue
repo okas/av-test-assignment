@@ -12,7 +12,11 @@
 <script setup>
 import { ref } from "vue";
 import WeatherForecast from "../components/weather-forecast.vue";
-import { useTranslatorAsync } from "../plugins/translatorPlugin";
+import { useTranslator } from "../plugins/translatorPlugin";
+
 const translationVm = ref({});
-useTranslatorAsync("views/Home", navigator.language).then(data => translationVm.value = data);
+
+const load = async () => translationVm.value = await useTranslator()("views/Home");
+
+load();
 </script>

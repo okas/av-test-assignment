@@ -1,5 +1,9 @@
 import { inject } from "vue";
 
+/**
+ * @param {string} modulePath
+ * @returns {Promise<Object>}
+ */
 async function translationResolverAsync(modulePath, language = "")  {
   let modulePromise;
 
@@ -17,14 +21,28 @@ async function translationResolverAsync(modulePath, language = "")  {
   return (await modulePromise()).default;
 };
 
-export const pluginSymbol = Symbol("translator plugin symbol");
+export const pluginSymbol = Symbol("translator plugin: resolver symbol");
 
-export default function translatorPlugin(app) {
-  app.config.globalProperties.$translatorResolverAsync = translationResolverAsync;
-  app.provide(pluginSymbol, translationResolverAsync);
+/**
+ * @param {import("vue").App<any>} app
+ */
+export default function install(app) {
+  const { globalProperties } = app.config;
+  // For Options API users.
+  globalProperties.$translatorResolverAsync = async (/** @type {string} */ modulePath, /** @type {string} */ language = "") =>
+  {
+    const lng = language?.length === 2 ? language : globalProperties.$store?.state?.language ?? "";
+
+    return await translationResolverAsync(modulePath, lng);
+  };
+  // For Composition API users.
+  app.provide(pluginSymbol, globalProperties.$translatorResolverAsync);
 };
 
-export async function useTranslatorAsync(modulePath, language = "") {
-  const resolver = inject(pluginSymbol);
-  return await resolver(modulePath, language);
+/** 
+ * @returns {(modulePath: String, language = "") => Promise<any>} 
+ */
+export function useTranslator() {
+  const funcAsync = inject(pluginSymbol);
+  return funcAsync;
 };

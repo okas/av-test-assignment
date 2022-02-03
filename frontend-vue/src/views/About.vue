@@ -25,7 +25,7 @@
 
 <script setup>
   import { ref } from "vue";
-  import { useTranslatorAsync } from "../plugins/translatorPlugin";
+  import { useTranslator } from "../plugins/translatorPlugin";
 
   const viewModel = ref({
     section: [
@@ -44,7 +44,7 @@
     ]
   });
 
-  useTranslatorAsync("views/about", navigator.language).then(data => viewModel.value = data);
+  useTranslator()("views/about").then(data => viewModel.value = data);
 </script>
 
 <style scoped>
