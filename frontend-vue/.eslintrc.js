@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   env: {
-    node: true,
+    es2022: true,//es2021 can be found highest sepcific version in docs
   },
   extends: [
     "plugin:vue/vue3-strongly-recommended",
@@ -9,7 +9,7 @@ module.exports = {
     "@vue/prettier",
   ],
   parserOptions: {
-    parser: "babel-eslint",
+    //ecmaVersion: 2022,
   },
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
