@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.21.0",
-    "swagger-client": "^3.17.0",
+    "swagger-client": "^3.18.4",
     "vue": "^3.2.29",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"
