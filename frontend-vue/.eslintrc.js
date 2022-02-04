@@ -12,7 +12,7 @@ module.exports = {
     //ecmaVersion: 2022,
   },
   rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-console": import.meta.env.MODE === "production" ? "warn" : "off",
+    "no-debugger": import.meta.env.MODE === "production" ? "warn" : "off",
   },
 };
