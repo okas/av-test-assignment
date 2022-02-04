@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node aspnetcore-https && vite",
+    "predev": "node ./aspnetcore-https.mjs",
+    "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint --ignore-path .gitignore",
