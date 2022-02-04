@@ -15,8 +15,8 @@ import { useStore } from "vuex";
 import { useTranslator } from "../plugins/translatorPlugin";
 
 const routeNamesTranslated = ref({});
-const store = useStore();
 
+const store = useStore();
 const translatorAsync = useTranslator();
 
 watchEffect(

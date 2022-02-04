@@ -72,106 +72,101 @@
   </article>
 </template>
 
-<script>
-import formatDateMixin from "../mixins/formatDateMixin";
+<script setup>
+import { reactive, ref, watch } from "vue";
+import { useApiClient } from "../plugins/swaggerClientPlugin";
+import { useTranslator } from "../plugins/translatorPlugin";
+import useFormatDateTime from "../utils/formatDateTime";
 
-export default {
-  name: "UserInteractions",
-  mixins: [formatDateMixin],
-  data: () => ({
-    interactions: [],
-    newInteraction: {
-      description: "",
-      deadline: "",
-    },
-    trannslatedVm: {
-      header: "",
-      section_form: {
-        description_placeholder: "",
-        deadline_label: "",
-        submit_text: "",
-      },
-      section_list: {
-        header: "",
-        table_header: [],
-      },
-    },
-  }),
-  async created() {
-    await this.getInteractions();
-    this.trannslatedVm = await this.$translatorResolverAsync(
-      "views/UserInteractions"
-    );
+const trannslatedVm = ref({
+  header: "",
+  section_form: {
+    description_placeholder: "",
+    deadline_label: "",
+    submit_text: "",
   },
-  methods: {
-    async getInteractions() {
-      const resp = await this.$api.then((client) =>
-        client.execute({
-          operationId: "get_api_userinteractions",
-          parameters: { isOpen: true },
-        })
-      );
-      if (resp.ok) {
-        this.interactions = resp.body.map(this.convertToVM);
-      }
-    },
-    async markInteractionClosed(itnteraction) {
-      if (!confirm("Kinnita pöördumise sulgemine")) {
-        return;
-      }
-      const resp = await this.$api.then((client) =>
-        client.execute({
-          operationId: "patch_api_userinteractions__id_",
-          parameters: { id: itnteraction.id },
-          requestBody: { id: itnteraction.id, isOpen: false },
-        })
-      );
-      if (resp.ok) {
-        this.interactions.splice(this.interactions.indexOf(itnteraction), 1);
-      }
-    },
-    /** Convert dates to JS Date instances from response. */
-    convertToVM({ created, deadline, ...rest }) {
-      return {
-        created: new Date(created),
-        deadline: new Date(deadline),
-        ...rest,
-      };
-    },
-    isProblematic(interaction) {
-      let toCompare = new Date();
-      toCompare.setHours(toCompare.getHours() + 1);
-      return interaction.deadline < toCompare;
-    },
-    toYesNo(interaction) {
-      return interaction.isOpen ? "jah" : "ei";
-    },
-    async addNewInteraction({ description, deadline }) {
-      const resp = await this.$api.then((client) =>
-        client.execute({
-          operationId: "post_api_userinteractions",
-          requestBody: { description, deadline: new Date(deadline) },
-        })
-      );
-      if (resp.ok) {
-        this.interactions.push(this.convertToVM(resp.body));
-        this.newInteraction.description = "";
-        this.newInteraction.deadline = "";
-      }
-    },
+  section_list: {
+    header: "",
+    table_header: [],
   },
-  watch: {
-    /** Keep table sorted by deadline desc. always.*/
-    interactions: {
-      immediate: true,
-      deep: true,
-      /** Sort by deadline property/column */
-      handler() {
-        this.interactions.sort((a, b) => a.deadline - b.deadline);
-      },
-    },
-  },
-};
+});
+const interactions = ref([]);
+const newInteraction = reactive({ description: "", deadline: "" });
+
+const api = useApiClient();
+const { formatDateTimeShortDateShortTime } = useFormatDateTime();
+
+useTranslator()("views/UserInteractions").then(
+  (data) => (trannslatedVm.value = data)
+);
+
+/** Keep table sorted by deadline desc. always.*/
+watch( // TODO to watchPostEffect?
+  interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
+  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
+  { immediate: true, deep: true }
+);
+
+getInteractions();
+
+function getInteractions() {
+  api.then((client) =>
+    client.execute({
+      operationId: "get_api_userinteractions",
+      parameters: { isOpen: true },
+    })
+  )
+  .then((resp) => {
+    if (resp.ok) interactions.value = resp.body.map(convertToVM);
+  });
+}
+
+function markInteractionClosed(interaction) {
+  if (!confirm("Kinnita pöördumise sulgemine")) {
+    return;
+  }
+  api.then((client) =>
+    client.execute({
+      operationId: "patch_api_userinteractions__id_",
+      parameters: { id: interaction.id },
+      requestBody: { id: interaction.id, isOpen: false },
+    })
+  )
+  .then((resp) => {
+    if (resp.ok) interactions.value.splice(interactions.value.indexOf(interaction), 1);
+  });
+}
+
+function isProblematic(interaction) {
+  let toCompare = new Date();
+  toCompare.setHours(toCompare.getHours() + 1);
+  return interaction.deadline < toCompare;
+}
+
+/** Convert dates to JS Date instances from response. */
+function convertToVM({ created, deadline, ...rest }) {
+  return {
+    created: new Date(created),
+    deadline: new Date(deadline),
+    ...rest,
+  };
+}
+
+function addNewInteraction({ description, deadline }) {
+  api.then((client) =>
+    client.execute({
+      operationId: "post_api_userinteractions",
+      requestBody: { description, deadline: new Date(deadline) },
+    })
+  )
+  .then((resp) => {
+    if (resp.ok) {
+      interactions.value.push(convertToVM(resp.body));
+      newInteraction.description = "";
+      newInteraction.deadline = "";
+    }
+  });
+}
 </script>
 
 <style scoped>

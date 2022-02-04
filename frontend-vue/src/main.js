@@ -3,14 +3,14 @@ import AppRoot from "./AppRoot.vue";
 import store from "./store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
-import { createInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
+import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
 
 const app = createApp(AppRoot);
 
 let swaggerOptions = Object.assign(
   { url: "/swagger/v1/swagger.json" },
-  createInterceptors(app)
+  createStoreInterceptors(store)
 );
 
 app.use(store)
