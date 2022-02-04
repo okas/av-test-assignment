@@ -18,8 +18,8 @@ export default {
       p2: "Seisuga 02. veebruar 2022:",
       list1: [
         "Vue osad on refaktooritud Composition API-le.",
-        "Katsetan teksitde tõlgetega, mitmekeelsuse tugi. Kirjutasin plugina, mis laeb tekste erinevates keeltes kõikidele vaadetele ja komponentidele, kus esineb mingisugust nähtavat teksti."
-      ]
-    }
-  ]
+        "Katsetan teksitde tõlgetega, mitmekeelsuse tugi. Kirjutasin plugina, mis laeb tekste erinevates keeltes kõikidele vaadetele ja komponentidele, kus esineb mingisugust nähtavat teksti.",
+      ],
+    },
+  ],
 };

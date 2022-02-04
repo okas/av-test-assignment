@@ -1,10 +1,14 @@
 <template>
   <section class="weather-forecast">
-    <h2>{{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup></h2>
+    <h2>
+      {{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup>
+    </h2>
     <table>
       <thead>
         <tr>
-          <th v-for="(item, i) in translationVm.tableHeader" :key="i">{{ item }}</th>
+          <th v-for="(item, i) in translationVm.tableHeader" :key="i">
+            {{ item }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -30,7 +34,9 @@ export default {
   data: () => ({ forecasts: [] }),
   setup() {
     const translationVm = ref({ header: [], tableHeader: [] });
-    useTranslator()("components/weather-forecast").then(data => translationVm.value = data);
+    useTranslator()("components/weather-forecast").then(
+      (data) => (translationVm.value = data)
+    );
     return { translationVm };
   },
   created() {

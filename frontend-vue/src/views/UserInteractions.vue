@@ -8,23 +8,28 @@
     <section>
       <div class="form-container">
         <div class="control">
-          <input type="text"
-                 id="new-description"
-                 :placeholder="trannslatedVm.section_form.description_placeholder"
-                 size="50"
-                 v-model="newInteraction.description"
-                 />
+          <input
+            type="text"
+            id="new-description"
+            :placeholder="trannslatedVm.section_form.description_placeholder"
+            size="50"
+            v-model="newInteraction.description"
+          />
         </div>
         <div class="control">
-          <input type="datetime-local"
-                 id="new-deadline"
-                 v-model="newInteraction.deadline" 
-                 />
-          <label for="new-deadline"> : {{ trannslatedVm.section_form.deadline_label }}</label>
+          <input
+            type="datetime-local"
+            id="new-deadline"
+            v-model="newInteraction.deadline"
+          />
+          <label for="new-deadline">
+            : {{ trannslatedVm.section_form.deadline_label }}</label
+          >
         </div>
         <div class="control">
-          <button @click="addNewInteraction(newInteraction)"
-                  >{{ trannslatedVm.section_form.submit_text }}</button>
+          <button @click="addNewInteraction(newInteraction)">
+            {{ trannslatedVm.section_form.submit_text }}
+          </button>
         </div>
         <div class="control">
           <button class="refresh-icon" @click="getInteractions">↻</button>
@@ -38,16 +43,27 @@
       <table>
         <thead>
           <tr>
-            <th v-for="(item, i) in trannslatedVm.section_list.table_header" :key="i">{{ item }}</th>
+            <th
+              v-for="(item, i) in trannslatedVm.section_list.table_header"
+              :key="i"
+            >
+              {{ item }}
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in interactions" :key="item.id" :class="{ 'due-problem': isProblematic(item) }">
+          <tr
+            v-for="item in interactions"
+            :key="item.id"
+            :class="{ 'due-problem': isProblematic(item) }"
+          >
             <td class="item-description">{{ item.description }}</td>
             <td>{{ formatDateTimeShortDateShortTime(item.created) }}</td>
             <td>{{ formatDateTimeShortDateShortTime(item.deadline) }}</td>
             <td class="item-open">
-              <button id="checkbox" @click="markInteractionClosed(item)">✔</button>
+              <button id="checkbox" @click="markInteractionClosed(item)">
+                ✔
+              </button>
             </td>
           </tr>
         </tbody>
@@ -66,14 +82,14 @@ export default {
     interactions: [],
     newInteraction: {
       description: "",
-      deadline: ""
+      deadline: "",
     },
     trannslatedVm: {
       header: "",
       section_form: {
-        description_placeholder: "" ,
+        description_placeholder: "",
         deadline_label: "",
-        submit_text: ""
+        submit_text: "",
       },
       section_list: {
         header: "",
@@ -83,7 +99,9 @@ export default {
   }),
   async created() {
     await this.getInteractions();
-    this.trannslatedVm = await this.$translatorResolverAsync("views/UserInteractions");
+    this.trannslatedVm = await this.$translatorResolverAsync(
+      "views/UserInteractions"
+    );
   },
   methods: {
     async getInteractions() {

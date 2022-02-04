@@ -18,8 +18,8 @@ export default {
       p2: "By 02. february 2022:",
       list1: [
         "Vue bists have been refactored to Composition API.",
-        "Experimenting texts translation, multi language support. Wrote plugin to dynamically load texts in different languages for all the views or components, that have any kind of visible texts."
-      ]
-    }
-  ]
+        "Experimenting texts translation, multi language support. Wrote plugin to dynamically load texts in different languages for all the views or components, that have any kind of visible texts.",
+      ],
+    },
+  ],
 };
