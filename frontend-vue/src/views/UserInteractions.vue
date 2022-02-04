@@ -6,23 +6,28 @@
     <section>
       <div class="form-container">
         <div class="control">
-          <input type="text"
-                 id="new-description"
-                 :placeholder="translationVm.section_form.description_placeholder"
-                 size="50"
-                 v-model="newInteraction.description"
-                 />
+          <input
+            type="text"
+            id="new-description"
+            :placeholder="translationVm.section_form.description_placeholder"
+            size="50"
+            v-model="newInteraction.description"
+          />
         </div>
         <div class="control">
-          <input type="datetime-local"
-                 id="new-deadline"
-                 v-model="newInteraction.deadline" 
-                 />
-          <label for="new-deadline"> : {{ translationVm.section_form.deadline_label }}</label>
+          <input
+            type="datetime-local"
+            id="new-deadline"
+            v-model="newInteraction.deadline"
+          />
+          <label for="new-deadline">
+            : {{ translationVm.section_form.deadline_label }}</label
+          >
         </div>
         <div class="control">
-          <button @click="addNewInteraction(newInteraction)"
-                  >{{ translationVm.section_form.submit_text }}</button>
+          <button @click="addNewInteraction(newInteraction)">
+            {{ translationVm.section_form.submit_text }}
+          </button>
         </div>
         <div class="control">
           <button class="refresh-icon" @click="getInteractions">↻</button>
@@ -36,27 +41,46 @@
       <table>
         <thead>
           <tr>
-            <th v-for="(item, i) in translationVm.section_list.table_header" :key="i">{{ item }}</th>
+            <th
+              v-for="(item, i) in translationVm.section_list.table_header"
+              :key="i"
+            >
+              {{ item }}
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in interactions" :key="item.id" :class="{ 'due-problem': isProblematic(item) }">
+          <tr
+            v-for="item in interactions"
+            :key="item.id"
+            :class="{ 'due-problem': isProblematic(item) }"
+          >
             <td class="item-description">
               <span v-text="item.description" />&nbsp;
-              <input type="text" :placeholder="item.description" v-model="item.description"
-                     style="border: none; font-size: inherit;" />
+              <input
+                type="text"
+                :placeholder="item.description"
+                v-model="item.description"
+                style="border: none; font-size: inherit;"
+            />
             </td>
             <td>
               <span v-text="formatDateTimeShortDateShortTime(item.deadline)" />
-              <DateTimeLocalEditor v-model:datevalue="item.deadline"
-                                   style="border: none; font-size: inherit; " />
+              <DateTimeLocalEditor 
+                v-model:datevalue="item.deadline"
+                style="border: none; font-size: inherit; "
+            />
             </td>
             <td>
-              <span  v-text="formatDateTimeShortDateShortTime(item.created)"/>
+              <span v-text="formatDateTimeShortDateShortTime(item.created)"/>
             </td>
             <td class="item-action">
-              <button @click="markInteractionClosed(item)">✔</button>
-              <button>↪</button>
+              <button @click="markInteractionClosed(item)">
+                ✔
+              </button>
+              <button>
+                ↪
+              </button>
             </td>
           </tr>
         </tbody>
@@ -66,60 +90,69 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, onBeforeMount } from "vue";
+import { reactive, ref, watch } from "vue";
 import DateTimeLocalEditor from "../components/datetime-local-editor.vue";
 import { useTranslator } from "../plugins/translatorPlugin";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 
-const interactions = ref([]);
 const translationVm = ref({
-      header: "",
-      section_form: {
-        description_placeholder: "" ,
-        deadline_label: "",
-        submit_text: ""
-      },
-      section_list: {
-        header: "",
-        table_header: [],
-      },
-    });
+  header: "",
+  section_form: {
+    description_placeholder: "",
+    deadline_label: "",
+    submit_text: "",
+  },
+  section_list: {
+    header: "",
+    table_header: [],
+  },
+});
+const interactions = ref([]);
 const newInteraction = reactive({ description: "", deadline: "" });
+
 const api = useApiClient();
-
-useTranslator()("views/UserInteractions").then(data => translationVm.value = data);
-
-onBeforeMount(getInteractions);
-
 const { formatDateTimeShortDateShortTime } = useFormatDateTime();
 
-async function getInteractions() {
-  const resp = await api.then((client) =>
+useTranslator()("views/UserInteractions").then(
+  (data) => (translationVm.value = data)
+);
+
+/** Keep table sorted by deadline desc. always.*/
+watch( // TODO to watchPostEffect?
+  interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
+  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
+  { immediate: true, deep: true }
+);
+
+getInteractions();
+
+function getInteractions() {
+  api.then((client) =>
     client.execute({
       operationId: "get_api_userinteractions",
       parameters: { isOpen: true },
     })
-  );
-  if (resp.ok) {
-    interactions.value = resp.body.map(convertToVM);
-  }
+  )
+  .then((resp) => {
+    if (resp.ok) interactions.value = resp.body.map(convertToVM);
+  });
 }
 
-async function markInteractionClosed(interaction) {
+function markInteractionClosed(interaction) {
   if (!confirm("Kinnita pöördumise sulgemine")) {
     return;
   }
-  const resp = await api.then((client) =>
+  api.then((client) =>
     client.execute({
       operationId: "patch_api_userinteractions__id_",
       parameters: { id: interaction.id },
       requestBody: { id: interaction.id, isOpen: false },
     })
-  );
-  if (resp.ok) {
-    interactions.value.splice(interactions.value.indexOf(interaction), 1);
-  }
+  )
+  .then((resp) => {
+    if (resp.ok) interactions.value.splice(interactions.value.indexOf(interaction), 1);
+  });
 }
 
 function isProblematic(interaction) {
@@ -137,26 +170,21 @@ function convertToVM({ created, deadline, ...rest }) {
   };
 }
 
-async function addNewInteraction({ description, deadline }) {
-  const resp = await api.then((client) =>
+function addNewInteraction({ description, deadline }) {
+  api.then((client) =>
     client.execute({
       operationId: "post_api_userinteractions",
       requestBody: { description, deadline: new Date(deadline) },
     })
-  );
-  if (resp.ok) {
-    interactions.value.push(convertToVM(resp.body));
-    newInteraction.description = "";
-    newInteraction.deadline = "";
-  }
+  )
+  .then((resp) => {
+    if (resp.ok) {
+      interactions.value.push(convertToVM(resp.body));
+      newInteraction.description = "";
+      newInteraction.deadline = "";
+    }
+  });
 }
-
-/** Keep table sorted by deadline desc. always.*/
-watch( // TODO to watchPostEffect?
-  interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
-  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
-  { immediate: true, deep: true }
-);
 </script>
 
 <style scoped>

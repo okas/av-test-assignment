@@ -1,9 +1,11 @@
 <template>
   <nav id="main-navigation" class="app-menu">
-    <template v-for="{path, name} in $router.options.routes" :key="path">
+    <template v-for="{ path, name } in $router.options.routes" :key="path">
       <router-link :to="path">{{ routeNamesTranslated[name] }}</router-link> |
     </template>
-    <a class="external" href="https://localhost:5001/swagger" target="_blank">Swagger</a>
+    <a class="external" href="https://localhost:5001/swagger" target="_blank"
+      >Swagger</a
+    >
   </nav>
 </template>
 
@@ -13,11 +15,17 @@ import { useStore } from "vuex";
 import { useTranslator } from "../plugins/translatorPlugin";
 
 const routeNamesTranslated = ref({});
-const store = useStore();
 
+const store = useStore();
 const translatorAsync = useTranslator();
 
-watchEffect(async () => routeNamesTranslated.value = await translatorAsync("components/main-navigation", store.state.language));
+watchEffect(
+  async () =>
+    (routeNamesTranslated.value = await translatorAsync(
+      "components/main-navigation",
+      store.state.language
+    ))
+);
 </script>
 
 <style scoped>
@@ -36,7 +44,7 @@ watchEffect(async () => routeNamesTranslated.value = await translatorAsync("comp
 }
 
 a.external[target="_blank"]::after {
-content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
-margin: 0px 3px 0px 5px;
+  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+  margin: 0px 3px 0px 5px;
 }
 </style>

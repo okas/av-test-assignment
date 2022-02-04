@@ -16,7 +16,8 @@ import { useTranslator } from "../plugins/translatorPlugin";
 
 const translationVm = ref({});
 
-const load = async () => translationVm.value = await useTranslator()("views/Home");
+const load = async () =>
+  (translationVm.value = await useTranslator()("views/Home"));
 
 load();
 </script>

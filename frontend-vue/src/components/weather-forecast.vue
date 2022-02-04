@@ -1,10 +1,14 @@
 <template>
   <section class="weather-forecast">
-    <h2>{{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup></h2>
+    <h2>
+      {{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup>
+    </h2>
     <table>
       <thead>
         <tr>
-          <th v-for="(item, i) in translationVm.tableHeader" :key="i">{{ item }}</th>
+          <th v-for="(item, i) in translationVm.tableHeader" :key="i">
+            {{ item }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -25,17 +29,21 @@ import useFormatDateTime from "../utils/formatDateTime";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import { useTranslator } from "../plugins/translatorPlugin";
 
-const translationVm = ref({ header: [], tableHeader: [] });
 const forecasts = ref([]);
-const api = useApiClient();
+const translationVm = ref({ header: [], tableHeader: [] });
+
 const { formatDateShort } = useFormatDateTime();
+const api = useApiClient();
 
-useTranslator()("components/weather-forecast").then(data => translationVm.value = data);
+useTranslator()("components/weather-forecast").then(
+  (data) => (translationVm.value = data)
+);
 
-api.then(client =>
+api.then((client) =>
   client.execute({ operationId: "get_weatherforecast" })
-).then(resp => {
-  if (resp.ok) forecasts.value = resp.body;
+)
+.then((resp) => {
+  if (resp.ok) forecasts.value = resp.body
 });
 </script>
 
