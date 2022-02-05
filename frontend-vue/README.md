@@ -5,9 +5,9 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compiles and hot-reloads for development, using Vite
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
@@ -15,12 +15,22 @@ npm run serve
 npm run build
 ```
 
-### Lints and fixes files
+### Locally preview production build
+```
+npm run serve
+```
+
+### Lints files
 ```
 npm run lint
 ```
 
+### Lints and fixes files
+```
+npm run lint:fix
+```
+
 ### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+See [Configuration Reference](https://vitejs.dev/config/#configuring-vite).
 
 just a test change to test issue reference in commit's comment
