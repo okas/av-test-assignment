@@ -1,7 +1,7 @@
-// This script sets up HTTPS for the application using the ASP.NET Core HTTPS certificate
+// This script sets up certificate for HTTPS for the application using the ASP.NET Core HTTPS certificate
 import { existsSync } from 'fs'
 import { spawn } from "child_process";
-import { certFilePath, keyFilePath } from "./https.dev.config.mjs";
+import { certFilePath, keyFilePath } from "./https.dev.config.js";
 
 if (!existsSync(certFilePath) || !existsSync(keyFilePath)) {
   spawn(

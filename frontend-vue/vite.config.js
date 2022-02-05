@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import vuePlugin from '@vitejs/plugin-vue';
 import { readFileSync } from 'fs'
-import { certFilePath, keyFilePath } from "./https.dev.config.mjs";
+import { certFilePath, keyFilePath } from "./https.dev.config.js";
 
 
 const defaultDevApiEndpointConf = {
