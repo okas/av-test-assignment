@@ -3,7 +3,7 @@
     <ProjectGuid>efa8b3b8-0942-4b92-9f3d-dabe24d716fb</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <StartupCommand>npm run serve</StartupCommand>
+    <StartupCommand>npm run dev</StartupCommand>
     <JavaScriptTestRoot>.\</JavaScriptTestRoot>
     <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
     <BuildCommand>

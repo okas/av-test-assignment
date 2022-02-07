@@ -2,30 +2,28 @@
   "name": "frontend-vue",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "node aspnetcore-https && vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "predev": "node aspnetcore-https.js",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "lint": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore,.vscode",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier . --write --ignore-path .gitignore,.vscode"
   },
   "dependencies": {
-    "core-js": "^3.21.0",
     "swagger-client": "^3.18.4",
     "vue": "^3.2.29",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.15",
-    "@vue/cli-plugin-eslint": "^4.5.15",
-    "@vue/cli-plugin-router": "^4.5.15",
-    "@vue/cli-plugin-vuex": "^4.5.0",
-    "@vue/cli-service": "^4.5.15",
-    "@vue/compiler-sfc": "^3.2.29",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^7.0.0",
-    "prettier": "^2.5.1"
+    "@vitejs/plugin-vue": "^2.1.0",
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-vue": "^8.4.1",
+    "prettier": "^2.5.1",
+    "vite": "^2.7.13"
   }
 }
