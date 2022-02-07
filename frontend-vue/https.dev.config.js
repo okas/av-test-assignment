@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from "path";
 
 const baseFolder =
   process.env.APPDATA !== undefined && process.env.APPDATA !== ""
@@ -9,7 +9,8 @@ const certificateArg = process.argv
   .map((arg) => arg.match(/--name=(?<value>.+)/i))
   .filter(Boolean)[0];
 
-const certificateName = certificateArg?.groups?.value ?? process.env.npm_package_name;
+const certificateName =
+  certificateArg?.groups?.value ?? process.env.npm_package_name;
 
 if (!certificateName) {
   console.error(
