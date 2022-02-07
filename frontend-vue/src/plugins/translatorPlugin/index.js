@@ -1,9 +1,10 @@
 import { inject } from "vue";
 
 /**
- * @typedef TranslatorConfig Translator options
+ * @typedef TranslatorConfig Translator options.
  * @type {object}
- * @property {string} [rootFolder=translations] Root path of translations in `/src` folder
+ * @property {() => string} getDefaultLanguage Will be used to get default language from somewhere.
+ * @property {string} [rootFolder=translations] Root path of translations in `/src` folder.
  */
 
 /**
@@ -41,7 +42,7 @@ export const pluginSymbol = Symbol("translator plugin: resolver symbol");
  * @param {import("vue").App<any>} app
  * @param {TranslatorConfig} config
  */
-export default function install(app, config = { rootFolder: "translations" }) {
+export default function install(app, config) {
   const { globalProperties } = app.config;
   const root = config?.rootFolder ?? "translations";
   // For Options API users.
@@ -50,9 +51,7 @@ export default function install(app, config = { rootFolder: "translations" }) {
     /** @type {string} */ language = ""
   ) => {
     const lng =
-      language?.length === 2
-        ? language
-        : globalProperties.$store?.state?.language ?? "";
+      language?.length === 2 ? language : config.getDefaultLanguage() ?? "";
 
     return await translationResolverAsync(root, modulePath, lng);
   };

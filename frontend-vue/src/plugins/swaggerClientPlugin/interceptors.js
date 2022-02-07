@@ -1,14 +1,15 @@
-export function createStoreInterceptors(store) {
-  const mutation = "SET_LOADING";
-
+/**
+ * @param {import("pinia").StoreDefinition} useStore
+ */
+export function createStoreInterceptors(useStore) {
   return {
     requestInterceptor(request) {
-      store.commit(mutation, true);
+      useStore().setLoading(true);
       return request;
     },
 
     responseInterceptor(response) {
-      store.commit(mutation, false);
+      useStore().setLoading(false);
       return response;
     },
   };

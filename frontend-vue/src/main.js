@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import AppRoot from "./AppRoot.vue";
-import store from "./store";
+import { createPinia } from "pinia";
+import useRootStore from "./stores/app-store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
 import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
@@ -10,13 +11,18 @@ const app = createApp(AppRoot);
 
 let swaggerOptions = Object.assign(
   { url: "/swagger/v1/swagger.json" },
-  createStoreInterceptors(store)
+  createStoreInterceptors(useRootStore)
 );
 
+const translatorOptions = {
+  getDefaultLanguage: () => useRootStore().language,
+  rootFolder: "translations",
+};
+
 app
-  .use(store)
+  .use(createPinia())
   .use(router)
   .use(apiClient, swaggerOptions)
-  .use(translatorPlugin, { rootFolder: "translations" });
+  .use(translatorPlugin, translatorOptions);
 
 app.mount("#app-root");
