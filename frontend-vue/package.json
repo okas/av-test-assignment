@@ -9,9 +9,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore",
-    "lint-fix": "npm run lint -- --fix",
-    "format": "prettier . --check --write --ignore-path .gitignore",
-    "postformat": "npm run lint-fix"
+    "lint-fix": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore --fix",
+    "format": "prettier . --check --write --ignore-path .gitignore && npm run lint-fix"
   },
   "dependencies": {
     "pinia": "^2.0.11",
