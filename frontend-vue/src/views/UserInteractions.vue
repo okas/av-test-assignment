@@ -9,18 +9,18 @@
       <div class="form-container">
         <div class="control">
           <input
-            type="text"
             id="new-description"
+            v-model="newInteraction.description"
+            type="text"
             :placeholder="trannslatedVm.section_form.description_placeholder"
             size="50"
-            v-model="newInteraction.description"
           />
         </div>
         <div class="control">
           <input
-            type="datetime-local"
             id="new-deadline"
             v-model="newInteraction.deadline"
+            type="datetime-local"
           />
           <label for="new-deadline">
             : {{ trannslatedVm.section_form.deadline_label }}</label
@@ -101,7 +101,8 @@ useTranslator()("views/UserInteractions").then(
 );
 
 /** Keep table sorted by deadline desc. always.*/
-watch( // TODO to watchPostEffect?
+watch(
+  // TODO to watchPostEffect?
   interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
   () => interactions.value.sort((a, b) => a.deadline - b.deadline),
   { immediate: true, deep: true }
@@ -110,31 +111,34 @@ watch( // TODO to watchPostEffect?
 getInteractions();
 
 function getInteractions() {
-  api.then((client) =>
-    client.execute({
-      operationId: "get_api_userinteractions",
-      parameters: { isOpen: true },
-    })
-  )
-  .then((resp) => {
-    if (resp.ok) interactions.value = resp.body.map(convertToVM);
-  });
+  api
+    .then((client) =>
+      client.execute({
+        operationId: "get_api_userinteractions",
+        parameters: { isOpen: true },
+      })
+    )
+    .then((resp) => {
+      if (resp.ok) interactions.value = resp.body.map(convertToVM);
+    });
 }
 
 function markInteractionClosed(interaction) {
   if (!confirm("Kinnita pöördumise sulgemine")) {
     return;
   }
-  api.then((client) =>
-    client.execute({
-      operationId: "patch_api_userinteractions__id_",
-      parameters: { id: interaction.id },
-      requestBody: { id: interaction.id, isOpen: false },
-    })
-  )
-  .then((resp) => {
-    if (resp.ok) interactions.value.splice(interactions.value.indexOf(interaction), 1);
-  });
+  api
+    .then((client) =>
+      client.execute({
+        operationId: "patch_api_userinteractions__id_",
+        parameters: { id: interaction.id },
+        requestBody: { id: interaction.id, isOpen: false },
+      })
+    )
+    .then((resp) => {
+      if (resp.ok)
+        interactions.value.splice(interactions.value.indexOf(interaction), 1);
+    });
 }
 
 function isProblematic(interaction) {
@@ -153,19 +157,20 @@ function convertToVM({ created, deadline, ...rest }) {
 }
 
 function addNewInteraction({ description, deadline }) {
-  api.then((client) =>
-    client.execute({
-      operationId: "post_api_userinteractions",
-      requestBody: { description, deadline: new Date(deadline) },
-    })
-  )
-  .then((resp) => {
-    if (resp.ok) {
-      interactions.value.push(convertToVM(resp.body));
-      newInteraction.description = "";
-      newInteraction.deadline = "";
-    }
-  });
+  api
+    .then((client) =>
+      client.execute({
+        operationId: "post_api_userinteractions",
+        requestBody: { description, deadline: new Date(deadline) },
+      })
+    )
+    .then((resp) => {
+      if (resp.ok) {
+        interactions.value.push(convertToVM(resp.body));
+        newInteraction.description = "";
+        newInteraction.deadline = "";
+      }
+    });
 }
 </script>
 

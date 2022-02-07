@@ -1,7 +1,7 @@
 <template>
   <header class="main-header">
     <MainNavigation />
-    <div class="global-loader-icon" v-if="$store.state.loading" />
+    <div v-if="$store.state.loading" class="global-loader-icon" />
   </header>
   <main>
     <router-view />
