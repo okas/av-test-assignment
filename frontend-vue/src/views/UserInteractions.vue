@@ -58,29 +58,25 @@
             <td class="item-description">
               <span v-text="item.description" />&nbsp;
               <input
+                v-model="item.description"
                 type="text"
                 :placeholder="item.description"
-                v-model="item.description"
-                style="border: none; font-size: inherit;"
-            />
+                style="border: none; font-size: inherit"
+              />
             </td>
             <td>
               <span v-text="formatDateTimeShortDateShortTime(item.deadline)" />
-              <DateTimeLocalEditor 
+              <DateTimeLocalEditor
                 v-model:datevalue="item.deadline"
-                style="border: none; font-size: inherit; "
-            />
+                style="border: none; font-size: inherit"
+              />
             </td>
             <td>
-              <span v-text="formatDateTimeShortDateShortTime(item.created)"/>
+              <span v-text="formatDateTimeShortDateShortTime(item.created)" />
             </td>
             <td class="item-action">
-              <button @click="markInteractionClosed(item)">
-                ✔
-              </button>
-              <button>
-                ↪
-              </button>
+              <button @click="markInteractionClosed(item)">✔</button>
+              <button>↪</button>
             </td>
           </tr>
         </tbody>
