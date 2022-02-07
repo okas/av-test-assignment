@@ -8,9 +8,10 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore,.vscode",
-    "lint:fix": "npm run lint -- --fix",
-    "format": "prettier . --write --ignore-path .gitignore,.vscode"
+    "lint": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore",
+    "lint-fix": "npm run lint -- --fix",
+    "format": "prettier . --check --write --ignore-path .gitignore",
+    "postformat": "npm run lint-fix"
   },
   "dependencies": {
     "swagger-client": "^3.18.4",

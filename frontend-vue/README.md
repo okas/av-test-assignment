@@ -33,10 +33,10 @@ npm run lint
 ### Lints and fixes files
 
 ```
-npm run lint:fix
+npm run lint-fix
 ```
 
-### Formats and saves changes to files
+### Formats, then lints and fixes files
 
 ```
 npm run format
