@@ -3,7 +3,7 @@
 <template>
   <article class="user-interaction">
     <header>
-      <h1>{{ trannslatedVm.header }}</h1>
+      <h1>{{ translatedVm.header }}</h1>
     </header>
     <section>
       <div class="form-container">
@@ -12,7 +12,7 @@
             id="new-description"
             v-model="newInteraction.description"
             type="text"
-            :placeholder="trannslatedVm.section_form.description_placeholder"
+            :placeholder="translatedVm.section_form.description_placeholder"
             size="50"
           />
         </div>
@@ -23,12 +23,12 @@
             type="datetime-local"
           />
           <label for="new-deadline">
-            : {{ trannslatedVm.section_form.deadline_label }}</label
+            : {{ translatedVm.section_form.deadline_label }}</label
           >
         </div>
         <div class="control">
           <button @click="addNewInteraction(newInteraction)">
-            {{ trannslatedVm.section_form.submit_text }}
+            {{ translatedVm.section_form.submit_text }}
           </button>
         </div>
         <div class="control">
@@ -38,13 +38,13 @@
     </section>
     <section>
       <header>
-        <h4>{{ trannslatedVm.section_list.header }}</h4>
+        <h4>{{ translatedVm.section_list.header }}</h4>
       </header>
       <table>
         <thead>
           <tr>
             <th
-              v-for="(item, i) in trannslatedVm.section_list.table_header"
+              v-for="(item, i) in translatedVm.section_list.table_header"
               :key="i"
             >
               {{ item }}
@@ -78,7 +78,7 @@ import { useApiClient } from "../plugins/swaggerClientPlugin";
 import { useTranslator } from "../plugins/translatorPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 
-const trannslatedVm = ref({
+const translatedVm = ref({
   header: "",
   section_form: {
     description_placeholder: "",
@@ -97,7 +97,7 @@ const api = useApiClient();
 const { formatDateTimeShortDateShortTime } = useFormatDateTime();
 
 useTranslator()("views/UserInteractions").then(
-  (data) => (trannslatedVm.value = data)
+  (data) => (translatedVm.value = data)
 );
 
 /** Keep table sorted by deadline desc. always.*/
