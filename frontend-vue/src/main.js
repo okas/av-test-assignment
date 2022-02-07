@@ -16,6 +16,6 @@ const swaggerOptions = {
 app.use(store)
   .use(router)
   .use(apiClient, swaggerOptions)
-  .use(translatorPlugin);
+  .use(translatorPlugin, { rootFolder: "translations" });
 
 app.mount("#app-root");

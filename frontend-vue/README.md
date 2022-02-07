@@ -1,26 +1,47 @@
 # frontend-vue
 
 ## Project setup
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compiles and hot-reloads for development, using Vite
+
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
+
 ```
 npm run build
 ```
 
-### Lints and fixes files
+### Locally preview production build
+
+```
+npm run serve
+```
+
+### Lints files
+
 ```
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Lints and fixes files
 
-just a test change to test issue reference in commit's comment
+```
+npm run lint:fix
+```
+
+### Formats and saves changes to files
+
+```
+npm run format
+```
+
+### Customize configuration
+
+See [Configuration Reference](https://vitejs.dev/config/#configuring-vite).
