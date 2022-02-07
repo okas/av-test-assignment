@@ -11,8 +11,8 @@
 
 <script setup>
 import { ref, watchEffect } from "vue";
-import { useStore } from "vuex";
 import { useTranslator } from "../plugins/translatorPlugin";
+import useRootStore from "../stores/app-store";
 
 const routeNamesTranslated = ref({
   Home: "",
@@ -20,14 +20,14 @@ const routeNamesTranslated = ref({
   UserInteractions: "",
 });
 
-const store = useStore();
+const store = useRootStore();
 const translatorAsync = useTranslator();
 
 watchEffect(
   async () =>
     (routeNamesTranslated.value = await translatorAsync(
       "components/main-navigation",
-      store.state.language
+      store.language
     ))
 );
 </script>

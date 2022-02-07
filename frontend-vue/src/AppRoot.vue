@@ -1,7 +1,7 @@
 <template>
   <header class="main-header">
     <MainNavigation />
-    <div v-if="$store.state.loading" class="global-loader-icon" />
+    <div v-if="store.loading" class="global-loader-icon" />
   </header>
   <main>
     <router-view />
@@ -11,6 +11,8 @@
 
 <script setup>
 import MainNavigation from "./components/main-navigation.vue";
+import useRootStore from "./stores/app-store";
+const store = useRootStore();
 </script>
 
 <style>
