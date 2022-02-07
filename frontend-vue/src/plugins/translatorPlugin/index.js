@@ -2,7 +2,7 @@ import { inject } from "vue";
 
 /**
  * @typedef TranslatorConfig Translator options
- * @type {object} 
+ * @type {object}
  * @property {string} [rootFolder=translations] Root path of translations in `/src` folder
  */
 
@@ -11,7 +11,11 @@ import { inject } from "vue";
  * @param {string} modulePath
  * @returns {Promise<Object>}
  */
-async function translationResolverAsync(templateRoot, modulePath, language = "") {
+async function translationResolverAsync(
+  templateRoot,
+  modulePath,
+  language = ""
+) {
   let modulePromise;
 
   // Consider: https://github.com/tc39/proposal-dynamic-import#import

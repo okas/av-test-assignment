@@ -1,32 +1,32 @@
 <template>
   <article class="user-interaction">
     <header>
-      <h1>{{ translationVm.header }}</h1>
+      <h1>{{ translatedVm.header }}</h1>
     </header>
     <section>
       <div class="form-container">
         <div class="control">
           <input
-            type="text"
             id="new-description"
-            :placeholder="translationVm.section_form.description_placeholder"
-            size="50"
             v-model="newInteraction.description"
+            type="text"
+            :placeholder="translatedVm.section_form.description_placeholder"
+            size="50"
           />
         </div>
         <div class="control">
           <input
-            type="datetime-local"
             id="new-deadline"
             v-model="newInteraction.deadline"
+            type="datetime-local"
           />
           <label for="new-deadline">
-            : {{ translationVm.section_form.deadline_label }}</label
+            : {{ translatedVm.section_form.deadline_label }}</label
           >
         </div>
         <div class="control">
           <button @click="addNewInteraction(newInteraction)">
-            {{ translationVm.section_form.submit_text }}
+            {{ translatedVm.section_form.submit_text }}
           </button>
         </div>
         <div class="control">
@@ -36,13 +36,13 @@
     </section>
     <section>
       <header>
-        <h4>{{ translationVm.section_list.header }}</h4>
+        <h4>{{ translatedVm.section_list.header }}</h4>
       </header>
       <table>
         <thead>
           <tr>
             <th
-              v-for="(item, i) in translationVm.section_list.table_header"
+              v-for="(item, i) in translatedVm.section_list.table_header"
               :key="i"
             >
               {{ item }}
@@ -96,7 +96,7 @@ import { useTranslator } from "../plugins/translatorPlugin";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 
-const translationVm = ref({
+const translatedVm = ref({
   header: "",
   section_form: {
     description_placeholder: "",
@@ -115,11 +115,12 @@ const api = useApiClient();
 const { formatDateTimeShortDateShortTime } = useFormatDateTime();
 
 useTranslator()("views/UserInteractions").then(
-  (data) => (translationVm.value = data)
+  (data) => (translatedVm.value = data)
 );
 
 /** Keep table sorted by deadline desc. always.*/
-watch( // TODO to watchPostEffect?
+watch(
+  // TODO to watchPostEffect?
   interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
   () => interactions.value.sort((a, b) => a.deadline - b.deadline),
   { immediate: true, deep: true }
@@ -128,31 +129,34 @@ watch( // TODO to watchPostEffect?
 getInteractions();
 
 function getInteractions() {
-  api.then((client) =>
-    client.execute({
-      operationId: "get_api_userinteractions",
-      parameters: { isOpen: true },
-    })
-  )
-  .then((resp) => {
-    if (resp.ok) interactions.value = resp.body.map(convertToVM);
-  });
+  api
+    .then((client) =>
+      client.execute({
+        operationId: "get_api_userinteractions",
+        parameters: { isOpen: true },
+      })
+    )
+    .then((resp) => {
+      if (resp.ok) interactions.value = resp.body.map(convertToVM);
+    });
 }
 
 function markInteractionClosed(interaction) {
   if (!confirm("Kinnita pöördumise sulgemine")) {
     return;
   }
-  api.then((client) =>
-    client.execute({
-      operationId: "patch_api_userinteractions__id_",
-      parameters: { id: interaction.id },
-      requestBody: { id: interaction.id, isOpen: false },
-    })
-  )
-  .then((resp) => {
-    if (resp.ok) interactions.value.splice(interactions.value.indexOf(interaction), 1);
-  });
+  api
+    .then((client) =>
+      client.execute({
+        operationId: "patch_api_userinteractions__id_",
+        parameters: { id: interaction.id },
+        requestBody: { id: interaction.id, isOpen: false },
+      })
+    )
+    .then((resp) => {
+      if (resp.ok)
+        interactions.value.splice(interactions.value.indexOf(interaction), 1);
+    });
 }
 
 function isProblematic(interaction) {
@@ -171,19 +175,20 @@ function convertToVM({ created, deadline, ...rest }) {
 }
 
 function addNewInteraction({ description, deadline }) {
-  api.then((client) =>
-    client.execute({
-      operationId: "post_api_userinteractions",
-      requestBody: { description, deadline: new Date(deadline) },
-    })
-  )
-  .then((resp) => {
-    if (resp.ok) {
-      interactions.value.push(convertToVM(resp.body));
-      newInteraction.description = "";
-      newInteraction.deadline = "";
-    }
-  });
+  api
+    .then((client) =>
+      client.execute({
+        operationId: "post_api_userinteractions",
+        requestBody: { description, deadline: new Date(deadline) },
+      })
+    )
+    .then((resp) => {
+      if (resp.ok) {
+        interactions.value.push(convertToVM(resp.body));
+        newInteraction.description = "";
+        newInteraction.deadline = "";
+      }
+    });
 }
 </script>
 

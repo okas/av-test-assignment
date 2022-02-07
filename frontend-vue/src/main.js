@@ -13,7 +13,8 @@ const swaggerOptions = {
   ...createStoreInterceptors(store),
 };
 
-app.use(store)
+app
+  .use(store)
   .use(router)
   .use(apiClient, swaggerOptions)
   .use(translatorPlugin, { rootFolder: "translations" });

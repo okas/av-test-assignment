@@ -14,7 +14,10 @@ import { ref } from "vue";
 import WeatherForecast from "../components/weather-forecast.vue";
 import { useTranslator } from "../plugins/translatorPlugin";
 
-const translationVm = ref({});
+const translationVm = ref({
+  header: "",
+  p1: "",
+});
 
 const load = async () =>
   (translationVm.value = await useTranslator()("views/Home"));

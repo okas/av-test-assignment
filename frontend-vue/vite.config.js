@@ -11,10 +11,7 @@ const defaultDevApiEndpointConf = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    vuePlugin(),
-    viteEslintPlugin
-  ],
+  plugins: [vuePlugin(), viteEslintPlugin],
   resolve: { alias: {} },
   server: {
     host: "localhost",

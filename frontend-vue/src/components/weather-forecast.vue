@@ -39,12 +39,11 @@ useTranslator()("components/weather-forecast").then(
   (data) => (translationVm.value = data)
 );
 
-api.then((client) =>
-  client.execute({ operationId: "get_weatherforecast" })
-)
-.then((resp) => {
-  if (resp.ok) forecasts.value = resp.body
-});
+api
+  .then((client) => client.execute({ operationId: "get_weatherforecast" }))
+  .then((resp) => {
+    if (resp.ok) forecasts.value = resp.body;
+  });
 </script>
 
 <style scoped>
