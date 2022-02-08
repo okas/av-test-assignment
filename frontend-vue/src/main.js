@@ -9,10 +9,10 @@ import translatorPlugin from "./plugins/translatorPlugin";
 
 const app = createApp(AppRoot);
 
-let swaggerOptions = Object.assign(
-  { url: "/swagger/v1/swagger.json" },
-  createStoreInterceptors(useRootStore)
-);
+const swaggerOptions = {
+  url: "/swagger/v1/swagger.json",
+  ...createStoreInterceptors(useRootStore)
+};
 
 const translatorOptions = {
   getDefaultLanguage: () => useRootStore().language,

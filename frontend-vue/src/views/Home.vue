@@ -19,8 +19,7 @@ const translationVm = ref({
   p1: "",
 });
 
-const load = async () =>
-  (translationVm.value = await useTranslator()("views/Home"));
-
-load();
+  useTranslator()("views/Home").then(
+    (data) => (translationVm.value = data)
+  );
 </script>
