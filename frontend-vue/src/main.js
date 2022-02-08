@@ -15,7 +15,9 @@ const swaggerOptions = {
 };
 
 const translatorOptions = {
-  getDefaultLanguage: () => useRootStore().language,
+  getLanguageAutomatically: () => useRootStore().language,
+  supportedLanguages: ["en", "et"], // TODO obtain...
+  fallBackLanguage: "en",
   rootFolder: "translations",
 };
 

@@ -3,7 +3,9 @@ import { inject } from "vue";
 /**
  * @typedef TranslatorConfig Translator options.
  * @type {object}
- * @property {() => string} getDefaultLanguage Will be used to get default language from somewhere.
+ * @property {() => string} getLanguageAutomatically Will be used to get language from somewhere in case of implicit translation call.
+ * @property {string[]} supportedLanguages language list, 2 char length.
+ * @property {string} fallBackLanguage
  * @property {string} [rootFolder=translations] Root path of translations in `/src` folder.
  */
 
@@ -12,28 +14,41 @@ import { inject } from "vue";
  * @param {string} modulePath
  * @returns {Promise<Object>}
  */
-async function translationResolverAsync(
-  templateRoot,
-  modulePath,
-  language = ""
-) {
-  let modulePromise;
-
+async function translationResolverAsync(templateRoot, modulePath, language) {
   // Consider: https://github.com/tc39/proposal-dynamic-import#import
   // Consider: https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  switch (language) {
-    default:
-    case "en":
-      modulePromise = import(`../../${templateRoot}/en/${modulePath}.js`);
-      break;
-    case "et":
-      modulePromise = import(`../../${templateRoot}/et/${modulePath}.js`);
-      break;
-  }
-
-  const module = await modulePromise;
+  const module = await import(
+    `../../../src/${templateRoot}/${language}/${modulePath}.js`
+  );
 
   return module.default;
+}
+
+/**
+ * @param {string} askedLanguage
+ * @param {TranslatorConfig} param1
+ * @throws {Error} If resolution failes.
+ */
+function resolveLanguage(
+  askedLanguage,
+  { supportedLanguages, getLanguageAutomatically, fallBackLanguage }
+) {
+  if (askedLanguage && askedLanguage in supportedLanguages) {
+    return askedLanguage;
+  }
+
+  const automaticLanguage = getLanguageAutomatically();
+
+  if (automaticLanguage) {
+    return automaticLanguage;
+  }
+
+  if (fallBackLanguage) {
+    console.warn("Using fallback language: ", fallBackLanguage);
+    return fallBackLanguage;
+  }
+
+  throw new Error("Could not resolve language");
 }
 
 export const pluginSymbol = Symbol("translator plugin: resolver symbol");
@@ -50,9 +65,7 @@ export default function install(app, config) {
     /** @type {string} */ modulePath,
     /** @type {string} */ language = ""
   ) => {
-    const lng =
-      language?.length === 2 ? language : config.getDefaultLanguage() ?? "";
-
+    const lng = resolveLanguage(language, config);
     return await translationResolverAsync(root, modulePath, lng);
   };
   // For Composition API users.
