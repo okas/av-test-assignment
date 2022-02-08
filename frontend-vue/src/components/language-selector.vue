@@ -32,7 +32,14 @@ const storageKey = "app:language";
 let storedLanguage = storage.getItem(storageKey);
 
 if (!storedLanguage) {
-  storedLanguage = fallBackLanguage;
+  // this should be first wisit ever to webapp
+  // use browser language, if it is supportedlanguage; otherwise use fallback language
+  storedLanguage = supportedLanguages.some(
+    (lng) => lng.iso === navigator.language
+  )
+    ? navigator.language
+    : fallBackLanguage;
+
   storage.setItem(storageKey, storedLanguage);
 }
 
