@@ -19,7 +19,5 @@ const translationVm = ref({
   p1: "",
 });
 
-  useTranslator()("views/Home").then(
-    (data) => (translationVm.value = data)
-  );
+useTranslator()("views/Home").then((data) => (translationVm.value = data));
 </script>

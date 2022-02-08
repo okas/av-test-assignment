@@ -11,7 +11,7 @@ const app = createApp(AppRoot);
 
 const swaggerOptions = {
   url: "/swagger/v1/swagger.json",
-  ...createStoreInterceptors(useRootStore)
+  ...createStoreInterceptors(useRootStore),
 };
 
 const translatorOptions = {
