@@ -6,6 +6,7 @@ import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
 import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
+import { supportedLanguages, fallBackLanguage } from "./translations/index";
 
 const app = createApp(AppRoot);
 
@@ -16,8 +17,8 @@ const swaggerOptions = {
 
 const translatorOptions = {
   getLanguageAutomatically: () => useRootStore().language,
-  supportedLanguages: ["en", "et"], // TODO obtain...
-  fallBackLanguage: "en",
+  supportedLanguages: supportedLanguages.map((item) => item.iso),
+  fallBackLanguage,
   rootFolder: "translations",
 };
 

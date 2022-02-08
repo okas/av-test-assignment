@@ -18,3 +18,5 @@ export const supportedLanguages = [
     auxilliar: "vali keel",
   },
 ];
+
+export const fallBackLanguage = "en";
