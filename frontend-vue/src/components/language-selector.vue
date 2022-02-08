@@ -21,10 +21,22 @@
 
 <script setup>
 import { computed, watchEffect } from "vue";
-import { supportedLanguages } from "../translations/index";
+import { supportedLanguages, fallBackLanguage } from "../translations/index";
 import useRootStore from "../stores/app-store";
 
 const store = useRootStore();
+
+const storage = window.localStorage;
+const storageKey = "app:language";
+
+let storedLanguage = storage.getItem(storageKey);
+
+if (!storedLanguage) {
+  storedLanguage = fallBackLanguage;
+  storage.setItem(storageKey, storedLanguage);
+}
+
+store.setLanguage(storedLanguage);
 
 const selectedItem = computed(() =>
   supportedLanguages.find((item) => item.iso === store.language)
@@ -34,7 +46,10 @@ function onLanguageChange({ target: { value } }) {
   store.setLanguage(value);
 }
 
-watchEffect(() => (document.documentElement.lang = store.language));
+watchEffect(() => {
+  document.documentElement.lang = store.language;
+  storage.setItem(storageKey, store.language);
+});
 </script>
 
 <style scoped></style>
