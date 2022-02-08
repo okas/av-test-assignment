@@ -4,7 +4,7 @@ import acceptHmr from "../utils/acceptHmr";
 const useRootStore = defineStore("app", {
   state: () => ({
     loading: true,
-    language: "en",
+    language: "",
   }),
 
   actions: {
