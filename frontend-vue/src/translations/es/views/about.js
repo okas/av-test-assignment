@@ -18,7 +18,7 @@ export default {
       p2: "Por 02. febrero 2022:",
       list1: [
         "Los partes de Vue se han refactorizado a la API de composición.",
-        "Experimentando la traducción de textos, compatibilidad con varios idiomas. Complemento escrito para cargar dinámicamente textos en diferentes idiomas para todas las vistas o componentes, que tienen cualquier tipo de texto visible".,
+        "Experimentando la traducción de textos, compatibilidad con varios idiomas. Complemento escrito para cargar dinámicamente textos en diferentes idiomas para todas las vistas o componentes, que tienen cualquier tipo de texto visible.",
       ],
     },
   ],
