@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import acceptHmr from "../utils/acceptHmr";
 
-const useRootStore = defineStore("app", {
+const useAppStore = defineStore("app", {
   state: () => ({
     loading: true,
     language: "",
@@ -20,6 +20,6 @@ const useRootStore = defineStore("app", {
   },
 });
 
-acceptHmr(useRootStore);
+acceptHmr(useAppStore);
 
-export default useRootStore;
+export default useAppStore;
