@@ -1,6 +1,5 @@
 <template>
   <div>
-    <button @click="store.setLanguage('')">clear language</button>
     <label for="global-language-selector">{{ selectedItem?.label }}</label
     >&nbsp;
     <select
