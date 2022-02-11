@@ -1,13 +1,13 @@
 <template>
   <div>
-    <label for="global-language-selector">{{ selectedItem.label }}</label
+    <label for="global-language-selector">{{ selectedItem?.label }}</label
     >&nbsp;
     <select
       id="global-language-selector"
-      :value="selectedItem.iso"
+      :value="selectedItem?.iso"
       @change.stop="onLanguageChange"
     >
-      <option disabled>{{ selectedItem.auxilliar }}</option>
+      <option disabled>{{ selectedItem?.auxilliar }}</option>
       <option
         v-for="{ iso, native } in supportedLanguages"
         :key="iso"
@@ -49,6 +49,7 @@ const selectedItem = computed(() =>
   supportedLanguages.find((item) => item.iso === store.language)
 );
 
+/** @param {Event & {target: EventTarget & {value: String}}} param0 */
 function onLanguageChange({ target: { value } }) {
   store.setLanguage(value);
 }
