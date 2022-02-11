@@ -16,7 +16,7 @@ const swaggerOptions = {
 };
 
 const translatorOptions = {
-  getLanguageAutomatically: () => useAppStore().language,
+  useStore: useAppStore,
   supportedLanguages: supportedLanguages.map((item) => item.iso),
   fallBackLanguage,
   rootFolder: "translations",
