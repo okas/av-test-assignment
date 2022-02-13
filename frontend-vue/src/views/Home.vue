@@ -10,14 +10,24 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import WeatherForecast from "../components/weather-forecast.vue";
 import { useTranslator } from "../plugins/translatorPlugin";
+import useRootStore from "../stores/app-store";
 
+const store = useRootStore();
 const translationVm = ref({
   header: "",
   p1: "",
 });
 
-useTranslator()("views/Home").then((data) => (translationVm.value = data));
+const translatorAsync = useTranslator();
+
+watchEffect(
+  async () =>
+    (translationVm.value = await translatorAsync(
+      "views/Home",
+      store.language
+    ))
+);
 </script>

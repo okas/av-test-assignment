@@ -24,19 +24,26 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import useFormatDateTime from "../utils/formatDateTime";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import { useTranslator } from "../plugins/translatorPlugin";
+import useRootStore from "../stores/app-store";
 
+const store = useRootStore();
 const forecasts = ref([]);
 const translationVm = ref({ header: [], tableHeader: [] });
 
 const { formatDateShort } = useFormatDateTime();
+const translatorAsync = useTranslator();
 const api = useApiClient();
 
-useTranslator()("components/weather-forecast").then(
-  (data) => (translationVm.value = data)
+watchEffect(
+  async () =>
+    (translationVm.value = await translatorAsync(
+      "components/weather-forecast",
+      store.language
+    ))
 );
 
 api
