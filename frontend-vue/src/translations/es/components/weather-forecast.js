@@ -1,4 +1,4 @@
 export default {
   header: ["Pronóstico del tiempo", "(API generado)"],
-  tableHeader: ["Fecha", "Temperatura °C", "Temperatura °F", "Descripción"],
+  tableHeader: ["Fetcha", "Temperatura °C", "Temperatura °F", "Descripción"],
 };
