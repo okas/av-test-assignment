@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   env: {
-    es2021: true,
+    es2022: true,
     node: true,
     browser: true,
     "vue/setup-compiler-macros": true,
@@ -9,7 +9,6 @@ module.exports = {
   extends: ["eslint:recommended", "plugin:vue/vue3-recommended", "prettier"],
   parser: "vue-eslint-parser",
   parserOptions: {
-    ecmaVersion: 2022,
     parser: "@typescript-eslint/parser",
   },
   plugins: ["@typescript-eslint"],
