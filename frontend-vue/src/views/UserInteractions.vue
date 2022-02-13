@@ -92,7 +92,12 @@ const translatedVm = ref({
     table_header: [],
   },
 });
-const interactions = ref([]); //TODO: add properties
+const interactions = ref([{
+  id: "",
+  description: "",
+  created: 0,
+  deadline: 0
+}]);
 const newInteraction = reactive({ description: "", deadline: "" });
 
 const api = useApiClient();
@@ -110,7 +115,7 @@ watchEffect(
 /** Keep table sorted by deadline desc. always.*/
 watch(
   // TODO to watchPostEffect?
-  interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
+  interactions, // TODO Is lodash.cloneDeep required to watch deeply nested props, in arrays?
   () => interactions.value.sort((a, b) => a.deadline - b.deadline),
   { immediate: true, deep: true }
 );

@@ -31,7 +31,14 @@ import { useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
 const store = useRootStore();
-const forecasts = ref([]);
+const forecasts = ref([
+  {
+    date: 0,
+    temperatureC: 0,
+    temperatureF: 0,
+    summary: "",
+  },
+]);
 const translationVm = ref({ header: [], tableHeader: [] });
 
 const { formatDateShort } = useFormatDateTime();
