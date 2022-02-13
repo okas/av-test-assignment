@@ -1,23 +1,24 @@
 import { createApp } from "vue";
 import AppRoot from "./AppRoot.vue";
 import { createPinia } from "pinia";
-import useRootStore from "./stores/app-store";
+import useAppStore from "./stores/app-store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
 import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
+import { supportedLanguages, fallBackLanguage } from "./translations/index";
 
 const app = createApp(AppRoot);
 
 const swaggerOptions = {
   url: "/swagger/v1/swagger.json",
-  ...createStoreInterceptors(useRootStore),
+  ...createStoreInterceptors(useAppStore),
 };
 
 const translatorOptions = {
-  getLanguageAutomatically: () => useRootStore().language,
-  supportedLanguages: ["en", "et"], // TODO obtain...
-  fallBackLanguage: "en",
+  useStore: useAppStore,
+  supportedLanguages: supportedLanguages.map((item) => item.iso),
+  fallBackLanguage,
   rootFolder: "translations",
 };
 
