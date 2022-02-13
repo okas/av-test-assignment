@@ -73,11 +73,13 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, watchEffect } from "vue";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import { useTranslator } from "../plugins/translatorPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
+import useRootStore from "../stores/app-store";
 
+const store = useRootStore();
 const translatedVm = ref({
   header: "",
   section_form: {
@@ -90,14 +92,19 @@ const translatedVm = ref({
     table_header: [],
   },
 });
-const interactions = ref([]);
+const interactions = ref([]); //TODO: add properties
 const newInteraction = reactive({ description: "", deadline: "" });
 
 const api = useApiClient();
 const { formatDateTimeShortDateShortTime } = useFormatDateTime();
+const translatorAsync = useTranslator();
 
-useTranslator()("views/UserInteractions").then(
-  (data) => (translatedVm.value = data)
+watchEffect(
+  async () =>
+    (translatedVm.value = await translatorAsync(
+      "views/UserInteractions",
+      store.language
+    ))
 );
 
 /** Keep table sorted by deadline desc. always.*/
