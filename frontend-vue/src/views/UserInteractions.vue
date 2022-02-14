@@ -65,14 +65,25 @@
               />
             </td>
             <td>
-              <span v-text="formatDateTimeShortDateShortTime(item.deadline)" />
+              <span
+                v-text="
+                  formatDateTimeShortDateShortTime(
+                    item.deadline,
+                    store.language
+                  )
+                "
+              />
               <DateTimeLocalEditor
                 v-model:datevalue="item.deadline"
                 style="border: none; font-size: inherit"
               />
             </td>
             <td>
-              <span v-text="formatDateTimeShortDateShortTime(item.created)" />
+              <span
+                v-text="
+                  formatDateTimeShortDateShortTime(item.created, store.language)
+                "
+              />
             </td>
             <td class="item-action">
               <button @click="markInteractionClosed(item)">✔</button>

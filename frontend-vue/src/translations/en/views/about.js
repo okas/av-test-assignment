@@ -15,7 +15,7 @@ export default {
     {
       header: "Added functionalities",
       p1: "I decided to develop further on this project to experiment features of ASP.NET Core Web API, VueJS and other things that are related to these.",
-      p2: "By 02. february 2022:",
+      p2: "By 02. February 2022:",
       list1: [
         "Vue bits have been refactored to Composition API.",
         "Experimenting texts translation, multi language support. Wrote plugin to dynamically load texts in different languages for all the views or components, that have any kind of visible texts.",
