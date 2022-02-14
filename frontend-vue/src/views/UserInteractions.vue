@@ -56,8 +56,16 @@
             :class="{ 'due-problem': isProblematic(item) }"
           >
             <td class="item-description">{{ item.description }}</td>
-            <td>{{ formatDateTimeShortDateShortTime(item.created) }}</td>
-            <td>{{ formatDateTimeShortDateShortTime(item.deadline) }}</td>
+            <td>
+              {{
+                formatDateTimeShortDateShortTime(item.created, store.language)
+              }}
+            </td>
+            <td>
+              {{
+                formatDateTimeShortDateShortTime(item.deadline, store.language)
+              }}
+            </td>
             <td class="item-open">
               <button id="checkbox" @click="markInteractionClosed(item)">
                 ✔
