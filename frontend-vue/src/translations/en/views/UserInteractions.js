@@ -9,4 +9,5 @@ export default {
     header: "Open requests",
     table_header: ["Description", "Created", "Deadline"],
   },
+  confirmMessage: "Confirm closing!",
 };

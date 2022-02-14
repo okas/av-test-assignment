@@ -9,4 +9,5 @@ export default {
     header: "Peticiones abiertas",
     table_header: ["Descriptción", "Creado", "Plazo"],
   },
+  confirmMessage: "¡Confirma cierre!",
 };

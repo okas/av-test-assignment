@@ -91,13 +91,16 @@ const translatedVm = ref({
     header: "",
     table_header: [],
   },
+  confirmMessage: "",
 });
-const interactions = ref([{
-  id: "",
-  description: "",
-  created: 0,
-  deadline: 0
-}]);
+const interactions = ref([
+  {
+    id: "",
+    description: "",
+    created: 0,
+    deadline: 0,
+  },
+]);
 const newInteraction = reactive({ description: "", deadline: "" });
 
 const api = useApiClient();
@@ -136,7 +139,7 @@ function getInteractions() {
 }
 
 function markInteractionClosed(interaction) {
-  if (!confirm("Kinnita pöördumise sulgemine")) {
+  if (!confirm(translatedVm.value.confirmMessage)) {
     return;
   }
   api
