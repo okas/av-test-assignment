@@ -1,5 +1,3 @@
-// eslint-disable-next-line
-
 <template>
   <article class="user-interaction">
     <header>
