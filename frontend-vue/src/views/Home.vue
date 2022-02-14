@@ -25,9 +25,6 @@ const translatorAsync = useTranslator();
 
 watchEffect(
   async () =>
-    (translationVm.value = await translatorAsync(
-      "views/Home",
-      store.language
-    ))
+    (translationVm.value = await translatorAsync("views/Home", store.language))
 );
 </script>
