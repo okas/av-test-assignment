@@ -53,11 +53,12 @@ watchEffect(
     ))
 );
 
-api
-  .then((client) => client.execute({ operationId: "get_weatherforecast" }))
-  .then((resp) => {
-    if (resp.ok) forecasts.value = resp.body;
-  });
+const resp = await api.then((client) =>
+  client.execute({ operationId: "get_weatherforecast" })
+);
+if (resp.ok) {
+  forecasts.value = resp.obj;
+}
 </script>
 
 <style scoped>
