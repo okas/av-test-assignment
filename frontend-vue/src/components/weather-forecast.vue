@@ -24,26 +24,41 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import useFormatDateTime from "../utils/formatDateTime";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import { useTranslator } from "../plugins/translatorPlugin";
+import useRootStore from "../stores/app-store";
 
-const forecasts = ref([]);
+const store = useRootStore();
+const forecasts = ref([
+  {
+    date: 0,
+    temperatureC: 0,
+    temperatureF: 0,
+    summary: "",
+  },
+]);
 const translationVm = ref({ header: [], tableHeader: [] });
 
 const { formatDateShort } = useFormatDateTime();
+const translatorAsync = useTranslator();
 const api = useApiClient();
 
-useTranslator()("components/weather-forecast").then(
-  (data) => (translationVm.value = data)
+watchEffect(
+  async () =>
+    (translationVm.value = await translatorAsync(
+      "components/weather-forecast",
+      store.language
+    ))
 );
 
-api
-  .then((client) => client.execute({ operationId: "get_weatherforecast" }))
-  .then((resp) => {
-    if (resp.ok) forecasts.value = resp.body;
-  });
+const resp = await api.then((client) =>
+  client.execute({ operationId: "get_weatherforecast" })
+);
+if (resp.ok) {
+  forecasts.value = resp.obj;
+}
 </script>
 
 <style scoped>

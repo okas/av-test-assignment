@@ -2,24 +2,24 @@
   <article class="about">
     <section>
       <header>
-        <h1>{{ viewModel.section[0].header }}</h1>
+        <h1>{{ translationVm.section[0].header }}</h1>
       </header>
-      <p>{{ viewModel.section[0].p1 }}</p>
+      <p>{{ translationVm.section[0].p1 }}</p>
       <ol>
-        <li v-for="(item, i) in viewModel.section[0].list1" :key="i">
+        <li v-for="(item, i) in translationVm.section[0].list1" :key="i">
           {{ item }}
         </li>
       </ol>
-      <p>{{ viewModel.section[0].p2 }}</p>
+      <p>{{ translationVm.section[0].p2 }}</p>
     </section>
     <section>
       <header>
-        <h1>{{ viewModel.section[1].header }}</h1>
+        <h1>{{ translationVm.section[1].header }}</h1>
       </header>
-      <p>{{ viewModel.section[1].p1 }}</p>
-      <p>{{ viewModel.section[1].p2 }}</p>
+      <p>{{ translationVm.section[1].p1 }}</p>
+      <p>{{ translationVm.section[1].p2 }}</p>
       <ol>
-        <li v-for="(item, i) in viewModel.section[1].list1" :key="i">
+        <li v-for="(item, i) in translationVm.section[1].list1" :key="i">
           {{ item }}
         </li>
       </ol>
@@ -28,10 +28,13 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { useTranslator } from "../plugins/translatorPlugin";
+import useRootStore from "../stores/app-store";
 
-const viewModel = ref({
+const store = useRootStore();
+
+const translationVm = ref({
   section: [
     {
       header: "",
@@ -48,7 +51,12 @@ const viewModel = ref({
   ],
 });
 
-useTranslator()("views/about").then((data) => (viewModel.value = data));
+const translatorAsync = useTranslator();
+
+watchEffect(
+  async () =>
+    (translationVm.value = await translatorAsync("views/about", store.language))
+);
 </script>
 
 <style scoped>

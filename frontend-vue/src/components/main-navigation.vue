@@ -1,6 +1,6 @@
 <template>
   <nav id="main-navigation" class="app-menu">
-    <template v-for="{ path, name } in $router.options.routes" :key="path">
+    <template v-for="{ path, name } in router.options.routes" :key="path">
       <router-link :to="path">{{ routeNamesTranslated[name] }}</router-link> |
     </template>
     <a class="external" href="https://localhost:5001/swagger" target="_blank"
@@ -11,16 +11,18 @@
 
 <script setup>
 import { ref, watchEffect } from "vue";
+import { useRouter } from "vue-router";
 import { useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
+const store = useRootStore();
 const routeNamesTranslated = ref({
   Home: "",
   About: "",
   UserInteractions: "",
 });
 
-const store = useRootStore();
+const router = useRouter();
 const translatorAsync = useTranslator();
 
 watchEffect(

@@ -9,4 +9,5 @@ export default {
     header: "Aktiivsed pöördumised",
     table_header: ["Kirjeldus", "Sisestatud", "Tähtaeg"],
   },
+  confirmMessage: "Kinnita pöördumise sulgemine!",
 };

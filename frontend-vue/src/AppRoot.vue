@@ -1,7 +1,11 @@
 <template>
   <header class="main-header">
+    <div
+      v-if="store.loading"
+      class="global-loader-icon global-loader-icon-position"
+    />
     <MainNavigation />
-    <div v-if="store.loading" class="global-loader-icon" />
+    <LanguageSelector class="language-selector-position" />
   </header>
   <main>
     <router-view />
@@ -11,6 +15,7 @@
 
 <script setup>
 import MainNavigation from "./components/main-navigation.vue";
+import LanguageSelector from "./components/language-selector.vue";
 import useRootStore from "./stores/app-store";
 const store = useRootStore();
 </script>
@@ -63,10 +68,19 @@ body {
   /*background-image: linear-gradient(to top, lightgrey 0%, lightgrey 1%, #e0e0e0 26%, #efefef 48%, #d9d9d9 75%, #bcbcbc 100%);*/
 }
 
-.global-loader-icon {
+.global-loader-icon-position {
   position: absolute;
   left: 1.5rem;
   top: 1.5rem;
+}
+
+.language-selector-position {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.8rem;
+}
+
+.global-loader-icon {
   border: 0.5rem solid #f3f3f3;
   border-top: 0.5rem solid #42b983;
   border-radius: 100%;

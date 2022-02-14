@@ -86,12 +86,14 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, watchEffect } from "vue";
 import DateTimeLocalEditor from "../components/datetime-local-editor.vue";
 import { useTranslator } from "../plugins/translatorPlugin";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
+import useRootStore from "../stores/app-store";
 
+const store = useRootStore();
 const translatedVm = ref({
   header: "",
   section_form: {
@@ -103,21 +105,34 @@ const translatedVm = ref({
     header: "",
     table_header: [],
   },
+  confirmMessage: "",
 });
-const interactions = ref([]);
+const interactions = ref([
+  {
+    id: "",
+    description: "",
+    created: 0,
+    deadline: 0,
+  },
+]);
 const newInteraction = reactive({ description: "", deadline: "" });
 
 const api = useApiClient();
 const { formatDateTimeShortDateShortTime } = useFormatDateTime();
+const translatorAsync = useTranslator();
 
-useTranslator()("views/UserInteractions").then(
-  (data) => (translatedVm.value = data)
+watchEffect(
+  async () =>
+    (translatedVm.value = await translatorAsync(
+      "views/UserInteractions",
+      store.language
+    ))
 );
 
 /** Keep table sorted by deadline desc. always.*/
 watch(
   // TODO to watchPostEffect?
-  interactions, // TODO Is lodash.cloneDeep required to wath deeply nested props, in arrays?
+  interactions, // TODO Is lodash.cloneDeep required to watch deeply nested props, in arrays?
   () => interactions.value.sort((a, b) => a.deadline - b.deadline),
   { immediate: true, deep: true }
 );
@@ -138,7 +153,7 @@ function getInteractions() {
 }
 
 function markInteractionClosed(interaction) {
-  if (!confirm("Kinnita pöördumise sulgemine")) {
+  if (!confirm(translatedVm.value.confirmMessage)) {
     return;
   }
   api
