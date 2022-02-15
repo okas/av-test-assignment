@@ -7,8 +7,19 @@ import apiClient from "./plugins/swaggerClientPlugin";
 import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
 import { supportedLanguages, fallBackLanguage } from "./translations/index";
+import htmlMetadataMiddleWare from "./middlewares/htmlMetadataMiddleWare";
+
+const appName = "Demo";
+const translationsRootFolder = "translations";
 
 const app = createApp(AppRoot);
+
+const htmlMetaDataOptions = {
+  titleTemplate: `%s | ${appName}`,
+  appName,
+  translationsRootFolder,
+  useStore: useAppStore,
+};
 
 const swaggerOptions = {
   url: "/swagger/v1/swagger.json",
@@ -19,13 +30,14 @@ const translatorOptions = {
   useStore: useAppStore,
   supportedLanguages: supportedLanguages.map((item) => item.iso),
   fallBackLanguage,
-  rootFolder: "translations",
+  rootFolder: translationsRootFolder,
 };
 
 app
   .use(createPinia())
   .use(router)
-  .use(apiClient, swaggerOptions)
-  .use(translatorPlugin, translatorOptions);
+  .use(htmlMetadataMiddleWare, htmlMetaDataOptions)
+  .use(translatorPlugin, translatorOptions)
+  .use(apiClient, swaggerOptions);
 
 app.mount("#app-root");
