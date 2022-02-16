@@ -2,7 +2,7 @@ export default {
   section: [
     {
       header: {
-        h1: "Description of test assignment (original)",
+        h2: "Description of test assignment (original)",
       },
       p_1: "The task is to implement a simple web application that allows to manage the requests sent to the support. The functionality of the simplified system would be as follows.",
       ol: {
@@ -18,16 +18,45 @@ export default {
     },
     {
       header: {
-        h1: "Added functionalities",
+        h2: "Added functionalities",
       },
       p_1: "I decided to develop further on this project to experiment features of ASP.NET Core Web API, VueJS and other things that are related to these.",
-      p_2: "By 02. February 2022:",
-      ol: {
-        li: [
-          "Vue bits have been refactored to Composition API.",
-          "Experimenting texts translation, multi language support. Wrote plugin to dynamically load texts in different languages for all the views or components, that have any kind of visible texts.",
-        ],
-      },
+      section: [
+        {
+          header: {
+            h3: "By February 02, 2022:",
+          },
+          ol: {
+            li: [
+              "Vue bits have been refactored to Composition API.",
+              "Experimenting texts translation, multi language support. Wrote plugin to dynamically load texts in different languages for all the views or components, that have any kind of visible texts.",
+            ],
+          },
+        },
+        {
+          header: {
+            h3: "By February 16, 2022:",
+          },
+          h4_1: "Changes regarding language management:",
+          ol_1: {
+            li: [
+              "On the first visit to app, browsers main language is analyzed against supported languages. If there is a match, then browser language is set to app language, otherwise falls back to default language.",
+              "On language change <html lang> is set.",
+              "On language change it is stored into `window.localStorage` object.",
+              "On language change document title is set.",
+              "Language change will update date and time formats on API originated data as well, without requesting it from API.",
+            ],
+          },
+          h4_2: "View 'About' (current) uses new `Tree` component:",
+          ol_2: {
+            li: [
+              "Tree reads the HTML structured data from JSON structure and renders it into view.",
+              "This source data must contain HTML structure, where properties are HTML tags.",
+              "Javascript Arrays, Objects and String values are supported.",
+            ],
+          },
+        },
+      ],
     },
   ],
 };
