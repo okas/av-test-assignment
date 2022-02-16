@@ -24,13 +24,48 @@
         </li>
       </ol>
     </section>
+    <section>
+      <header><h1>Testing</h1></header>
+      <Tree :data="testTree" />
+    </section>
   </article>
 </template>
 
 <script setup>
-import { ref, watchEffect } from "vue";
+import { defineAsyncComponent, ref, watchEffect } from "vue";
 import { useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
+
+const Tree = defineAsyncComponent(() => import("../components/tree.vue"));
+
+const testTree = [
+  [
+    {
+      article: {
+        section: {
+          p: "list subject",
+          span: ["span1", "span2"],
+          div: {
+            p: "section>div>p",
+            span: ["section>div>p>span1", "section>div>p>span2"],
+          },
+          div_1: ["div1", "div2"],
+        },
+        section_1: [
+          {
+            div: {
+              p: "section_1>div>p",
+              p_1: ["section_1>div>p[0]", "section_1>div>p[1]"],
+            },
+          },
+        ],
+        ol: {
+          li: ["ol>li[0]", "ol>li[1]"],
+        },
+      },
+    },
+  ],
+];
 
 const store = useRootStore();
 
