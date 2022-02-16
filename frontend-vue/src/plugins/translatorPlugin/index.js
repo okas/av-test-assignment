@@ -2,11 +2,6 @@ import { inject, watchPostEffect } from "vue";
 import { isUselessString } from "../../utils/stringHelpers";
 
 /**
- * @typedef LanguageStore Store with language related property and action
- * @type {import("pinia").Store<string, {language: string}, {} , {setLanguage: (language: string) => void}>}
- */
-
-/**
  * @typedef TranslatorConfig Translator options.
  * @type {object}
  * @property {() => LanguageStore} useStore Store with language related property and action
@@ -18,6 +13,7 @@ import { isUselessString } from "../../utils/stringHelpers";
 /**
  * @param {string} templateRoot
  * @param {string} modulePath
+ * @param {string} language
  * @returns {Promise<Object>}
  */
 async function translationResolverAsync(templateRoot, modulePath, language) {

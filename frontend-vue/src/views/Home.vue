@@ -19,8 +19,7 @@
 </template>
 
 <script setup>
-import { ref, watchEffect } from "vue";
-import WeatherForecast from "../components/weather-forecast.vue";
+import { defineAsyncComponent, ref, watchEffect } from "vue";
 import { useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
@@ -31,6 +30,10 @@ const translationVm = ref({
 });
 
 const translatorAsync = useTranslator();
+
+const WeatherForecast = defineAsyncComponent(() =>
+  import("../components/weather-forecast.vue")
+);
 
 watchEffect(
   async () =>
