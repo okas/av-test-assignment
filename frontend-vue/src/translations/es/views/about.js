@@ -2,7 +2,7 @@ export default {
   section: [
     {
       header: {
-        h1: "Descripción de la obra de prueba (original)",
+        h2: "Descripción de la obra de prueba (original)",
       },
       p_1: "La tarea es implementar una aplicación web sencilla que permita gestionar las peticiones enviadas al soporte. La funcionalidad del sistema simplificado sería la siguiente.",
       ol: {
@@ -18,16 +18,45 @@ export default {
     },
     {
       header: {
-        h1: "Funcionalidades extras",
+        h2: "Funcionalidades extras",
       },
       p_1: "Decidí desarrollar más este proyecto para experimentar las funciones de ASP.NET Core Web API, VueJS y otras cosas relacionadas con estos.",
-      p_2: "Por 02. febrero 2022:",
-      ol: {
-        li: [
-          "Los partes de Vue se han refactorizado a la API de composición.",
-          "Experimentación de traducción de textos, soporte multilingüe. Complemento escrito para cargar dinámicamente textos en diferentes idiomas para todas las vistas o componentes, que tienen cualquier tipo de texto visible.",
-        ],
-      },
+      section: [
+        {
+          header: {
+            h3: "Por 02. febrero 2022:",
+          },
+          ol: {
+            li: [
+              "Los partes de Vue se han refactorizado a la API de composición.",
+              "Experimentación de traducción de textos, soporte multilingüe. Complemento escrito para cargar dinámicamente textos en diferentes idiomas para todas las vistas o componentes, que tienen cualquier tipo de texto visible.",
+            ],
+          },
+        },
+        {
+          header: {
+            h3: "Por 16. febrero 2022:",
+          },
+          h4_1: "Cambios de manejo de idioma:",
+          ol_1: {
+            li: [
+              "En la primera visita a la aplicación, el idioma principal de los navegadores se analiza con los idiomas admitidos. Si hay una coincidencia, el idioma del navegador se establece en el idioma de la aplicación; de lo contrario, vuelve al idioma predeterminado.",
+              "En el cambio de idioma, se establece <html lang>.",
+              "En el cambio de idioma, se almacena en el objeto `window.localStorage`.",
+              "Al cambiar el idioma, se establece el título del documento.",
+              "El cambio de idioma también actualizará los formatos de fecha y hora en los datos originados por la API, sin solicitarlo a la API.",
+            ],
+          },
+          h4_2: "Vista 'Información' (actual) usa nuevo componente `Tree`:",
+          ol_2: {
+            li: [
+              "Tree lee los datos estructurados HTML de la estructura JSON y los presenta a la vista.",
+              "Estos datos de origen deben contener una estructura HTML, donde las propiedades son etiquetas HTML.",
+              "Se admiten Array, Object y String tipos de Javascript.",
+            ],
+          },
+        },
+      ],
     },
   ],
 };

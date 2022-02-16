@@ -2,7 +2,7 @@ export default {
   section: [
     {
       header: {
-        h1: "Test ülesande kirjeldus (esialgne)",
+        h2: "Test ülesande kirjeldus (esialgne)",
       },
       p_1: "Ülesanne on teostada lihtne veebirakendus, mis võimaldaks hallata kasutajatoele saadetud pöördumisi. Lihtsustatud süsteemi funktsionaalsus oleks järgmine.",
       ol: {
@@ -18,16 +18,45 @@ export default {
     },
     {
       header: {
-        h1: "Lisanduv funktsionaalsus",
+        h2: "Lisanduv funktsionaalsus",
       },
       p_1: "Otsistasin seda projekti edasi arendada, et eksperimenteerida ASP.NET Core Web API, VueJS ja teiste seotud tehnoloogiatega.",
-      p_2: "Seisuga 02. veebruar 2022:",
-      ol: {
-        li: [
-          "Vue osad on refaktooritud Composition API-le.",
-          "Katsetan tekstide tõlgetega, mitmekeelsuse tugi. Kirjutasin pulgina, mis laeb tekste erinevates keeltes kõikidele vaadetele ja komponentidele, kus esineb mingisugust nähtavat teksti.",
-        ],
-      },
+      section: [
+        {
+          header: {
+            h3: "Seisuga 02. veebruar 2022:",
+          },
+          ol: {
+            li: [
+              "Vue osad on refaktooritud Composition API-le.",
+              "Katsetan tekstide tõlgetega, mitmekeelsuse tugi. Kirjutasin pulgina, mis laeb tekste erinevates keeltes kõikidele vaadetele ja komponentidele, kus esineb mingisugust nähtavat teksti.",
+            ],
+          },
+        },
+        {
+          header: {
+            h3: "Seisuga 16. veebruar 2022:",
+          },
+          h4_1: "Keele haldusega seotud muudatused:",
+          ol_1: {
+            li: [
+              "Esmasel app-i avamisel võrreldakse, kas browser-i peamine keel on toetatud keelte hulgas. Kui on, siis pannakse see app-i keeleks, muul juhul kasutatakse app-i vaikekeelt.",
+              "Keele vahetusel muudetakse <html lang> attribuudi väärtus.",
+              "Keele vahetus salvestatakse `window.localStorage` objekti.",
+              "Keele vahetusel muudetakse dokumendi tiitel.",
+              "Keele vahetus muudab kuupäevade vormingud ka API-st päritud info kuvamisl, kuid uut API pöördumist ei sooritata.",
+            ],
+          },
+          h4_2: "Vaade 'Rakendusest' (käesolev) kasutab uut `Tree` komponenti:",
+          ol_2: {
+            li: [
+              "Tree loeb JSON struktuuris HTML struktuuriga info ja renderdab selle vaatesse.",
+              "See lähteinfo peab sisaldama HTML struktuuri, kus omadused on korrektsed HTML viibad.",
+              "Toetatud on nii Javascript Array, Object ja String väärtused.",
+            ],
+          },
+        },
+      ],
     },
   ],
 };
