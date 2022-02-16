@@ -2,16 +2,13 @@
   <TreeArray v-if="Array.isArray(data)" :data="data" />
 
   <TreeObject v-else-if="isObject(data)" :data="data" />
-
-  <TreeString v-else-if="isString(data)" :data="data" />
 </template>
 
 <script setup>
-import { isObject, isString } from "../utils/typeHelpers";
+import { isObject } from "../utils/typeHelpers";
 
 import TreeArray from "./tree/tree-array.vue";
 import TreeObject from "./tree/tree-object.vue";
-import TreeString from "./tree/tree-string.vue";
 
 defineProps({
   data: {
@@ -19,7 +16,7 @@ defineProps({
     validator(value) {
       if (!(Array.isArray(value) || typeof value === "object")) {
         throw new Error(
-          `Tree component 'data' property validation error: invalid  type; must be either object or array, but was ${typeof value}.`
+          `Tree component 'data' property validation error: invalid type; must be either object or array, but was ${typeof value}.`
         );
       }
       return true;

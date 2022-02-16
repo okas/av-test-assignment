@@ -1,6 +1,10 @@
 <template>
   <template v-for="(item, i) in data" :key="i">
-    <TreeArray v-if="Array.isArray(item)" :data="item" />
+    <TreeArray
+      v-if="Array.isArray(item)"
+      :name="sanitizeTag(name)"
+      :data="item"
+    />
 
     <TreeString
       v-else-if="isString(item)"
@@ -10,10 +14,10 @@
 
     <template v-else-if="isObject(item)">
       <component :is="sanitizeTag(name)" v-if="name">
-        <TreeObject :data="item" />
+        <TreeObject :name="sanitizeTag(name)" :data="item" />
       </component>
 
-      <TreeObject v-else :data="item" />
+      <TreeObject v-else :name="sanitizeTag(name)" :data="item" />
     </template>
   </template>
 </template>

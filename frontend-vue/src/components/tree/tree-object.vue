@@ -13,7 +13,7 @@
     />
 
     <component :is="sanitizeTag(key)" v-else-if="isObject(value)">
-      <TreeObject :data="value" />
+      <TreeObject :name="sanitizeTag(key)" :data="value" />
     </component>
   </template>
 </template>
@@ -25,6 +25,10 @@ import TreeArray from "./tree-array.vue";
 import TreeString from "./tree-string.vue";
 
 defineProps({
+  name: {
+    type: String,
+    default: "",
+  },
   data: {
     type: Object,
     required: true,
