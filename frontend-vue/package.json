@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "cd .. && husky install frontend-vue/.husky",
     "predev": "node aspnetcore-https.js",
     "dev": "vite",
     "build": "vite build",
@@ -27,6 +28,8 @@
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-vue": "^8.4.1",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
     "prettier": "^2.5.1",
     "typescript": "^4.5.5",
     "vite": "^2.8.3"
