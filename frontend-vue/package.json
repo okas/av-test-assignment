@@ -8,8 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore",
-    "lint-fix": "eslint . --ext .cjs,.mjs,.js,.vue --ignore-path .gitignore --fix",
+    "lint": "eslint . --ext .ts,.tsx,.jsx,.cjs,.mjs,.js,.vue,.json --ignore-path .gitignore",
+    "lint-fix": "eslint . --ext .ts,.tsx,.jsx,.cjs,.mjs,.js,.vue,.json --ignore-path .gitignore --fix",
     "format": "prettier . --check --write --ignore-path .gitignore && npm run lint-fix"
   },
   "dependencies": {
