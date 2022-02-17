@@ -20,6 +20,7 @@ export default function install(
   { titleTemplate, appName, translationsRootFolder, useStore }
 ) {
   const router = app.config.globalProperties.$router;
+  const currentRoute = router.currentRoute;
   const title = useTitle(appName);
   const store = useStore();
 
@@ -38,9 +39,12 @@ export default function install(
         `../../../src/${translationsRootFolder}/${store.language}/htmlMetadata.js`
       );
       titlesOfCurrentLanguage = module.default;
-      titleChanger(router.currentRoute.value.name);
+    }
+    if (!isUselessString(currentRoute.value.name)) {
+      titleChanger(currentRoute.value.name);
     }
   });
 
-  router.beforeEach((to) => titleChanger(to.name));
+  // This ensures that titlesOfCurrentLanguage has been filled by the time hook runs.
+  router.afterEach(({ name }) => titleChanger(name));
 }
