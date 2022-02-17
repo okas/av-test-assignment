@@ -217,10 +217,11 @@ function addNewInteraction({ description, deadline }) {
 <style scoped>
 table {
   table-layout: auto;
-  border-spacing: 0px;
+  border-spacing: 0;
   border: 1px #42b983 solid;
   width: 100%;
 }
+
 td,
 th {
   padding: 0.75rem 0.5rem;
@@ -228,32 +229,41 @@ th {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
 td {
   text-align: right;
 }
+
 th {
   border-bottom: 1px #42b983 solid;
 }
+
 tbody tr:nth-child(even) {
   background-color: #f2f2f2;
 }
+
 tbody tr:hover {
   background: #daf1f1;
   outline: 1px solid black;
 }
+
 .item-description {
   text-align: justify;
 }
+
 .item-action {
   text-align: center;
 }
+
 tbody tr.due-problem {
   outline: 1px solid red;
   background-color: #ffe6e6;
 }
+
 tbody tr.due-problem:hover {
   outline: 1px solid black;
 }
+
 .form {
   display: flex;
   flex-direction: row;
@@ -261,10 +271,12 @@ tbody tr.due-problem:hover {
   align-items: center;
   gap: 1rem;
 }
+
 .control {
   align-self: auto;
   flex-grow: 4;
 }
+
 .refresh-icon {
   font-weight: 700;
   font-size: 1rem;
