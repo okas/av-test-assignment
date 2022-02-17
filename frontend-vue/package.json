@@ -11,7 +11,7 @@
     "serve": "vite preview",
     "lint": "eslint . --ext .ts,.tsx,.jsx,.cjs,.mjs,.js,.vue,.json --ignore-path .gitignore",
     "lint-fix": "eslint . --ext .ts,.tsx,.jsx,.cjs,.mjs,.js,.vue,.json --ignore-path .gitignore --fix",
-    "format": "prettier . --check --write --ignore-path .gitignore && npm run lint-fix"
+    "format": "prettier . --ignore-unknown --ignore-path .gitignore --check --write && npm run lint-fix"
   },
   "dependencies": {
     "@vueuse/core": "^7.6.2",
