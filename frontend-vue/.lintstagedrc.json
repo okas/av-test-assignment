@@ -1,3 +1,4 @@
 {
-  "*": ["eslint --fix", "prettier --ignore-unknown --check --write"]
+  "*": ["prettier --ignore-unknown --check --write", "eslint --fix"],
+  "*.{css,scss,sass,vue}": "stylelint --fix"
 }
