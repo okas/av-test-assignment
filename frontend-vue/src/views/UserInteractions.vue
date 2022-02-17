@@ -4,7 +4,7 @@
       <h1>{{ translatedVm.header }}</h1>
     </header>
     <section>
-      <div class="form-container">
+      <form class="form" @submit.prevent>
         <div class="control">
           <input
             id="new-description"
@@ -32,7 +32,7 @@
         <div class="control">
           <button class="refresh-icon" @click="getInteractions">↻</button>
         </div>
-      </div>
+      </form>
     </section>
     <section>
       <header>
@@ -198,7 +198,7 @@ function addNewInteraction({ description, deadline }) {
 <style scoped>
 table {
   table-layout: auto;
-  border-spacing: 0px;
+  border-spacing: 0;
   border: 1px #42b983 solid;
   width: 100%;
 }
@@ -245,7 +245,7 @@ tbody tr.due-problem:hover {
   outline: 1px solid black;
 }
 
-.form-container {
+.form {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

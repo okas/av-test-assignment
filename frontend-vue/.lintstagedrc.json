@@ -1,3 +1,4 @@
 {
-  "*": "npm run format"
+  "*": ["prettier --ignore-unknown --check --write", "eslint --fix"],
+  "*.{css,scss,sass,vue}": "stylelint --fix"
 }

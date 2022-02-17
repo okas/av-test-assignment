@@ -35,5 +35,3 @@ function onLanguageChange({ target: { value } }) {
   store.setLanguage(value);
 }
 </script>
-
-<style scoped></style>

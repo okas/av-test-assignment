@@ -26,6 +26,7 @@ body {
   margin: 0;
   min-height: 100%;
 }
+
 body {
   overflow-y: scroll;
   box-sizing: border-box;
@@ -55,17 +56,18 @@ body {
   border-end-end-radius: 0.25rem 0.25rem;
   background: linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(0, 0, 0, 0.15) 100%
+      rgb(255 255 255 / 15%) 0%,
+      rgb(0 0 0 / 15%) 100%
     ),
     radial-gradient(
         at top center,
-        rgba(255, 255, 255, 0.4) 0%,
-        rgba(0, 0, 0, 0.4) 120%
+        rgb(255 255 255 / 40%) 0%,
+        rgb(0 0 0 / 40%) 120%
       )
       #989898;
   background-blend-mode: multiply, multiply;
-  /*background-image: linear-gradient(to top, lightgrey 0%, lightgrey 1%, #e0e0e0 26%, #efefef 48%, #d9d9d9 75%, #bcbcbc 100%);*/
+
+  /* background-image: linear-gradient(to top, lightgrey 0%, lightgrey 1%, #e0e0e0 26%, #efefef 48%, #d9d9d9 75%, #bcbcbc 100%); */
 }
 
 .global-loader-icon-position {
