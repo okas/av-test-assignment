@@ -1,9 +1,3 @@
-<template>
-  <TreeArray v-if="Array.isArray(data)" :data="data" />
-
-  <TreeObject v-else-if="isObject(data)" :data="data" />
-</template>
-
 <script setup>
 import { isObject } from "../utils/typeHelpers";
 
@@ -24,3 +18,8 @@ defineProps({
   },
 });
 </script>
+
+<template>
+  <TreeArray v-if="Array.isArray(data)" :data="data" />
+  <TreeObject v-else-if="isObject(data)" :data="data" />
+</template>

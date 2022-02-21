@@ -1,7 +1,3 @@
-<template>
-  <input v-model="dataValueClientFormatted" type="datetime-local" />
-</template>
-
 <script setup>
 import { defineProps, defineEmits, computed } from "vue";
 import useFormatDateTime from "../utils/formatDateTime";
@@ -32,3 +28,7 @@ const dataValueClientFormatted = computed({
 
 const { formatToHtmlStringDateTime } = useFormatDateTime();
 </script>
+
+<template>
+  <input v-model="dataValueClientFormatted" type="datetime-local" />
+</template>

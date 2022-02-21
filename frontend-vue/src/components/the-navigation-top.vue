@@ -1,14 +1,3 @@
-<template>
-  <nav id="navigation-top" class="app-menu">
-    <template v-for="{ path, name } in router.options.routes" :key="path">
-      <router-link :to="path">{{ routeNamesTranslated[name] }}</router-link> |
-    </template>
-    <a class="external" href="https://localhost:5001/swagger" target="_blank"
-      >Swagger</a
-    >
-  </nav>
-</template>
-
 <script setup>
 import { ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
@@ -34,6 +23,22 @@ watchEffect(
 );
 </script>
 
+<template>
+  <nav id="navigation-top" class="app-menu">
+    <template v-for="{ path, name } in router.options.routes" :key="path">
+      <router-link :to="path" v-text="routeNamesTranslated[name]" />
+      |
+    </template>
+    <a
+      class="swagger-link"
+      href="https://localhost:5001/swagger"
+      target="_blank"
+    >
+      Swagger
+    </a>
+  </nav>
+</template>
+
 <style scoped>
 #navigation-top {
   padding: 30px;
@@ -49,7 +54,7 @@ watchEffect(
   filter: drop-shadow(0 2px 6px #330);
 }
 
-a.external[target="_blank"]::after {
+.swagger-link::after {
   content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==");
   margin: 0 3px 0 5px;
 }

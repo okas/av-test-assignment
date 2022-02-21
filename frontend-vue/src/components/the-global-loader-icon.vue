@@ -1,11 +1,11 @@
-<template>
-  <div v-if="store.loading" class="global-loader-icon" />
-</template>
-
 <script setup>
 import useRootStore from "../stores/app-store";
 const store = useRootStore();
 </script>
+
+<template>
+  <div v-if="store.loading" class="global-loader-icon" />
+</template>
 
 <style scoped>
 .global-loader-icon {
