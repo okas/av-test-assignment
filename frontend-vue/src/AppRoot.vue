@@ -1,3 +1,9 @@
+<script setup>
+import TheNavigationTop from "./components/the-navigation-top.vue";
+import TheLanguageSelector from "./components/the-language-selector.vue";
+import TheGlobalLoaderIcon from "./components/the-global-loader-icon.vue";
+</script>
+
 <template>
   <header class="header-main">
     <TheGlobalLoaderIcon class="global-loader-icon-position" />
@@ -9,12 +15,6 @@
   </main>
   <aside></aside>
 </template>
-
-<script setup>
-import TheNavigationTop from "./components/the-navigation-top.vue";
-import TheLanguageSelector from "./components/the-language-selector.vue";
-import TheGlobalLoaderIcon from "./components/the-global-loader-icon.vue";
-</script>
 
 <style>
 html,
