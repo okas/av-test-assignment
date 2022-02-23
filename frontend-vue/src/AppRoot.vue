@@ -1,24 +1,20 @@
+<script setup>
+import TheNavigationTop from "./components/the-navigation-top.vue";
+import TheLanguageSelector from "./components/the-language-selector.vue";
+import TheGlobalLoaderIcon from "./components/the-global-loader-icon.vue";
+</script>
+
 <template>
-  <header class="main-header">
-    <div
-      v-if="store.loading"
-      class="global-loader-icon global-loader-icon-position"
-    />
-    <MainNavigation />
-    <LanguageSelector class="language-selector-position" />
+  <header class="header-main">
+    <TheGlobalLoaderIcon class="global-loader-icon-position" />
+    <TheNavigationTop />
+    <TheLanguageSelector class="language-selector-position" />
   </header>
   <main>
     <router-view />
   </main>
   <aside></aside>
 </template>
-
-<script setup>
-import MainNavigation from "./components/main-navigation.vue";
-import LanguageSelector from "./components/language-selector.vue";
-import useRootStore from "./stores/app-store";
-const store = useRootStore();
-</script>
 
 <style>
 html,
@@ -48,7 +44,7 @@ body {
   background-color: #eff5f5;
 }
 
-.main-header {
+.header-main {
   position: relative;
   border-start-start-radius: 0.8rem 0.8rem;
   border-start-end-radius: 0.8rem 0.8rem;
@@ -80,24 +76,5 @@ body {
   position: absolute;
   right: 1.5rem;
   top: 1.8rem;
-}
-
-.global-loader-icon {
-  border: 0.5rem solid #f3f3f3;
-  border-top: 0.5rem solid #42b983;
-  border-radius: 100%;
-  width: 1rem;
-  height: 1rem;
-  animation: spin 0.5s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
 }
 </style>

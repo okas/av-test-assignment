@@ -1,9 +1,3 @@
-<template>
-  <article class="about">
-    <Tree :data="translationVm" />
-  </article>
-</template>
-
 <script setup>
 import { defineAsyncComponent, ref, watchEffect } from "vue";
 import { useTranslator } from "../plugins/translatorPlugin";
@@ -17,9 +11,15 @@ const translatorAsync = useTranslator();
 
 watchEffect(
   async () =>
-    (translationVm.value = await translatorAsync("views/about", store.language))
+    (translationVm.value = await translatorAsync("views/About", store.language))
 );
 </script>
+
+<template>
+  <article class="about">
+    <Tree :data="translationVm" />
+  </article>
+</template>
 
 <style scoped>
 .about {

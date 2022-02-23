@@ -1,9 +1,3 @@
-<template>
-  <component :is="sanitizeTag(name)">
-    {{ data }}
-  </component>
-</template>
-
 <script setup>
 import { sanitizeTag } from "./common";
 
@@ -18,3 +12,7 @@ defineProps({
   },
 });
 </script>
+
+<template>
+  <component :is="sanitizeTag(name)" v-text="data" />
+</template>

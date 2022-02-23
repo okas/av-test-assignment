@@ -1,28 +1,3 @@
-<template>
-  <section class="weather-forecast">
-    <h2>
-      {{ translationVm.header[0] }} <sup>{{ translationVm.header[1] }}</sup>
-    </h2>
-    <table>
-      <thead>
-        <tr>
-          <th v-for="(item, i) in translationVm.tableHeader" :key="i">
-            {{ item }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, i) in forecasts" :key="i">
-          <td class="item">{{ formatDateShort(item.date, store.language) }}</td>
-          <td class="item">{{ item.temperatureC }}</td>
-          <td class="item">{{ item.temperatureF }}</td>
-          <td class="item">{{ item.summary }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-</template>
-
 <script setup>
 import { ref, watchEffect } from "vue";
 import useFormatDateTime from "../utils/formatDateTime";
@@ -60,6 +35,38 @@ if (resp.ok) {
   forecasts.value = resp.obj;
 }
 </script>
+
+<template>
+  <section class="weather-forecast">
+    <h2>
+      {{ translationVm.header[0] }}<sup v-text="translationVm.header[1]" />
+    </h2>
+    <table>
+      <thead>
+        <tr>
+          <th
+            v-for="(item, i) in translationVm.tableHeader"
+            :key="i"
+            v-text="item"
+          />
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(
+            { date, temperatureC, temperatureF, summary }, i
+          ) in forecasts"
+          :key="i"
+        >
+          <td class="item" v-text="formatDateShort(date, store.language)" />
+          <td class="item" v-text="temperatureC" />
+          <td class="item" v-text="temperatureF" />
+          <td class="item" v-text="summary" />
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</template>
 
 <style scoped>
 h3 {

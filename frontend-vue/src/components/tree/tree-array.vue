@@ -1,27 +1,3 @@
-<template>
-  <template v-for="(item, i) in data" :key="i">
-    <TreeArray
-      v-if="Array.isArray(item)"
-      :name="sanitizeTag(name)"
-      :data="item"
-    />
-
-    <TreeString
-      v-else-if="isString(item)"
-      :name="sanitizeTag(name)"
-      :data="item"
-    />
-
-    <template v-else-if="isObject(item)">
-      <component :is="sanitizeTag(name)" v-if="name">
-        <TreeObject :name="sanitizeTag(name)" :data="item" />
-      </component>
-
-      <TreeObject v-else :name="sanitizeTag(name)" :data="item" />
-    </template>
-  </template>
-</template>
-
 <script setup>
 import { sanitizeTag } from "./common";
 import { isObject, isString } from "../../utils/typeHelpers";
@@ -39,3 +15,24 @@ defineProps({
   },
 });
 </script>
+
+<template>
+  <template v-for="(item, i) in data" :key="i">
+    <TreeArray
+      v-if="Array.isArray(item)"
+      :name="sanitizeTag(name)"
+      :data="item"
+    />
+    <TreeString
+      v-else-if="isString(item)"
+      :name="sanitizeTag(name)"
+      :data="item"
+    />
+    <template v-else-if="isObject(item)">
+      <component :is="sanitizeTag(name)" v-if="name">
+        <TreeObject :name="sanitizeTag(name)" :data="item" />
+      </component>
+      <TreeObject v-else :name="sanitizeTag(name)" :data="item" />
+    </template>
+  </template>
+</template>
