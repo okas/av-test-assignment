@@ -1,33 +1,34 @@
 import { useTitle } from "@vueuse/core";
-import { watchEffect } from "vue";
+import { StoreDefinition } from "pinia";
+import { watchEffect, App } from "vue";
+import { Router } from "vue-router";
 import { isUselessString } from "../utils/stringHelpers";
 
-/**
- * @typedef HtmlMetadataMiddleWareConfig
- * @type {object}
- * @property  {string} titleTemplate
- * @property  {string} appName
- * @property {string} translationsRootFolder Root path of translations in `/src` folder.
- * @property  {() => LanguageStore} useStore Store with language related property and action
- */
+export interface HtmlMetadataMiddleWareConfig {
+  titleTemplate: string;
+  appName: string;
+  translationsRootFolder: string;
+  useStore: StoreDefinition<string, { language: string }>;
+}
 
-/**
- * @param {import("vue").App<any>} app
- * @param {HtmlMetadataMiddleWareConfig}
- */
 export default function install(
-  app,
-  { titleTemplate, appName, translationsRootFolder, useStore }
-) {
-  const router = app.config.globalProperties.$router;
+  app: App,
+  {
+    titleTemplate,
+    appName,
+    translationsRootFolder,
+    useStore,
+  }: HtmlMetadataMiddleWareConfig
+): void {
+  const router: Router = app.config.globalProperties.$router;
   const currentRoute = router.currentRoute;
   const title = useTitle(appName);
   const store = useStore();
 
-  let titlesOfCurrentLanguage = {};
+  let titlesOfCurrentLanguage: Map<string, string> = null;
 
-  const titleChanger = (routeName) => {
-    const currentTitle = titlesOfCurrentLanguage[routeName];
+  const titleChanger = (routeName: string) => {
+    const currentTitle = titlesOfCurrentLanguage.get(routeName);
     title.value = isUselessString(currentTitle)
       ? appName
       : titleTemplate.replace("%s", currentTitle);
@@ -38,13 +39,14 @@ export default function install(
       const module = await import(
         `../../../src/${translationsRootFolder}/${store.language}/htmlMetadata.js`
       );
-      titlesOfCurrentLanguage = module.default;
+      titlesOfCurrentLanguage = new Map(Object.entries(module.default));
     }
-    if (!isUselessString(currentRoute.value.name)) {
-      titleChanger(currentRoute.value.name);
+    const routeName = currentRoute?.value?.name?.toString();
+    if (!isUselessString(routeName)) {
+      titleChanger(routeName);
     }
   });
 
   // This ensures that titlesOfCurrentLanguage has been filled by the time hook runs.
-  router.afterEach(({ name }) => titleChanger(name));
+  router.afterEach(({ name }) => titleChanger(name.toString()));
 }
