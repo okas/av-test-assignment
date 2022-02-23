@@ -41,7 +41,7 @@ watchEffect(
 
 <style scoped>
 #navigation-top {
-  padding: 30px;
+  padding: 1.75rem;
 }
 
 #navigation-top a {
