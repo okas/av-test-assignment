@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import acceptHmr from "../utils/acceptHmr";
+import acceptHmr from "./acceptHmr";
 
 const useAppStore = defineStore("app", {
   state: () => ({
