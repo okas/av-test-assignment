@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import acceptHmr from "./acceptHmr";
+import useAcceptHmr from "./helpers";
 
 const useAppStore = defineStore("app", {
   state: () => ({
@@ -8,18 +8,16 @@ const useAppStore = defineStore("app", {
   }),
 
   actions: {
-    /**@param {boolean} state */
-    setLoading(state) {
+    setLoading(state: Boolean) {
       this.loading = state;
     },
 
-    /** @param {string} language */
-    setLanguage(language) {
+    setLanguage(language: String) {
       this.language = language;
     },
   },
 });
 
-acceptHmr(useAppStore);
+useAcceptHmr(useAppStore);
 
 export default useAppStore;
