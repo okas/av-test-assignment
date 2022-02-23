@@ -1,48 +1,54 @@
-<template>
-  <transition name="fade">
-    <div v-if="show" class="modal">
-      <div class="modal__backdrop" @click.self="closeModal()">
-        <div class="modal__dialog">
-          <div class="modal__header">
-            <slot name="header" />
-            <button type="button" class="modal__close" @click="closeModal()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
-                <path
-                  fill="currentColor"
-                  d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-                ></path>
-              </svg>
-            </button>
-          </div>
-          <div class="modal__body">
-            <slot name="body" />
-          </div>
-          <div class="modal__footer">
-            <slot name="footer" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </transition>
-</template>
+<script setup lang="ts">
+import { watchEffect } from "vue";
+import { UseFocusTrap } from "@vueuse/integrations/useFocusTrap/component";
+import ButtonClose from "./button-close.vue";
 
-<script setup>
-import { ref } from "vue";
+const props = defineProps({
+  show: { required: true, type: Boolean },
+});
 
-const show = ref(false);
+const emit = defineEmits(["close"]);
+
+watchEffect(() => {
+  if (props.show) {
+    document.querySelector("body")?.classList.add("overflow-hidden");
+  } else {
+    document.querySelector("body")?.classList.remove("overflow-hidden");
+  }
+});
 
 function closeModal() {
-  show.value = false;
-  document.querySelector("body")?.classList.remove("overflow-hidden");
+  emit("close");
 }
-// eslint-disable-next-line no-unused-vars
-function openModal() {
-  show.value = true;
-  document.querySelector("body")?.classList.add("overflow-hidden");
-}
-
-defineExpose({ openModal, closeModal });
 </script>
+<!-- TODO: focus config to first input element? -->
+<template>
+  <teleport to="body">
+    <transition name="fade">
+      <UseFocusTrap v-if="show" class="modal" as="div" @keyup.esc="closeModal">
+        <div class="modal--backdrop" @click.self="closeModal" />
+        <div class="modal--dialog">
+          <header class="modal--header">
+            <slot name="header" />
+            <ButtonClose @click="closeModal" />
+          </header>
+          <section class="modal--body">
+            <slot name="default" />
+          </section>
+          <footer class="modal--footer">
+            <slot name="footer" />
+          </footer>
+        </div>
+      </UseFocusTrap>
+    </transition>
+  </teleport>
+</template>
+
+<style>
+.overflow-hidden {
+  overflow: hidden;
+}
+</style>
 
 <style lang="scss" scoped>
 .modal {
@@ -55,8 +61,8 @@ defineExpose({ openModal, closeModal });
   left: 0;
   z-index: 9;
 
-  &__backdrop {
-    background-color: rgb(0 0 0 / 30%);
+  &--backdrop {
+    background-color: rgb(41 102 78 / 36%);
     position: fixed;
     top: 0;
     right: 0;
@@ -65,9 +71,10 @@ defineExpose({ openModal, closeModal });
     z-index: 1;
   }
 
-  &__dialog {
+  &--dialog {
     background-color: #fff;
     position: relative;
+    top: 9.2rem;
     width: 600px;
     margin: 50px auto;
     display: flex;
@@ -79,19 +86,14 @@ defineExpose({ openModal, closeModal });
     }
   }
 
-  &__close {
-    width: 30px;
-    height: 30px;
-  }
-
-  &__header {
+  &--header {
     padding: 20px 20px 10px;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
   }
 
-  &__body {
+  &--body {
     padding: 10px 20px;
     overflow: auto;
     display: flex;
@@ -99,17 +101,20 @@ defineExpose({ openModal, closeModal });
     align-items: stretch;
   }
 
-  &__footer {
+  &--footer {
     padding: 10px 20px 20px;
   }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
+.fade-enter-active {
+  transition: opacity 0.15s;
 }
 
-.fade-enter,
+.fade-leave-active {
+  transition: opacity 0.25s;
+}
+
+.fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
