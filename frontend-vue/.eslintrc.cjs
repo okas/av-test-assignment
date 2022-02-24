@@ -16,4 +16,12 @@ module.exports = {
     "no-console": process.env.MODE === "production" ? "warn" : "off",
     "no-debugger": process.env.MODE === "production" ? "warn" : "off",
   },
+  overrides: [
+    {
+      files: ["*.html"],
+      rules: {
+        "vue/comment-directive": "off",
+      },
+    },
+  ],
 };
