@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
-import { useTranslator } from "../plugins/translatorPlugin";
+import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
 const store = useRootStore();
@@ -12,7 +12,7 @@ const routeNamesTranslated = ref({
 });
 
 const router = useRouter();
-const translatorAsync = useTranslator();
+const translatorAsync = useTranslator() as TranslatorAsync;
 
 watchEffect(
   async () =>

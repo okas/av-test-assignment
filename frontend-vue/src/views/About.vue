@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { defineAsyncComponent, ref, watchEffect } from "vue";
 import { useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
+import { TranslatorAsync } from "../plugins/translatorPlugin";
 
 const Tree = defineAsyncComponent(() => import("../components/tree.vue"));
 const store = useRootStore();
 const translationVm = ref(null);
 
-const translatorAsync = useTranslator();
+const translatorAsync = useTranslator() as TranslatorAsync;
 
 watchEffect(
   async () =>

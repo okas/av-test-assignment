@@ -128,7 +128,7 @@ export declare type TranslatorAsync = (
   modulePath: string,
   // eslint-disable-next-line no-unused-vars
   language?: string
-) => Promise<object>;
+) => Promise<any>;
 
 export const pluginSymbol: InjectionKey<TranslatorAsync> = Symbol(
   "translator plugin: resolver symbol"

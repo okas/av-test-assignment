@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import useRootStore from "../stores/app-store";
 const store = useRootStore();
 </script>
