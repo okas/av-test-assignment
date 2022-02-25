@@ -4,7 +4,7 @@ import { createPinia } from "pinia";
 import useAppStore from "./stores/app-store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
-import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
+import { useStoreInterceptors } from "./plugins/swaggerClientPlugin/useStoreInterceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
 import { supportedLanguages, fallBackLanguage } from "./translations/index";
 import htmlMetadataMiddleWare from "./middlewares/htmlMetadataMiddleWare";
@@ -23,7 +23,7 @@ const htmlMetaDataOptions = {
 
 const swaggerOptions = {
   url: "/swagger/v1/swagger.json",
-  ...createStoreInterceptors(useAppStore),
+  ...useStoreInterceptors(useAppStore),
 };
 
 const translatorOptions = {
