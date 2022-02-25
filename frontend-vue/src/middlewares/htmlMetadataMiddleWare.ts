@@ -1,16 +1,14 @@
 import { useTitle } from "@vueuse/core";
-import { StoreDefinition } from "pinia";
 import { watchEffect, App } from "vue";
 import { Router } from "vue-router";
 import { isUselessString } from "../utils/stringHelpers";
-
-export type LanguageStore = StoreDefinition<string, { language: string }>;
+import { LanguageStore } from "../stores/types";
 
 export interface HtmlMetadataMiddleWareConfig {
   titleTemplate: string;
   appName: string;
   translationsRootFolder: string;
-  useStore: LanguageStore;
+  useStore(): LanguageStore;
 }
 
 export default function install(

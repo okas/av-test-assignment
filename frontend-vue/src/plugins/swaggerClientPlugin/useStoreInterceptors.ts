@@ -1,15 +1,4 @@
-import { StoreDefinition } from "pinia";
-
-export declare type LoadingStateStore = any &
-  StoreDefinition<
-    string,
-    {},
-    {},
-    {
-      // eslint-disable-next-line no-unused-vars
-      setLoading(state: boolean): void;
-    }
-  >;
+import { LoadingStateStore } from "../../stores/types";
 
 export function useStoreInterceptors(useStore: LoadingStateStore) {
   return {

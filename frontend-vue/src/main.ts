@@ -5,7 +5,7 @@ import useAppStore from "./stores/app-store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
 import { useStoreInterceptors } from "./plugins/swaggerClientPlugin/useStoreInterceptors";
-import translatorPlugin from "./plugins/translatorPlugin";
+import translatorPlugin, { TranslatorConfig } from "./plugins/translatorPlugin";
 import { supportedLanguages, fallBackLanguage } from "./translations/index";
 import htmlMetadataMiddleWare, {
   HtmlMetadataMiddleWareConfig,
@@ -28,7 +28,7 @@ const swaggerOptions = {
   ...useStoreInterceptors(useAppStore),
 };
 
-const translatorOptions = {
+const translatorOptions: TranslatorConfig = {
   useStore: useAppStore,
   supportedLanguages: supportedLanguages.map((item) => item.iso),
   fallBackLanguage,
