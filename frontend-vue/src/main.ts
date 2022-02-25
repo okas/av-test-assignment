@@ -7,14 +7,16 @@ import apiClient from "./plugins/swaggerClientPlugin";
 import { useStoreInterceptors } from "./plugins/swaggerClientPlugin/useStoreInterceptors";
 import translatorPlugin from "./plugins/translatorPlugin";
 import { supportedLanguages, fallBackLanguage } from "./translations/index";
-import htmlMetadataMiddleWare from "./middlewares/htmlMetadataMiddleWare";
+import htmlMetadataMiddleWare, {
+  HtmlMetadataMiddleWareConfig,
+} from "./middlewares/htmlMetadataMiddleWare";
 
 const appName = "Demo";
 const translationsRootFolder = "translations";
 
 const app = createApp(AppRoot);
 
-const htmlMetaDataOptions = {
+const htmlMetaDataOptions: HtmlMetadataMiddleWareConfig = {
   titleTemplate: `%s | ${appName}`,
   appName,
   translationsRootFolder,
