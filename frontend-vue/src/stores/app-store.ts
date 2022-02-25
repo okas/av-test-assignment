@@ -8,11 +8,11 @@ const useAppStore = defineStore("app", {
   }),
 
   actions: {
-    setLoading(state: Boolean) {
+    setLoading(state: boolean) {
       this.loading = state;
     },
 
-    setLanguage(language: String) {
+    setLanguage(language: string) {
       this.language = language;
     },
   },

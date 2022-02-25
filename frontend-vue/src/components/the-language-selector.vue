@@ -9,7 +9,7 @@ const selectedItem = computed(() =>
   supportedLanguages.find((item) => item.iso === store.language)
 );
 
-/** @param {Event & {target: EventTarget & {value: String}}} param0 */
+/** @param {Event & {target: EventTarget & {value: string}}} param0 */
 function onLanguageChange({ target: { value } }) {
   store.setLanguage(value);
 }
