@@ -4,11 +4,13 @@ import { watchEffect, App } from "vue";
 import { Router } from "vue-router";
 import { isUselessString } from "../utils/stringHelpers";
 
+export type LanguageStore = StoreDefinition<string, { language: string }>;
+
 export interface HtmlMetadataMiddleWareConfig {
   titleTemplate: string;
   appName: string;
   translationsRootFolder: string;
-  useStore: StoreDefinition<string, { language: string }>;
+  useStore: LanguageStore;
 }
 
 export default function install(
