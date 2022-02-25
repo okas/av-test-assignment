@@ -1,14 +1,13 @@
-import { inject, watchPostEffect } from "vue";
+import { LanguageStore } from "../../stores/types";
+import { inject, InjectionKey, watchPostEffect } from "vue";
 import { isUselessString } from "../../utils/stringHelpers";
 
-/**
- * @typedef TranslatorConfig Translator options.
- * @type {object}
- * @property {() => LanguageStore} useStore Store with language related property and action
- * @property {string[]} supportedLanguages language list, 2 char length.
- * @property {string} fallBackLanguage
- * @property {string} [rootFolder=translations] Root path of translations in `/src` folder.
- */
+export interface TranslatorConfig {
+  useStore(): LanguageStore;
+  supportedLanguages: string[];
+  fallBackLanguage: string;
+  rootFolder?: string;
+}
 
 /**
  * @param {string} templateRoot
@@ -16,7 +15,11 @@ import { isUselessString } from "../../utils/stringHelpers";
  * @param {string} language
  * @returns {Promise<Object>}
  */
-async function translationResolverAsync(templateRoot, modulePath, language) {
+async function translationResolverAsync(
+  templateRoot: string,
+  modulePath: string,
+  language: string
+): Promise<object> {
   // Consider: https://github.com/tc39/proposal-dynamic-import#import
   // Consider: https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const module = await import(
@@ -33,9 +36,9 @@ async function translationResolverAsync(templateRoot, modulePath, language) {
  * @throws {Error} If resolution fails.
  */
 function resolveLanguage(
-  askedLanguage,
-  store,
-  { supportedLanguages, fallBackLanguage }
+  askedLanguage: string,
+  store: LanguageStore,
+  { supportedLanguages, fallBackLanguage }: TranslatorConfig
 ) {
   if (askedLanguage && askedLanguage in supportedLanguages) {
     return askedLanguage;
@@ -64,7 +67,10 @@ const storageKey = "app:language";
  * @returns Handler function.
  * @throws If attempted value is not in supported languages list, then throws.
  */
-function getLanguageStateSideEffects(store, { supportedLanguages }) {
+function getLanguageStateSideEffects(
+  store: LanguageStore,
+  { supportedLanguages }: TranslatorConfig
+) {
   return () => {
     const newValue = store.language;
 
@@ -95,7 +101,10 @@ function getLanguageStateSideEffects(store, { supportedLanguages }) {
  * @param {LanguageStore} store
  * @param {TranslatorConfig}
  */
-function storeInitialLanguage(store, { supportedLanguages, fallBackLanguage }) {
+function storeInitialLanguage(
+  store: LanguageStore,
+  { supportedLanguages, fallBackLanguage }: TranslatorConfig
+) {
   let initialLang = window.localStorage.getItem(storageKey);
 
   if (isUselessString(initialLang)) {
@@ -114,13 +123,25 @@ const storeSetLanguageGuard = ({ name, args: [newValue] }) => {
   }
 };
 
-export const pluginSymbol = Symbol("translator plugin: resolver symbol");
+export declare type TranslatorAsync = (
+  // eslint-disable-next-line no-unused-vars
+  modulePath: string,
+  // eslint-disable-next-line no-unused-vars
+  language?: string
+) => Promise<object>;
+
+export const pluginSymbol: InjectionKey<TranslatorAsync> = Symbol(
+  "translator plugin: resolver symbol"
+);
 
 /**
  * @param {import("vue").App<any>} app
  * @param {TranslatorConfig} config
  */
-export default function install(app, config) {
+export default function install(
+  app: import("vue").App<any>,
+  config: TranslatorConfig
+) {
   const { globalProperties } = app.config;
   const root = config?.rootFolder ?? "translations";
 
@@ -134,8 +155,8 @@ export default function install(app, config) {
 
   // For Options API users.
   globalProperties.$translatorResolverAsync = async (
-    /** @type {string} */ modulePath,
-    /** @type {string} */ language = ""
+    modulePath: string,
+    language: string = ""
   ) => {
     const lng = resolveLanguage(language, store, config);
     return await translationResolverAsync(root, modulePath, lng);
@@ -144,9 +165,6 @@ export default function install(app, config) {
   app.provide(pluginSymbol, globalProperties.$translatorResolverAsync);
 }
 
-/**
- * @returns {(modulePath: String, language = "") => Promise<any>}
- */
 export function useTranslator() {
   const funcAsync = inject(pluginSymbol);
   return funcAsync;
