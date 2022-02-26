@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { isObject } from "../utils/typeHelpers";
 
 import TreeArray from "./tree/tree-array.vue";

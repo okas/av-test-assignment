@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { defineAsyncComponent, ref, watchEffect } from "vue";
-import { useTranslator } from "../plugins/translatorPlugin";
+import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
-const WeatherForecast = defineAsyncComponent(() =>
-  import("../components/weather-forecast.vue")
+const WeatherForecast = defineAsyncComponent(
+  () => import("../components/weather-forecast.vue")
 );
 
 const store = useRootStore();
@@ -13,7 +13,7 @@ const translationVm = ref({
   p1: "",
 });
 
-const translatorAsync = useTranslator();
+const translatorAsync = useTranslator() as TranslatorAsync;
 
 watchEffect(
   async () =>

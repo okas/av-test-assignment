@@ -5,10 +5,13 @@ export default function useFormatDateTime() {
 
   /**
    * Format date using Intl API.
-   * @param {string|Number|Date} date Any Date constructor compatible parameter.
-   * @param {string|readonly string[]} [locale=navigator.languages] Defaults to browser's language list.
+   * @param date Any Date constructor compatible parameter.
+   * @param locale Defaults to browser's language list.
    */
-  function formatDateShort(date, locale = navigator.languages) {
+  function formatDateShort(
+    date: string | Number | Date,
+    locale: string | readonly string[] = navigator.languages
+  ): Date {
     const d = new Date(date);
     if (!isDate(date)) {
       return d;
@@ -18,15 +21,15 @@ export default function useFormatDateTime() {
   }
 
   /**
-   * Format date using Intl API, that respects privided or default locale.
+   * Format date using Intl API, that respects provided or default locale.
    * Example: 12. dec 2021 15:45 or 12. dec 2021 3:45 PM
-   * @param {string|Number|Date} date Any Date constructor compatible parameter.
-   * @param {string|readonly string[]} [locale=navigator.languages] Defaults to browser's language list.
+   * @param date Any Date constructor compatible parameter.
+   * @param locale Defaults to browser's language list.
    */
   function formatDateTimeShortDateShortTime(
-    date,
+    date: string | Number | Date,
     locale = navigator.languages
-  ) {
+  ): Date {
     const d = new Date(date);
     if (!isDate(date)) {
       return d;
@@ -44,9 +47,9 @@ export default function useFormatDateTime() {
   /**
    * Format date using Intl API to "yyyy-MM-ddThh:mm".
    * [HTML DateTime string]{@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local#value}
-   * @param {string|Number|Date} date Any Date constructor compatible parameter.
+   * @param date Any Date constructor compatible parameter.
    */
-  function formatToHtmlStringDateTime(date) {
+  function formatToHtmlStringDateTime(date: string | Number | Date): string {
     const d = new Date(date);
     if (!isDate(date)) {
       return d;

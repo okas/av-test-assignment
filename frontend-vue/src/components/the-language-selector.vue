@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { supportedLanguages } from "../translations/index";
 import useRootStore from "../stores/app-store";
@@ -9,9 +9,8 @@ const selectedItem = computed(() =>
   supportedLanguages.find((item) => item.iso === store.language)
 );
 
-/** @param {Event & {target: EventTarget & {value: String}}} param0 */
-function onLanguageChange({ target: { value } }) {
-  store.setLanguage(value);
+function onLanguageChange(event: Event) {
+  store.setLanguage((event.target as HTMLSelectElement)?.value);
 }
 </script>
 
