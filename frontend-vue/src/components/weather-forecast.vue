@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watchEffect } from "vue";
 import useFormatDateTime from "../utils/formatDateTime";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
-import { useTranslator } from "../plugins/translatorPlugin";
+import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
 const store = useRootStore();
@@ -17,7 +17,7 @@ const forecasts = ref([
 const translationVm = ref({ header: [], tableHeader: [] });
 
 const { formatDateShort } = useFormatDateTime();
-const translatorAsync = useTranslator();
+const translatorAsync = useTranslator() as TranslatorAsync;
 const api = useApiClient();
 
 watchEffect(

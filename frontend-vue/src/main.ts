@@ -4,17 +4,19 @@ import { createPinia } from "pinia";
 import useAppStore from "./stores/app-store";
 import router from "./router";
 import apiClient from "./plugins/swaggerClientPlugin";
-import { createStoreInterceptors } from "./plugins/swaggerClientPlugin/interceptors";
-import translatorPlugin from "./plugins/translatorPlugin";
+import { useStoreInterceptors } from "./plugins/swaggerClientPlugin/useStoreInterceptors";
+import translatorPlugin, { TranslatorConfig } from "./plugins/translatorPlugin";
 import { supportedLanguages, fallBackLanguage } from "./translations/index";
-import htmlMetadataMiddleWare from "./middlewares/htmlMetadataMiddleWare";
+import htmlMetadataMiddleWare, {
+  HtmlMetadataMiddleWareConfig,
+} from "./middlewares/htmlMetadataMiddleWare";
 
 const appName = "Demo";
 const translationsRootFolder = "translations";
 
 const app = createApp(AppRoot);
 
-const htmlMetaDataOptions = {
+const htmlMetaDataOptions: HtmlMetadataMiddleWareConfig = {
   titleTemplate: `%s | ${appName}`,
   appName,
   translationsRootFolder,
@@ -23,10 +25,10 @@ const htmlMetaDataOptions = {
 
 const swaggerOptions = {
   url: "/swagger/v1/swagger.json",
-  ...createStoreInterceptors(useAppStore),
+  ...useStoreInterceptors(useAppStore),
 };
 
-const translatorOptions = {
+const translatorOptions: TranslatorConfig = {
   useStore: useAppStore,
   supportedLanguages: supportedLanguages.map((item) => item.iso),
   fallBackLanguage,
