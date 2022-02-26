@@ -5,28 +5,33 @@ import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import useRootStore from "../stores/app-store";
 
 const store = useRootStore();
-const routeNamesTranslated = ref({
-  Home: "",
-  About: "",
-  UserInteractions: "",
-});
+const routeNamesTranslated = ref(
+  new Map([
+    ["Home", ""],
+    ["About", ""],
+    ["UserInteractions", ""],
+  ])
+);
 
 const router = useRouter();
 const translatorAsync = useTranslator() as TranslatorAsync;
 
-watchEffect(
-  async () =>
-    (routeNamesTranslated.value = await translatorAsync(
-      "components/the-navigation-top",
-      store.language
-    ))
-);
+watchEffect(async () => {
+  const data = await translatorAsync(
+    "components/the-navigation-top",
+    store.language
+  );
+  routeNamesTranslated.value = new Map(Object.entries(data));
+});
 </script>
 
 <template>
   <nav id="navigation-top" class="app-menu">
     <template v-for="{ path, name } in router.options.routes" :key="path">
-      <router-link :to="path" v-text="routeNamesTranslated[name]" />
+      <router-link
+        :to="path"
+        v-text="routeNamesTranslated.get(name?.toString() ?? '')"
+      />
       |
     </template>
     <a
