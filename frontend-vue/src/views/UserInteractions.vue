@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from "vue";
-import { useTranslator } from "../plugins/translatorPlugin";
+import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 import useRootStore from "../stores/app-store";
@@ -11,6 +11,7 @@ import ModalAdd from "../components/userinteraction-modal-add.vue";
 // );
 
 const store = useRootStore();
+
 const translatedVm = ref({
   header: "",
   section_list: {
@@ -36,23 +37,7 @@ const api = useApiClient();
 const { formatDateTimeShortDateShortTime: formatDateTimeToShort } =
   useFormatDateTime();
 
-const translatorAsync = useTranslator();
-
-watchEffect(
-  async () =>
-    (translatedVm.value = await translatorAsync(
-      "views/UserInteractions",
-      store.language
-    ))
-);
-
-/** Keep table sorted by deadline desc. always.*/
-watch(
-  // TODO: to watchPostEffect?
-  interactions, // TODO: Is lodash.cloneDeep required to watch deeply nested props, in arrays?
-  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
-  { immediate: true, deep: true }
-);
+const translatorAsync = useTranslator() as TranslatorAsync;
 
 getInteractions();
 
@@ -106,9 +91,7 @@ async function openAddDialog(): Promise<void> {
   if (!modalAdd?.value) {
     return;
   }
-
   const { data, isCanceled } = await modalAdd.value.dialog.reveal();
-
   if (!isCanceled) {
     addNewInteraction(data);
   }
@@ -128,6 +111,21 @@ function addNewInteraction({ description, deadline }) {
       }
     });
 }
+
+watchEffect(async () => {
+  translatedVm.value = await translatorAsync(
+    "views/UserInteractions",
+    store.language
+  );
+});
+
+/** Keep table sorted by deadline desc. always.*/
+watch(
+  // TODO: to watchPostEffect?
+  interactions, // TODO: Is lodash.cloneDeep required to watch deeply nested props, in arrays?
+  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
+  { immediate: true, deep: true }
+);
 </script>
 
 <template>
