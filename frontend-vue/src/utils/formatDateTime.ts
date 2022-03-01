@@ -28,7 +28,7 @@ export default function useFormatDateTime() {
    */
   function formatDateTimeShortDateShortTime(
     date: string | Number | Date,
-    locale = navigator.languages
+    locale: string | readonly string[] = navigator.languages
   ): Date {
     const d = new Date(date);
     if (!isDate(date)) {
