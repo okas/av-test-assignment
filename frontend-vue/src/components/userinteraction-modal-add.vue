@@ -5,6 +5,16 @@ import ModalBase from "./base-modal.vue";
 import DateTimeLocalEditor from "./input-datetime-local.vue";
 import { useRoundToNext15Minutes } from "../utils/dateTimeHelpers";
 
+class ViewModel {
+  description: string;
+  deadline: Date;
+
+  constructor(description = "", deadline = useRoundToNext15Minutes()) {
+    this.description = description;
+    this.deadline = deadline;
+  }
+}
+
 const translatedVm = ref({
   title: "Add new interaction",
   section_form: {
@@ -14,15 +24,15 @@ const translatedVm = ref({
   },
 });
 
-const viewModel = ref<{ description: String; deadline: Date } | null>();
+const viewModel = ref<ViewModel | null>(null);
 
 const dialog = useConfirmDialog();
 
-dialog.onReveal(() => {
-  viewModel.value = { description: "", deadline: useRoundToNext15Minutes() };
-});
+dialog.onReveal(() => (viewModel.value = new ViewModel()));
 
 dialog.onCancel(() => (viewModel.value = null));
+
+dialog.onConfirm(() => (viewModel.value = null));
 
 defineExpose({ dialog });
 </script>
@@ -41,7 +51,7 @@ defineExpose({ dialog });
         />
         <input
           id="new-description"
-          v-model="viewModel.description"
+          v-model="viewModel!.description"
           class="control"
           type="text"
           :placeholder="translatedVm.section_form.description_placeholder"
@@ -54,7 +64,7 @@ defineExpose({ dialog });
         />
         <DateTimeLocalEditor
           id="new-deadline"
-          v-model:datevalue="viewModel.deadline"
+          v-model:datevalue="viewModel!.deadline"
           class="control"
         />
       </fieldset>
