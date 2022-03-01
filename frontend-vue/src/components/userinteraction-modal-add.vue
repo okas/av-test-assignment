@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
+import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import { useConfirmDialog } from "@vueuse/core";
+import useRootStore from "../stores/app-store";
 import ModalBase from "./base-modal.vue";
 import DateTimeLocalEditor from "./input-datetime-local.vue";
 import { useRoundToNext15Minutes } from "../utils/dateTimeHelpers";
@@ -15,12 +17,15 @@ class ViewModel {
   }
 }
 
+const store = useRootStore();
+
 const translatedVm = ref({
-  title: "Add new interaction",
-  section_form: {
-    description_placeholder: "description",
-    deadline_label: "deadline",
-    submit_text: "add new",
+  title: "",
+  form: {
+    description: "",
+    deadline: "",
+    submit_text: "",
+    cancel_text: "",
   },
 });
 
@@ -34,7 +39,16 @@ dialog.onCancel(() => (viewModel.value = null));
 
 dialog.onConfirm(() => (viewModel.value = null));
 
+const translatorAsync = useTranslator() as TranslatorAsync;
+
 defineExpose({ dialog });
+
+watchEffect(async () => {
+  translatedVm.value = await translatorAsync(
+    "components/userinteraction-modal-add",
+    store.language
+  );
+});
 </script>
 <!-- TODO: focus config to first input element? -->
 <template>
@@ -47,20 +61,20 @@ defineExpose({ dialog });
         <label
           class="label"
           for="new-description"
-          v-text="translatedVm.section_form.description_placeholder"
+          v-text="translatedVm.form.description"
         />
         <input
           id="new-description"
           v-model="viewModel!.description"
           class="control"
           type="text"
-          :placeholder="translatedVm.section_form.description_placeholder"
+          :placeholder="translatedVm.form.description"
           size="50"
         />
         <label
           class="label"
           for="new-deadline"
-          v-text="translatedVm.section_form.deadline_label"
+          v-text="translatedVm.form.deadline"
         />
         <DateTimeLocalEditor
           id="new-deadline"
@@ -70,10 +84,10 @@ defineExpose({ dialog });
       </fieldset>
     </form>
     <template #footer>
-      <button @click="dialog.cancel">Cancel</button>
+      <button @click="dialog.cancel" v-text="translatedVm.form.cancel_text" />
       <button
         @click="dialog.confirm(viewModel)"
-        v-text="translatedVm.section_form.submit_text"
+        v-text="translatedVm.form.submit_text"
       />
     </template>
   </ModalBase>
