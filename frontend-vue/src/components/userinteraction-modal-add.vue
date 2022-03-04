@@ -6,11 +6,11 @@ import useRootStore from "../stores/app-store";
 import ModalBase from "./base-modal.vue";
 import DateTimeLocalEditor from "./input-datetime-local.vue";
 import { useRoundToNext15Minutes } from "../utils/dateTimeHelpers";
+import { IInteractionAdd } from "../models/Interaction";
 
-class ViewModel {
+class ViewModel implements IInteractionAdd {
   description: string;
   deadline: Date;
-
   constructor(description = "", deadline = useRoundToNext15Minutes()) {
     this.description = description;
     this.deadline = deadline;
@@ -31,7 +31,7 @@ const translatedVm = ref({
 
 const viewModel = ref<ViewModel | null>(null);
 
-const dialog = useConfirmDialog();
+const dialog = useConfirmDialog<IInteractionAdd, IInteractionAdd, null>();
 
 dialog.onReveal(() => (viewModel.value = new ViewModel()));
 
@@ -56,7 +56,7 @@ watchEffect(async () => {
     <template #header>
       <h1 v-text="translatedVm.title" />
     </template>
-    <form @submit.prevent="dialog.confirm(viewModel)">
+    <form @submit.prevent="dialog.confirm(viewModel!)">
       <fieldset class="form-grid">
         <label
           class="label"
@@ -86,7 +86,7 @@ watchEffect(async () => {
     <template #footer>
       <button @click="dialog.cancel" v-text="translatedVm.form.cancel_text" />
       <button
-        @click="dialog.confirm(viewModel)"
+        @click="dialog.confirm(viewModel!)"
         v-text="translatedVm.form.submit_text"
       />
     </template>
