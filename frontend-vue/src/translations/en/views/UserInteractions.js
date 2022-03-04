@@ -7,7 +7,7 @@ export default {
   },
   section_list: {
     header: "Open requests",
-    table_header: ["Description", "Created", "Deadline"],
+    table_header: ["Description", "Deadline", "Created"],
   },
   confirmMessage: "Confirm closing!",
 };

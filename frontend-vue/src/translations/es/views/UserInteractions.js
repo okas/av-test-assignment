@@ -7,7 +7,7 @@ export default {
   },
   section_list: {
     header: "Peticiones abiertas",
-    table_header: ["Descripción", "Creado", "Plazo"],
+    table_header: ["Descripción", "Plazo", "Creado"],
   },
   confirmMessage: "¡Confirma cierre!",
 };

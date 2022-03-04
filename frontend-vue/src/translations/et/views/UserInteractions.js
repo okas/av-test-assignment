@@ -7,7 +7,7 @@ export default {
   },
   section_list: {
     header: "Aktiivsed pöördumised",
-    table_header: ["Kirjeldus", "Sisestatud", "Tähtaeg"],
+    table_header: ["Kirjeldus", "Tähtaeg", "Sisestatud"],
   },
   confirmMessage: "Kinnita pöördumise sulgemine!",
 };
