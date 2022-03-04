@@ -156,9 +156,9 @@ watch(
         <thead>
           <tr>
             <th
-              v-for="(item, i) in translatedVm.section_list.table_header"
+              v-for="(headerName, i) in translatedVm.section_list.table_header"
               :key="i"
-              v-text="item"
+              v-text="headerName"
             />
           </tr>
         </thead>
