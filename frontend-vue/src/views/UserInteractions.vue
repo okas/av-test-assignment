@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
@@ -123,10 +123,9 @@ watchEffect(async () => {
 
 /** Keep table sorted by deadline desc. always.*/
 watch(
-  // TODO: to watchPostEffect?
-  interactions, // TODO: Is lodash.cloneDeep required to watch deeply nested props, in arrays?
-  () => interactions.value.sort((a, b) => a.deadline - b.deadline),
-  { immediate: true, deep: true }
+  computed(() => interactions.value.map((i) => i.deadline)),
+  () => interactions.value.sort((a, b) => +a.deadline - +b.deadline),
+  { deep: true }
 );
 </script>
 
