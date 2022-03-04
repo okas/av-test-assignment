@@ -5,10 +5,26 @@ import { useApiClient } from "../plugins/swaggerClientPlugin";
 import useFormatDateTime from "../utils/formatDateTime";
 import useRootStore from "../stores/app-store";
 import ModalAdd from "../components/userinteraction-modal-add.vue";
+import { IInteractionAdd, IInteractionVm } from "../models/Interaction";
 // TODO: test dynamic component, especially its lifetime consternes and :ref template prop co-op.
 // const ModalAdd = defineAsyncComponent(() =>
 //   import("../components/userinteraction-modal-add.vue")
 // );
+
+class ViewModel implements IInteractionVm {
+  id: string;
+  description: string;
+  deadline: Date;
+  created: Date;
+  isOpen: boolean;
+  constructor({ id, description, deadline, created, isOpen }: any) {
+    this.id = id;
+    this.description = description;
+    this.deadline = new Date(deadline);
+    this.created = new Date(created);
+    this.isOpen = isOpen;
+  }
+}
 
 const store = useRootStore();
 
@@ -21,14 +37,8 @@ const translatedVm = ref({
   section_form: { submit_text: "add new" },
   confirmMessage: "",
 });
-const interactions = ref([
-  {
-    id: "",
-    description: "",
-    created: 0,
-    deadline: 0,
-  },
-]);
+
+const interactions = ref<IInteractionVm[]>([]);
 
 const modalAdd = ref<InstanceType<typeof ModalAdd> | null>(null);
 
@@ -50,7 +60,8 @@ function getInteractions() {
       })
     )
     .then((resp) => {
-      if (resp.ok) interactions.value = resp.body.map(convertToVM);
+      if (resp.ok)
+        interactions.value = resp.body.map((raw: any) => new ViewModel(raw));
     });
 }
 
@@ -72,19 +83,10 @@ function markInteractionClosed(interaction) {
     });
 }
 
-function isProblematic(interaction) {
+function isProblematic(interaction: IInteractionVm) {
   let toCompare = new Date();
   toCompare.setHours(toCompare.getHours() + 1);
   return interaction.deadline < toCompare;
-}
-
-/** Convert dates to JS Date instances from response. */
-function convertToVM({ created, deadline, ...rest }) {
-  return {
-    created: new Date(created),
-    deadline: new Date(deadline),
-    ...rest,
-  };
 }
 
 async function openAddDialog(): Promise<void> {
@@ -93,11 +95,11 @@ async function openAddDialog(): Promise<void> {
   }
   const { data, isCanceled } = await modalAdd.value.dialog.reveal();
   if (!isCanceled) {
-    addNewInteraction(data);
+    addNewInteraction(data as IInteractionAdd);
   }
 }
 
-function addNewInteraction({ description, deadline }) {
+function addNewInteraction({ description, deadline }: IInteractionAdd) {
   api
     .then((client) =>
       client.execute({
@@ -107,7 +109,7 @@ function addNewInteraction({ description, deadline }) {
     )
     .then((resp) => {
       if (resp.ok) {
-        interactions.value.push(convertToVM(resp.body));
+        interactions.value.push(new ViewModel(resp.body));
       }
     });
 }
