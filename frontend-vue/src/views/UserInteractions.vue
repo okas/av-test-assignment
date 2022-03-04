@@ -139,7 +139,7 @@ watch(
       <div class="">
         <button
           class="icon-add"
-          :disabled="modalAdd?.value?.dialog.isRevealed.value"
+          :disabled="modalAdd?.dialog.isRevealed.value"
           @click="openAddDialog"
           v-text="translatedVm.section_form.submit_text"
         ></button>
