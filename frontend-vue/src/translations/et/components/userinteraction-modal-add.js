@@ -3,7 +3,5 @@ export default {
   form: {
     description: "kirjeldus",
     deadline: "tähtaeg",
-    submit_text: "lisa",
-    cancel_text: "katkesta",
   },
 };

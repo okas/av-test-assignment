@@ -3,7 +3,6 @@ export default {
   section_form: {
     description_placeholder: "descripción",
     deadline_label: "plazo",
-    submit_text: "añadir",
   },
   section_list: {
     header: "Peticiones abiertas",

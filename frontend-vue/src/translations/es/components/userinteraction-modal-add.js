@@ -3,7 +3,5 @@ export default {
   form: {
     description: "descripción",
     deadline: "plazo",
-    submit_text: "añadir",
-    cancel_text: "cancelar",
   },
 };
