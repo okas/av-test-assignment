@@ -44,6 +44,12 @@ class EditViewModel implements IInteractionEdit {
   description: string;
   deadline: Date;
   isOpen: boolean;
+  get checkedControl() {
+    return !this.isOpen;
+  }
+  set checkedControl(value) {
+    this.isOpen = !value;
+  }
   constructor({ id, description, deadline, isOpen }: IInteractionVm) {
     this.id = id;
     this.description = description;
@@ -72,7 +78,7 @@ const api = useApiClient();
 const { formatDateTimeShortDateShortTime: formatDateTimeToShort } =
   useFormatDateTime();
 
-const interactionToEdit = ref<IInteractionEdit | null>(null);
+const interactionToEdit = ref<EditViewModel | null>(null);
 
 const savingToApi = ref(false);
 
@@ -249,7 +255,7 @@ watch(
             <td class="item-openstate">
               <input
                 v-if="isEditorShown(id)"
-                v-model="interactionToEdit!.isOpen"
+                v-model="interactionToEdit!.checkedControl"
                 type="checkbox"
               />
               <button v-else @click="markInteractionClosed(id)">
