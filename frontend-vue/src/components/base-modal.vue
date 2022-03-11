@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchEffect } from "vue";
 import { UseFocusTrap } from "@vueuse/integrations/useFocusTrap/component";
-import ButtonClose from "./button-close.vue";
+import IconClose from "../assets/svg-material/close_black_24dp.svg?component";
 
 const props = defineProps({
   show: { required: true, type: Boolean },
@@ -30,7 +30,9 @@ function closeModal() {
         <div class="modal--dialog">
           <header class="modal--header">
             <slot name="header" />
-            <ButtonClose @click="closeModal" />
+            <button @click="closeModal">
+              <IconClose />
+            </button>
           </header>
           <section class="modal--body">
             <slot name="default" />
