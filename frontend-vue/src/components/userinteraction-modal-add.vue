@@ -4,6 +4,7 @@ import { TranslatorAsync, useTranslator } from "../plugins/translatorPlugin";
 import { useConfirmDialog } from "@vueuse/core";
 import useRootStore from "../stores/app-store";
 import ModalBase from "./base-modal.vue";
+import IconSave from "../assets/svg-material/save_black_24dp.svg?component";
 import DateTimeLocalEditor from "./input-datetime-local.vue";
 import { useRoundToNext15Minutes } from "../utils/dateTimeHelpers";
 import { IInteractionAdd } from "../models/Interaction";
@@ -24,8 +25,6 @@ const translatedVm = ref({
   form: {
     description: "",
     deadline: "",
-    submit_text: "",
-    cancel_text: "",
   },
 });
 
@@ -84,11 +83,9 @@ watchEffect(async () => {
       </fieldset>
     </form>
     <template #footer>
-      <button @click="dialog.cancel" v-text="translatedVm.form.cancel_text" />
-      <button
-        @click="dialog.confirm(viewModel!)"
-        v-text="translatedVm.form.submit_text"
-      />
+      <button @click="dialog.confirm(viewModel!)">
+        <IconSave />
+      </button>
     </template>
   </ModalBase>
 </template>

@@ -7,6 +7,12 @@ import { useRemoveOne } from "../utils/arrayHelpers";
 import useRootStore from "../stores/app-store";
 import InputDateLocal from "../components/input-datetime-local.vue";
 import ModalAdd from "../components/userinteraction-modal-add.vue";
+import IconAdd from "../assets/svg-material/playlist_add_black_24dp.svg?component";
+import IconRefresh from "../assets/svg-material/refresh_black_24dp.svg?component";
+import IconUnchecked from "../assets/svg-material/check_box_outline_blank_black_24dp.svg?component";
+import IconEdit from "../assets/svg-material/edit_black_24dp.svg?component";
+import IconSave from "../assets/svg-material/save_black_24dp.svg?component";
+import IconCancel from "../assets/svg-material/cancel_presentation_black_24dp.svg?component";
 import {
   IInteractionVm,
   IInteractionAdd,
@@ -206,8 +212,12 @@ watch(
       <h1 v-text="translatedVm.header" />
     </header>
     <fieldset class="tools" :disabled="modalAdd?.dialog.isRevealed.value">
-      <button class="icon-add" @click="openAddDialog">+</button>
-      <button class="icon-refresh" @click="getInteractions">↻</button>
+      <button @click="openAddDialog">
+        <IconAdd class="icon-add" />
+      </button>
+      <button @click="getInteractions">
+        <IconRefresh class="icon-refresh" />
+      </button>
     </fieldset>
     <section>
       <header>
@@ -242,7 +252,9 @@ watch(
                 v-model="interactionToEdit!.isOpen"
                 type="checkbox"
               />
-              <button v-else @click="markInteractionClosed(id)">✔</button>
+              <button v-else @click="markInteractionClosed(id)">
+                <IconUnchecked />
+              </button>
             </td>
             <td class="item-description">
               <input
@@ -273,15 +285,21 @@ watch(
                 class="aux-controls"
                 :disabled="savingToApi"
               >
-                <button alt="dsefasec" @click="saveEditChanges" />
-                <button @click="closeEditor" />
+                <button @click="saveEditChanges">
+                  <IconSave />
+                </button>
+                <button @click="closeEditor">
+                  <IconCancel />
+                </button>
               </fieldset>
               <template v-else>
                 {{ formatDateTimeToShort(created, store.language) }}
               </template>
             </td>
             <td v-if="!isEditorShown(id)" class="item-action">
-              <button :disabled="savingToApi" @click="openEditor(id)">↪</button>
+              <button :disabled="savingToApi" @click="openEditor(id)">
+                <IconEdit />
+              </button>
             </td>
           </tr>
         </tbody>
@@ -346,25 +364,6 @@ thead tr {
 
 .item-action {
   text-align: center;
-}
-
-.icon {
-  &-refresh,
-  &-add {
-    height: 2rem;
-    width: 2rem;
-    font-size: 1rem;
-    line-height: 1rem;
-    font-weight: 900;
-  }
-
-  &-refresh {
-    color: #14b8b8;
-  }
-
-  &-add {
-    color: #8a14b8;
-  }
 }
 
 tr.item {
