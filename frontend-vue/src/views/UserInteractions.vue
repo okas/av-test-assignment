@@ -114,7 +114,7 @@ function markInteractionClosed(id: string) {
     )
     .then((resp) => {
       if (resp.ok) {
-        useRemoveOne(interactions.value, (item) => item.id === id);
+        useRemoveOne(interactions.value, ({ id: iId }) => iId === id);
       }
     });
 }
