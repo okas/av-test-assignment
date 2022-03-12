@@ -7,5 +7,13 @@
     "stylelint-config-prettier",
     "stylelint-config-prettier-scss"
   ],
-  "ignoreFiles": ["**/*.js"]
+  "ignoreFiles": ["**/*.js"],
+  "overrides": [
+    {
+      "files": ["**/*.scss", "**/*.vue"],
+      "rules": {
+        "function-no-unknown": [true, { "ignoreFunctions": ["color.scale"] }]
+      }
+    }
+  ]
 }

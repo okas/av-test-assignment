@@ -22,7 +22,7 @@ public sealed class UserInteractionQueryTests
     /// <param name="fixture"></param>
     public UserInteractionQueryTests(IntegrationTestFixture fixture)
     {
-        _knownEntitesIdIsOpen = GenerateKnownData(5);
+        _knownEntitesIdIsOpen = GenerateWithKnownIdIsOpen(5);
         SeedData(fixture, _knownEntitesIdIsOpen);
         _sutController = new UserInteractionsController(
             fixture.ScopedServiceProvider!.GetService<IMediator>()!);

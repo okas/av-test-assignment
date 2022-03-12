@@ -5,6 +5,8 @@ namespace Backend.WebApi.Tests;
 
 public static class UserInteractionUtilities
 {
+    public static Guid[] GenerateWithKnownId(int count = 4) => Enumerable.Range(0, count).Select(i => Guid.NewGuid()).ToArray();
+
     /// <summary>
     /// Generates array of named tuples of Guid and bool. The represent UserInteraction entity's <see cref="UserInteraction.Id"/> and <see cref="UserInteraction.IsOpen"/> known values for testing.
     /// </summary>
@@ -12,11 +14,9 @@ public static class UserInteractionUtilities
     /// Default implementation for IsOpen value will be <see langword="true"/> for every even element of returned array.
     /// </remarks>
     /// <param name="count">Count of elements to generate.</param>
-    /// <returns></returns>
-    public static (Guid Id, bool IsOpen)[] GenerateKnownData(int count = 4)
-    {
-        return Enumerable.Range(0, count).Select(i => (Guid.NewGuid(), i % 2 == 0)).ToArray();
-    }
+    public static (Guid Id, bool IsOpen)[] GenerateWithKnownIdIsOpen(int count = 4) => GenerateWithKnownId(count).ToIdIsOpen();
+
+    public static void SeedData(ApiLocalDbFixture dbFixture, params Guid[] knownEntitesId) => SeedData(dbFixture, knownEntitesId.ToIdIsOpen());
 
     /// <summary>
     /// Generate test data to database, that can be requested from API tests.
@@ -24,7 +24,6 @@ public static class UserInteractionUtilities
     /// <remarks>
     /// Will use one-time DbContext to not to conflict with context used for testing.
     /// </remarks>
-    /// <param name="dbFixture"></param>
     public static void SeedData(ApiLocalDbFixture dbFixture, params (Guid Id, bool IsOpen)[] knownEntityIds)
     {
         if (!knownEntityIds.Any())
@@ -40,6 +39,8 @@ public static class UserInteractionUtilities
 
         context.SaveChanges();
     }
+
+    private static (Guid x, bool)[] ToIdIsOpen(this Guid[] ids) => ids.Select((x, i) => (x, i % 2 == 0)).ToArray();
 
     private static UserInteraction[] GenerateEntities((Guid Id, bool IsOpen)[] knownEntityIds)
     {

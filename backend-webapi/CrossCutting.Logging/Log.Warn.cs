@@ -4,7 +4,7 @@ public static partial class Log
 {
     [LoggerMessage(
         3001,
-         LogLevel.Warning,
+        LogLevel.Warning,
         "Not found: {Model}.")]
     public static partial void WarnNotFound(this ILogger logger, object Model, Exception? ex);
 
@@ -15,8 +15,14 @@ public static partial class Log
     public static partial void WarnAlreadyExists(this ILogger logger, object Model, Exception? ex);
 
     [LoggerMessage(
-    3999,
-     LogLevel.Warning,
-    "Operation was cancelled wtih reason {Reason}.")]
+        3003,
+        LogLevel.Warning,
+        "Operation detected optimistic concurrency during saving updates for {Model}. Operation cancelled.")]
+    public static partial void WarnOptimisticConcurrencyDetection(this ILogger logger, object Model, Exception? ex);
+
+    [LoggerMessage(
+        3999,
+        LogLevel.Warning,
+        "Operation was cancelled wtih reason {Reason}.")]
     public static partial void WarnOperationCancelledWithReason(this ILogger logger, string Reason, Exception? ex);
 }

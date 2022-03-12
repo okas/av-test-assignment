@@ -28,12 +28,21 @@ public readonly record struct UserInteractionSetOpenStateCommand(
 
         public async Task<Unit> Handle(UserInteractionSetOpenStateCommand rq, CancellationToken ct)
         {
-            _context.Attach(new UserInteraction
+            // TODO Need to study and work out optimal way to handle it. I wish taht either 
+            byte[] rowVer = await _context.UserInteraction.AsNoTracking()
+                .Where(e => e.Id == rq.Id)
+                .Select(e => e.RowVer)
+                .SingleOrDefaultAsync(ct).ConfigureAwait(false)
+                    ?? throw new NotFoundException("Operation cancelled.", new { rq.Id }, typeof(Handler).FullName!);
+
+            _context.Attach(new UserInteraction // TODO needs revision, because RowVersion is added to entity and it needs to be in context to update.
             {
                 Id = rq.Id,
                 IsOpen = rq.IsOpen,
-            }
-            ).Property(model => model.IsOpen).IsModified = true;
+                RowVer = rowVer,
+            })
+            .Property(e => e.IsOpen)
+            .IsModified = true;
 
             try
             {
@@ -42,6 +51,7 @@ public readonly record struct UserInteractionSetOpenStateCommand(
             catch (DbUpdateConcurrencyException ex)
             {
                 // TODO Analyze https://docs.microsoft.com/en-us/ef/core/saving/concurrency to implement better handling
+                // TODO tests fail here
                 if (!await _context.UserInteraction.AnyAsync(model => model.Id == rq.Id, ct).ConfigureAwait(false))
                 {
                     throw new NotFoundException("Operation cancelled.", rq, typeof(Handler).FullName!, ex);

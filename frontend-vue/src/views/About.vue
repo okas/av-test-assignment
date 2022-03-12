@@ -12,7 +12,7 @@ const translatorAsync = useTranslator() as TranslatorAsync;
 
 watchEffect(
   async () =>
-    (translationVm.value = await translatorAsync("views/About", store.language))
+    (translationVm.value = await translatorAsync("views/about", store.language))
 );
 </script>
 

@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import vuePlugin from "@vitejs/plugin-vue";
 import viteEslintPlugin from "vite-plugin-eslint";
+import svgLoaderPlugin from "vite-svg-loader";
 import { readFileSync } from "fs";
 import { Checker as ViteCheckerPlugin } from "vite-plugin-checker";
 import { certFilePath, keyFilePath } from "./https.dev.config.js";
@@ -22,6 +23,7 @@ export default defineConfig({
         lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
       },
     }),
+    svgLoaderPlugin(),
   ],
   define: {
     __VUE_OPTIONS_API__: false,

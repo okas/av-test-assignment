@@ -12,7 +12,7 @@ namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
 public readonly record struct UserInteractionCreateCommand(
     [property: Required] DateTime Deadline,
-    [property: Required, MinLength(2)] string? Description)
+    [property: Required, MinLength(2)] string Description)
     : IRequest<UserInteractionDto>
 {
     /// <summary>
@@ -28,7 +28,6 @@ public readonly record struct UserInteractionCreateCommand(
         /// <inheritdoc />
         /// <exception cref="AlreadyExistsException" />
         /// <exception cref="DbUpdateConcurrencyException" />
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0042:Do not use blocking calls in an async method", Justification = "Context Add method is enough as this current DL config do not use Hi/Lo key gen for current entity.")]
         public async Task<UserInteractionDto> Handle(UserInteractionCreateCommand rq, CancellationToken ct)
         {
             UserInteraction model = new()
@@ -38,9 +37,9 @@ public readonly record struct UserInteractionCreateCommand(
                 Description = rq.Description,
                 Deadline = rq.Deadline,
             };
-
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             _context.UserInteraction.Add(model);
-
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
             try
             {
                 await _context.SaveChangesAsync(ct).ConfigureAwait(false);
