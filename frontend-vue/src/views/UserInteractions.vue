@@ -151,20 +151,26 @@ function addNewInteraction({ description, deadline }: IInteractionAdd) {
 }
 
 async function editInteraction() {
+  const { id, isOpen } = interactionToEdit.value!;
   return await api
     .then((client) =>
       client.execute({
-        operationId: "put_api_userinteractions",
-        requestBody: interactionToEdit.value,
+        operationId: "put_api_userinteractions__id_",
+        parameters: { id },
+        requestBody: { ...interactionToEdit.value },
       })
     )
     .then((resp) => {
       if (resp.ok) {
-        const id = interactionToEdit.value?.id;
-        Object.assign(
-          interactions.value.find((item) => item.id === id),
-          interactionToEdit.value
-        );
+        const findFn = ({ id: iId }: IInteractionVm) => iId === id;
+        if (isOpen) {
+          Object.assign(
+            interactions.value.find(findFn),
+            interactionToEdit.value
+          );
+        } else {
+          useRemoveOne(interactions.value, findFn);
+        }
       }
     });
 }

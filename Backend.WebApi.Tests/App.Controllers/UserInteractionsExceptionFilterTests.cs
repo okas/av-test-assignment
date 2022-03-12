@@ -31,6 +31,7 @@ public class UserInteractionsExceptionFilterTests
         {
             new object[] { _controllerType.GetMethod(nameof(UserInteractionsController.PostUserInteraction))! },
             new object[] { _controllerType.GetMethod(nameof(UserInteractionsController.PatchUserInteraction))! },
+            new object[] { _controllerType.GetMethod(nameof(UserInteractionsController.PutUserInteraction))! },
         };
     }
 }

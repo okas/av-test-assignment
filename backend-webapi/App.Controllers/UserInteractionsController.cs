@@ -79,6 +79,23 @@ public class UserInteractionsController : ControllerBase
     }
 
     /// <summary>
+    /// Put/update UserInteraction model.
+    /// </summary>
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ServiceFilter(typeof(CUDOperationsExceptionFilter))]
+    public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionUpdateCommand command, CancellationToken ct)
+    {
+        if (id == command.Id && await _mediator.Send(command, ct) == default)
+        {
+            return NoContent();
+        }
+        return BadRequest();
+    }
+
+    /// <summary>
     /// Create Userinteraction.
     /// </summary>
     [HttpPost]
