@@ -75,16 +75,16 @@ const modalAdd = ref<InstanceType<typeof ModalAdd> | null>(null);
 
 const api = useApiClient();
 
-const { formatDateTimeShortDateShortTime: formatDateTimeToShort } =
-  useFormatDateTime();
-
 const interactionToEdit = ref<EditViewModel | null>(null);
 
 const savingToApi = ref(false);
 
+getInteractions();
+
 const translatorAsync = useTranslator() as TranslatorAsync;
 
-getInteractions();
+const { formatDateTimeShortDateShortTime: formatDateTimeToShort } =
+  useFormatDateTime();
 
 function getInteractions() {
   api
