@@ -16,8 +16,8 @@
     "format": "prettier . --ignore-unknown --ignore-path .gitignore --check --write && npm run lint-script-fix && npm run lint-style-fix"
   },
   "dependencies": {
-    "@vueuse/core": "^8.0.0",
-    "@vueuse/integrations": "^8.0.0",
+    "@vueuse/core": "^8.0.1",
+    "@vueuse/integrations": "^8.0.1",
     "focus-trap": "^6.7.3",
     "pinia": "^2.0.11",
     "swagger-client": "^3.18.4",
