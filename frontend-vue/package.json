@@ -19,7 +19,7 @@
     "@vueuse/core": "^8.0.1",
     "@vueuse/integrations": "^8.0.1",
     "focus-trap": "^6.7.3",
-    "pinia": "^2.0.11",
+    "pinia": "^2.0.12",
     "swagger-client": "^3.18.4",
     "vue": "^3.2.31",
     "vue-router": "^4.0.14"
