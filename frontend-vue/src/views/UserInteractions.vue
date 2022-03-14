@@ -135,12 +135,12 @@ async function openAddDialog(): Promise<void> {
   }
 }
 
-function addNewInteraction({ description, deadline }: IInteractionAdd) {
+function addNewInteraction(newItem: IInteractionAdd) {
   api
     .then((client) =>
       client.execute({
         operationId: "post_api_userinteractions",
-        requestBody: { description, deadline: new Date(deadline) },
+        requestBody: { ...newItem },
       })
     )
     .then((resp) => {
