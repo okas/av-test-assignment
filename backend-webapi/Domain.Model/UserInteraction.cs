@@ -3,7 +3,7 @@
 /// <summary>
 /// User Interaction model. For storage purpose, as of now.
 /// </summary>
-public class UserInteraction
+public class UserInteraction : IEntity
 {
     public Guid Id { get; set; }
 
