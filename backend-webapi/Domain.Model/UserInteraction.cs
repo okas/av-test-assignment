@@ -15,5 +15,5 @@ public class UserInteraction
 
     public bool IsOpen { get; set; }
 
-    public byte[]? RowVer { get; set; }
+    public byte[] RowVer { get; set; } = Array.Empty<byte>();
 }

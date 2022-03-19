@@ -4,6 +4,7 @@ using Backend.WebApi.Infrastructure.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.WebApi.Infrastructure.Data.EF.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220318173003_UserInteraction_OptimisticConcurrency_Update")]
+    partial class UserInteraction_OptimisticConcurrency_Update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +52,7 @@ namespace Backend.WebApi.Infrastructure.Data.EF.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserInteraction", (string)null);
+                    b.ToTable("UserInteraction");
                 });
 #pragma warning restore 612, 618
         }
