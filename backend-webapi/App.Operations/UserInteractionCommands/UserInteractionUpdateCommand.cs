@@ -5,7 +5,6 @@ using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
@@ -19,45 +18,34 @@ public readonly record struct UserInteractionUpdateCommand(
     /// <summary>
     /// Handles <see cref="UserInteractionUpdateCommand" /> command.
     /// </summary>
-    public class Handler : IRequestHandler<UserInteractionUpdateCommand>
+    public class Handler : ConcurrencyHandlerBase, IRequestHandler<UserInteractionUpdateCommand, Unit>
     {
         private static readonly string _logCategory;
-        private readonly ApiDbContext _context;
         private readonly ILogger<Handler> _logger;
 
         static Handler() => _logCategory = typeof(Handler).FullName!;
 
-        public Handler(ApiDbContext context, ILogger<Handler> logger) => (_context, _logger) = (context, logger);
+        public Handler(ApiDbContext context, ILogger<Handler> logger) : base(context)
+        {
+            _logger = logger;
+        }
 
         /// <inheritdoc />
-        /// <exception cref="NotFoundException" />
-        /// <exception cref="ConcurrentUpdateException" />
-        /// <exception cref="OperationCanceledException" />
-        /// <exception cref="DbUpdateException" />
+        /// <inheritdoc cref="ConcurrencyHandlerBase.SaveAndHandleExceptions" />
         public async Task<Unit> Handle(UserInteractionUpdateCommand rq, CancellationToken ct)
         {
-            UserInteraction entity = await _context.UserInteraction.FindAsync(new object[] { rq.Id }, ct).ConfigureAwait(false)
+            UserInteraction entity = await _context.UserInteraction.FindAsync(new object[] { rq.Id }, ct)
+                .ConfigureAwait(false)
                 ?? throw new NotFoundException("Update operation cancelled.", new { rq.Id }, _logCategory);
 
             _context.Entry(entity).CurrentValues.SetValues(rq);
 
-            try
-            {
-                await _context.SaveChangesAsync(ct).ConfigureAwait(false);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                const string message = "Concurrency detected, operation cancelled.";
-                var model = new { entity.Id };
-
-                throw await _context.UserInteraction.AnyAsync(e => e.Id == entity.Id, CancellationToken.None).ConfigureAwait(false)
-                    ? new ConcurrentUpdateException(message, model, _logCategory)
-                    : new NotFoundException(message, model, _logCategory);
-            }
+            await base.SaveAndHandleExceptions(entity, _logCategory, ct).ConfigureAwait(false);
 
             _logger.InformUpdated(new { entity.Id });
 
             return Unit.Value;
         }
+
     }
 }

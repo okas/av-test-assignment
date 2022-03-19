@@ -19,13 +19,20 @@ public readonly record struct UserInteractionSetOpenStateCommand(
     /// <summary>
     /// Handles <see cref="UserInteractionSetOpenStateCommand" /> command.
     /// </summary>
-    public class Handler : IRequestHandler<UserInteractionSetOpenStateCommand>
+    public class Handler : ConcurrencyHandlerBase, IRequestHandler<UserInteractionSetOpenStateCommand>
     {
-        private readonly ApiDbContext _context;
+        private static readonly string _logCategory;
         private readonly ILogger<Handler> _logger;
 
-        public Handler(ApiDbContext context, ILogger<Handler> logger) => (_context, _logger) = (context, logger);
+        static Handler() => _logCategory = typeof(Handler).FullName!;
 
+        public Handler(ApiDbContext context, ILogger<Handler> logger) : base(context)
+        {
+            _logger = logger;
+        }
+
+        /// <inheritdoc />
+        /// <inheritdoc cref="ConcurrencyHandlerBase.SaveAndHandleExceptions" />
         public async Task<Unit> Handle(UserInteractionSetOpenStateCommand rq, CancellationToken ct)
         {
             // TODO Need to study and work out optimal way to handle it. I wish taht either 
@@ -33,31 +40,18 @@ public readonly record struct UserInteractionSetOpenStateCommand(
                 .Where(e => e.Id == rq.Id)
                 .Select(e => e.RowVer)
                 .SingleOrDefaultAsync(ct).ConfigureAwait(false)
-                    ?? throw new NotFoundException("Operation cancelled.", new { rq.Id }, typeof(Handler).FullName!);
+                    ?? throw new NotFoundException("Operation cancelled.", new { rq.Id }, _logCategory);
 
-            _context.Attach(new UserInteraction // TODO needs revision, because RowVersion is added to entity and it needs to be in context to update.
+            UserInteraction entity = new() // TODO needs revision, because RowVersion is added to entity and it needs to be in context to update.
             {
                 Id = rq.Id,
                 IsOpen = rq.IsOpen,
                 RowVer = rowVer,
-            })
-            .Property(e => e.IsOpen)
-            .IsModified = true;
+            };
 
-            try
-            {
-                await _context.SaveChangesAsync(ct).ConfigureAwait(false);
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                // TODO Analyze https://docs.microsoft.com/en-us/ef/core/saving/concurrency to implement better handling
-                // TODO tests fail here
-                if (!await _context.UserInteraction.AnyAsync(model => model.Id == rq.Id, ct).ConfigureAwait(false))
-                {
-                    throw new NotFoundException("Operation cancelled.", rq, typeof(Handler).FullName!, ex);
-                }
-                throw;
-            }
+            _context.Attach(entity).Property(e => e.IsOpen).IsModified = true;
+
+            await base.SaveAndHandleExceptions(entity, _logCategory, ct).ConfigureAwait(false);
 
             _logger.InformChanged(rq);
 
