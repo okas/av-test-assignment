@@ -1,9 +1,9 @@
-﻿using Backend.WebApi.Domain.Exceptions;
+using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.WebApi.App.Operations;
+namespace Backend.WebApi.App.Operations.UserInteractionCommands;
 
 public abstract class ConcurrencyHandlerBase
 {
