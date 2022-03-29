@@ -1,5 +1,6 @@
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Extensions;
+using Backend.WebApi.App.Filters;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using MediatR;
@@ -47,7 +48,9 @@ public class UserInteractionsController : ControllerBase
     /// Get Userinteraction by ID.
     /// </summary>
     [HttpGet("{Id}")]
+    [ServiceFilter(typeof(IfNoneMatchActionFilter))]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInteractionDto>> GetUserInteraction([FromRoute] UserInteractionGetByIdQuery query, CancellationToken ct)
     {
