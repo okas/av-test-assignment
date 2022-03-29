@@ -18,8 +18,7 @@ public readonly record struct UserInteractionDto(
     DateTime Deadline,
     DateTime Created,
     bool IsOpen,
-    string ETag
-    )
+    string ETag) : IETag
 {
     public static Expression<Func<UserInteraction, UserInteractionDto>> Projection => (model) => new()
     {

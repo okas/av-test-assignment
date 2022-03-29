@@ -53,6 +53,9 @@ public static class ServicesConfiguration
             .AddTransient<CUDOperationsExceptionFilter>()
             .AddTransient<OperationCancelledExceptionFilter>();
 
+        builder.Services
+            .AddScoped<IfNoneMatchActionFilter>();
+
         return builder;
     }
 

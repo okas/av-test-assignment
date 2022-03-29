@@ -19,4 +19,14 @@ public static partial class Log
         LogLevel.Information,
         "Updated: {Model}")]
     public static partial void InformUpdated(this ILogger logger, object Model);
+
+    [LoggerMessage(
+        1101,
+        LogLevel.Information,
+        "Set HTTP Header `{HeaderName}={HeaderValue}`; HTTP status code is {statusCode}.")]
+    public static partial void InformConditionalRqIfNoneMatch(
+        this ILogger logger,
+        string HeaderName,
+        string HeaderValue,
+        int statusCode);
 }

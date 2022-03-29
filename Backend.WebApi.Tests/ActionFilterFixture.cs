@@ -9,9 +9,19 @@ namespace Backend.WebApi.Tests;
 
 public class ActionFilterFixture
 {
-    public ActionContext ActionContext { get; init; } = new(new DefaultHttpContext(), new RouteData(), new ActionDescriptor());
+    public ActionContext CreateActionContext() => new(
+        new DefaultHttpContext(),
+        new RouteData(),
+        new ActionDescriptor());
 
-    public ExceptionContext CreateExceptionContext() => new(ActionContext, Array.Empty<IFilterMetadata>());
+    public ExceptionContext CreateExceptionContext() => new(
+        CreateActionContext(),
+        Array.Empty<IFilterMetadata>());
+
+    public ActionExecutedContext CreateActionExecutedContext() => new(
+        CreateActionContext(),
+        Array.Empty<IFilterMetadata>(), controller: default);
+
 }
 
 [CollectionDefinition("ActionFilterFixture")]
