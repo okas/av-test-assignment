@@ -1,4 +1,4 @@
-using Backend.WebApi.Domain.Exceptions;
+﻿using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Domain.Model;
 using Backend.WebApi.Infrastructure.Data.EF;
 using Microsoft.EntityFrameworkCore;
