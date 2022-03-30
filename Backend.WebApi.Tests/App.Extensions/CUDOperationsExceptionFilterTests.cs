@@ -9,12 +9,12 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.App.Extensions;
 
-[Collection("ActionFilterFixture")]
+[Collection("ActionExecutionFixture")]
 public class CUDOperationsExceptionFilterTests
 {
     private readonly ExceptionContext _exceptionContext;
 
-    public CUDOperationsExceptionFilterTests(ActionFilterFixture fixture)
+    public CUDOperationsExceptionFilterTests(ActionExecutionFixture fixture)
     {
         _exceptionContext = fixture.CreateExceptionContext();
     }

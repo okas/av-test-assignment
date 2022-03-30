@@ -7,12 +7,12 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.App.Extensions;
 
-[Collection("ActionFilterFixture")]
+[Collection("ActionExecutionFixture")]
 public class OperationCancelledExceptionFilterTests
 {
     private readonly ExceptionContext _exceptionContext;
 
-    public OperationCancelledExceptionFilterTests(ActionFilterFixture fixture)
+    public OperationCancelledExceptionFilterTests(ActionExecutionFixture fixture)
     {
         _exceptionContext = fixture.CreateExceptionContext();
     }

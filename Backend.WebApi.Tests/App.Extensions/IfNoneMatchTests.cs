@@ -9,12 +9,12 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.App.Extensions
 {
-    [Collection("ActionFilterFixture")]
+    [Collection("ActionExecutionFixture")]
     public class IfNoneMatchTests
     {
         private readonly ActionExecutedContext _actionFilterContext;
 
-        public IfNoneMatchTests(ActionFilterFixture fixture) =>
+        public IfNoneMatchTests(ActionExecutionFixture fixture) =>
             _actionFilterContext = fixture.CreateActionExecutedContext();
 
         [Theory]

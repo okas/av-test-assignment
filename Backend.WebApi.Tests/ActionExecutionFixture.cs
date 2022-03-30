@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Backend.WebApi.Tests;
 
-public class ActionFilterFixture
+public class ActionExecutionFixture
 {
     public ActionContext CreateActionContext() => new(
         new DefaultHttpContext(),
@@ -24,8 +24,8 @@ public class ActionFilterFixture
 
 }
 
-[CollectionDefinition("ActionFilterFixture")]
-public class ActionFilterFixtureCollection : ICollectionFixture<ActionFilterFixture>
+[CollectionDefinition("ActionExecutionFixture")]
+public class ActionFilterFixtureCollection : ICollectionFixture<ActionExecutionFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the
