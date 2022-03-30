@@ -45,6 +45,30 @@ public static class UserInteractionUtilities
     /// <remarks>
     /// Will use one-time DbContext to not to conflict with context used for testing.
     /// </remarks>
+    public static UserInteractionKnownTestData[] SeedDataGenerateAndReturnKnown(ApiLocalDbFixture dbFixture, params (Guid Id, bool IsOpen)[] knownEntityIds)
+    {
+        if (!knownEntityIds.Any())
+        {
+            throw new ArgumentException("Basedata for entity creation is mandatory.", nameof(knownEntityIds));
+        }
+
+        UserInteraction[] entities = GenerateEntities(knownEntityIds);
+
+        using ApiDbContext context = dbFixture.CreateContext();
+
+        context.UserInteraction.AddRange(entities);
+
+        context.SaveChanges();
+
+        return GenerateKnownUserInteractionTestData(knownEntityIds, context);
+    }
+
+    /// <summary>
+    /// Generate test data to database, that can be requested from API tests.
+    /// </summary>
+    /// <remarks>
+    /// Will use one-time DbContext to not to conflict with context used for testing.
+    /// </remarks>
     public static void SeedData(ApiLocalDbFixture dbFixture, params (Guid Id, bool IsOpen)[] knownEntityIds)
     {
         if (!knownEntityIds.Any())
