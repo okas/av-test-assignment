@@ -4,7 +4,6 @@ using Backend.WebApi.Domain.Exceptions;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using MediatR;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 using static Backend.WebApi.App.Operations.UserInteractionCommands.UserInteractionSetOpenStateCommand;
@@ -15,15 +14,15 @@ namespace Backend.WebApi.Tests.App.Operations.UserInteractionCommands;
 [Collection("ApiLocalDbFixture")]
 public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
 {
-    private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
+    private readonly UserInteractionKnownTestData[] _knownData;
     private readonly ApiDbContext _sutDbContext;
     private readonly Handler _sutCommandHandler;
 
     public UserInteractionSetOpenStateCommandTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = GenerateWithKnownIdIsOpen(2);
         _sutDbContext = dbFixture.CreateContext();
-        SeedData(dbFixture, _knownEntitesIdIsOpen);
+        // current algorithm ensures that every other entry will be `IsOpen=false`, so 2 is minimum for some tests!
+        _knownData = SeedDataGenerateAndReturnKnown(dbFixture, 2);
         _sutCommandHandler = new(_sutDbContext, new NullLogger<Handler>());
     }
 
@@ -35,13 +34,13 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
     public async Task SetOpenState_ExistingInteraction_Succeeds(bool existingValue, bool newValue)
     {
         // Arrange+
-        (Guid id, _) = _knownEntitesIdIsOpen.First(k => k.IsOpen == existingValue);
+        (Guid id, _, byte[] rowVer) = _knownData.First(k => k.IsOpen == existingValue);
 
-        UserInteractionSetOpenStateCommand correctModelCommand = new()
-        {
-            Id = id,
-            IsOpen = newValue,
-        };
+        UserInteractionSetOpenStateCommand correctModelCommand = new(
+            id,
+            IsOpen: newValue,
+            rowVer
+        );
 
         // Act
         _ = await _sutCommandHandler.Handle(
@@ -62,7 +61,7 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
     {
         var exceptionDataModel = new { Id };
 
-        Func<Task<Unit>> act = () =>
+        Func<Task<byte[]>> act = () =>
         _sutCommandHandler.Handle(
            notExistingModelCommand,
            ct: default
@@ -71,8 +70,9 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
         // Act
         // Assert
         using AssertionScope _ = new();
+
         (await act.Should().ThrowAsync<NotFoundException>()
-             .WithMessage("Operation cancelled."))
+             .WithMessage("Concurrency detected, operation cancelled."))
              .Which.Data[BaseException.ModelDataKey].Should().BeEquivalentTo(exceptionDataModel);
     }
 
@@ -82,3 +82,4 @@ public sealed class UserInteractionSetOpenStateCommandTests : IDisposable
     public void Dispose() => _sutDbContext.Dispose();
 }
 
+// TODO: w/ and w/o rowver scenarios testing

@@ -1,3 +1,4 @@
+using Backend.WebApi.App.ActionResults;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Extensions;
 using Backend.WebApi.App.Filters;
@@ -5,6 +6,7 @@ using Backend.WebApi.App.Operations.UserInteractionCommands;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace Backend.WebApi.App.Controllers;
 
@@ -69,16 +71,24 @@ public class UserInteractionsController : ControllerBase
     /// </remarks>
     [HttpPatch("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ServiceFilter(typeof(CUDOperationsExceptionFilter))]
-    public async Task<IActionResult> PatchUserInteraction(Guid id, UserInteractionSetOpenStateCommand command, CancellationToken ct)
+    public async Task<IActionResult> PatchUserInteraction(
+        Guid id,
+        [FromHeader(Name = "If-Match")] byte[] rowVer,
+        UserInteractionSetOpenStateCommand command,
+        CancellationToken ct)
     {
-        if (id == command.Id && await _mediator.Send(command, ct) == default)
+        if (id != command.Id)
         {
-            return NoContent();
-        }
         return BadRequest();
+        }
+
+        byte[] eTag = await _mediator.Send(command with { RowVer = rowVer }, ct);
+
+        return new HeaderedStatusCodeResult(
+            StatusCodes.Status204NoContent,
+            new(HeaderNames.ETag, new[] { Convert.ToBase64String(eTag) }));
     }
 
     /// <summary>

@@ -1,10 +1,12 @@
+﻿using Backend.WebApi.App.ActionResults;
 using Backend.WebApi.App.Controllers;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
-using Backend.WebApi.Domain.Model;
-using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
+using FluentAssertions.Execution;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 using Xunit;
 using static Backend.WebApi.Tests.UserInteractionUtilities;
 
@@ -31,23 +33,26 @@ public sealed class UserInteractionOpenStateChangeTests
         // Arrange
         UserInteractionSetOpenStateCommand command = new(
             _knownSingle.Id,
-            IsOpen: false
+            IsOpen: false,
+            RowVer: Array.Empty<byte>()
         );
 
         // Act
         IActionResult response =
             await _sutController.PatchUserInteraction(
-                _entityId,
+                _knownSingle.Id,
+                _knownSingle.RowVer,
                 command,
                 ct: default
                 );
 
         // Assert
-        response.Should().BeOfType<NoContentResult>().And.NotBeNull();
+        using AssertionScope _ = new();
 
-        using ApiDbContext newContext = _fixture.CreateContext();
-        UserInteraction? interactionModel = await newContext.UserInteraction.FindAsync(_knownSingle.Id);
-        interactionModel.Should().NotBeNull();
-        interactionModel!.IsOpen.Should().BeFalse();
+        response.Should().NotBeNull().And.BeOfType<HeaderedStatusCodeResult>()
+            .Which.StatusCode.Should().Be(StatusCodes.Status204NoContent);
+
+        response.As<HeaderedStatusCodeResult>()
+             .Headers.Should().ContainKey(HeaderNames.ETag);
     }
 }
