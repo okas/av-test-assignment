@@ -2,6 +2,7 @@
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionCommands;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -9,7 +10,6 @@ using Xunit;
 namespace Backend.WebApi.Tests.App.Controllers;
 
 [Collection("IntegrationTestFixture")]
-
 public sealed class UserInteractionCreationTests
 {
     private readonly UserInteractionCreateCommand _knownCorrectCommand;
@@ -52,10 +52,14 @@ public sealed class UserInteractionCreationTests
                           .Value.As<UserInteractionDto>();
 
         // Assert
+        using AssertionScope _ = new();
+
         dto.Id.Should().NotBeEmpty();
+
         dto.Created.Should().BeOnOrAfter(DateTime.Now.AddSeconds(-5)).And.NotBeAfter(DateTime.Now);
+
         dto.IsOpen.Should().BeTrue();
+
         dto.Description.Should().BeEquivalentTo(_knownCorrectCommand.Description);
     }
-
 }
