@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Extensions;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
@@ -17,7 +17,7 @@ public static class ServicesConfiguration
             .AspNetCoreRoutingSetup()
             .ApplicationSetup()
             .MediatRSetup()
-            .ControllersAndODataSetup()
+            .ApiSetup()
             .SwaggerSetup();
 
     private static WebApplicationBuilder EntityFrameworkCoreSetup(this WebApplicationBuilder builder)
@@ -66,7 +66,7 @@ public static class ServicesConfiguration
         return builder;
     }
 
-    private static WebApplicationBuilder ControllersAndODataSetup(this WebApplicationBuilder builder)
+    private static WebApplicationBuilder ApiSetup(this WebApplicationBuilder builder)
     {
         builder.Services.AddControllers().AddOData(c =>
         {
