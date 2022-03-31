@@ -1,8 +1,9 @@
-﻿using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.CrossCutting.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 
 namespace Backend.WebApi.App.Filters;
 
@@ -52,7 +53,7 @@ public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter
         await next();
 
         _logger.InformConditionalRqIfNoneMatch(
-            "ETag",
+            HeaderNames.ETag,
             context.HttpContext.Response.Headers.ETag,
             context.HttpContext.Response.StatusCode);
     }
