@@ -21,8 +21,9 @@ public class UserInteractionsExceptionFilterTests
     {
         // Act
         // Assert
-        actionMethod.Should().BeDecoratedWith<ServiceFilterAttribute>()
-            .Which.ServiceType.Should().Be<CUDOperationsExceptionFilter>();
+        actionMethod.GetCustomAttributes<ServiceFilterAttribute>().Should().Contain(
+            x => x.ServiceType == typeof(CUDOperationsExceptionFilter)
+        );
     }
 
     public static IEnumerable<object[]> GetActionMethods()
