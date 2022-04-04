@@ -1,5 +1,6 @@
 ﻿using AutoFixture.Xunit2;
 using Backend.WebApi.App.Filters;
+using Backend.WebApi.Tests.App.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Http;
@@ -7,125 +8,125 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Xunit;
 
-namespace Backend.WebApi.Tests.App.Extensions
+namespace Backend.WebApi.Tests.App.Filters
 {
     [Collection("ActionExecutionFixture")]
     public class IfNoneMatchTests
     {
-        private readonly ActionExecutedContext _actionFilterContext;
+        private readonly ActionExecutedContext _actionExecutedContext;
 
         public IfNoneMatchTests(ActionExecutionFixture fixture) =>
-            _actionFilterContext = fixture.CreateActionExecutedContext();
+            _actionExecutedContext = fixture.CreateActionExecutedContext();
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuting_OkObjectResultValueIsIETag_ETagHeaderSetFromResult(
+        public void OnActionExecuted_OkObjectResultValueIsIETag_ETagHeaderSetFromResult(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
             IfNoneMatchActionFilter sutActionFilter)
         {
-            _actionFilterContext.Result = result;
+            _actionExecutedContext.Result = result;
 
             // Act
             sutActionFilter.OnActionExecuted(
-                _actionFilterContext
+                _actionExecutedContext
                 );
 
             // Assert
-            _actionFilterContext.HttpContext.Response.Headers.ETag.Should().BeEquivalentTo(Value.ETag);
+            _actionExecutedContext.HttpContext.Response.Headers.ETag.Should().BeEquivalentTo(Value.ETag);
         }
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuting_ExistingModelButETagMisMatch_ProducesOkObjectResultWithValueAndETag(
+        public void OnActionExecuted_ExistingModelButETagMisMatch_ProducesOkObjectResultWithValueAndETag(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
             IfNoneMatchActionFilter sutActionFilter)
         {
-            _actionFilterContext.Result = result;
+            _actionExecutedContext.Result = result;
 
             // Act
             sutActionFilter.OnActionExecuted(
-                _actionFilterContext
+                _actionExecutedContext
                 );
 
             // Assert
             using AssertionScope _ = new();
 
-            _actionFilterContext.Result.Should().BeOfType<OkObjectResult>()
+            _actionExecutedContext.Result.Should().BeOfType<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(Value);
 
-            _actionFilterContext.HttpContext.Response.Headers.ETag.Should().BeEquivalentTo(Value.ETag);
+            _actionExecutedContext.HttpContext.Response.Headers.ETag.Should().BeEquivalentTo(Value.ETag);
         }
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuting_ExistingETagInRequest_ProducesStatusCodeResult304(
+        public void OnActionExecuted_ExistingETagInRequest_ProducesStatusCodeResult304(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
             IfNoneMatchActionFilter sutActionFilter)
         {
-            _actionFilterContext.HttpContext.Request.Headers.IfNoneMatch = Value.ETag;
-            _actionFilterContext.Result = result;
+            _actionExecutedContext.HttpContext.Request.Headers.IfNoneMatch = Value.ETag;
+            _actionExecutedContext.Result = result;
 
             // Act
             sutActionFilter.OnActionExecuted(
-                _actionFilterContext
+                _actionExecutedContext
                 );
 
             // Assert
-            _actionFilterContext.Result.Should().BeOfType<StatusCodeResult>()
+            _actionExecutedContext.Result.Should().BeOfType<StatusCodeResult>()
                 .Which.StatusCode.Should().Be(StatusCodes.Status304NotModified);
         }
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuting_ExeptionThrownOnActionExecution_ResultIsUnChangedAndETagNotSet(
+        public void OnActionExecuted_ExeptionThrownOnActionExecution_ResultIsUnChangedAndETagNotSet(
            // Arrange
            IActionResult result,
            Exception ex,
            IfNoneMatchActionFilter sutActionFilter)
         {
-            _actionFilterContext.Exception = ex;
-            _actionFilterContext.Result = result;
+            _actionExecutedContext.Exception = ex;
+            _actionExecutedContext.Result = result;
 
             // Act
             sutActionFilter.OnActionExecuted(
-                _actionFilterContext
+                _actionExecutedContext
                 );
 
             // Assert
             using AssertionScope _ = new();
 
-            _actionFilterContext.Result.Should().BeSameAs(result);
+            _actionExecutedContext.Result.Should().BeSameAs(result);
 
-            _actionFilterContext.HttpContext.Response.Headers.ETag.Should().BeEmpty();
+            _actionExecutedContext.HttpContext.Response.Headers.ETag.Should().BeEmpty();
         }
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuting_ShortCircuited_ResultIsUnChangedAndETagNotSet(
+        public void OnActionExecuted_ShortCircuited_ResultIsUnChangedAndETagNotSet(
            // Arrange
            IActionResult result,
            IfNoneMatchActionFilter sutActionFilter)
         {
-            _actionFilterContext.Canceled = true;
-            _actionFilterContext.Result = result;
+            _actionExecutedContext.Canceled = true;
+            _actionExecutedContext.Result = result;
 
             // Act
             sutActionFilter.OnActionExecuted(
-                _actionFilterContext
+                _actionExecutedContext
                 );
 
             // Assert
             using AssertionScope _ = new();
 
-            _actionFilterContext.Result.Should().BeSameAs(result);
+            _actionExecutedContext.Result.Should().BeSameAs(result);
 
-            _actionFilterContext.HttpContext.Response.Headers.ETag.Should().BeEmpty();
+            _actionExecutedContext.HttpContext.Response.Headers.ETag.Should().BeEmpty();
         }
     }
 }
