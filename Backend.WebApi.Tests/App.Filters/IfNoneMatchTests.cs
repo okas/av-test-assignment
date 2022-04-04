@@ -78,8 +78,7 @@ namespace Backend.WebApi.Tests.App.Filters
                 );
 
             // Assert
-            _actionExecutedContext.Result.Should().BeOfType<StatusCodeResult>()
-                .Which.StatusCode.Should().Be(StatusCodes.Status304NotModified);
+            _actionExecutedContext.Result.Should().BeStatusCodeResultHttp304();
         }
 
         [Theory]
