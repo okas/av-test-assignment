@@ -18,10 +18,15 @@ public class ActionExecutionFixture
         CreateActionContext(),
         Array.Empty<IFilterMetadata>());
 
+    public ActionExecutingContext CreateActionExecutingContext() => new(
+        CreateActionContext(),
+        Array.Empty<IFilterMetadata>(),
+        new Dictionary<string, object?>(StringComparer.Ordinal),
+        controller: default);
+
     public ActionExecutedContext CreateActionExecutedContext() => new(
         CreateActionContext(),
         Array.Empty<IFilterMetadata>(), controller: default);
-
 }
 
 [CollectionDefinition("ActionExecutionFixture")]

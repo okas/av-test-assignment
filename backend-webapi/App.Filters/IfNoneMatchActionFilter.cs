@@ -1,3 +1,4 @@
+﻿using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.CrossCutting.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -15,17 +16,31 @@ namespace Backend.WebApi.App.Filters;
 /// HTTP header <c>ETAG</c> will be set if there no exceptions havent thrown and action execution is not cancelled.
 /// <para>NB! [currently] does not use any caching capabilities.</para>
 /// </summary>
-public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter
+public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter //TODO: rename, remove "action" part, because it is more than that
 {
-
+    private readonly ICacheService<IETag> _cache;
     private readonly ILogger<IfNoneMatchActionFilter> _logger;
 
-    public IfNoneMatchActionFilter(ILogger<IfNoneMatchActionFilter> logger) => _logger = logger;
+    public IfNoneMatchActionFilter(ICacheService<IETag> cache, ILogger<IfNoneMatchActionFilter> logger)
+        => (_cache, _logger) = (cache, logger);
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        // TODO: compare with cache; short-circuit with HTTP304, if exists 
-        _logger.LogDebug("If-None-Match: {}", context.HttpContext.Request.Headers.IfNoneMatch);
+        string? foundHeader = context.HttpContext.Request.Headers.IfNoneMatch.FirstOrDefault();
+
+        if (string.IsNullOrEmpty(foundHeader) || string.Equals(foundHeader, "*", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        if (_cache.Get(foundHeader).Result is null)
+        {
+            return;
+        }
+
+        context.HttpContext.Response.Headers.ETag = foundHeader;
+
+        context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
     }
 
     public void OnActionExecuted(ActionExecutedContext context)
