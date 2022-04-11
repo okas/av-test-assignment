@@ -1,26 +1,25 @@
 ﻿using AutoFixture.Xunit2;
 using Backend.WebApi.App.Filters;
 using Backend.WebApi.Tests.App.Extensions;
+using Backend.WebApi.Tests.App.Filters;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Xunit;
 
 namespace Backend.WebApi.Tests.App.Filters
 {
-    [Collection("ActionExecutionFixture")]
-    public class IfNoneMatchTests
+    public partial class IfNoneMatchTests_OnActionExecuted : IClassFixture<ActionExecutionFixture>
     {
         private readonly ActionExecutedContext _actionExecutedContext;
 
-        public IfNoneMatchTests(ActionExecutionFixture fixture) =>
-            _actionExecutedContext = fixture.CreateActionExecutedContext();
+        public IfNoneMatchTests_OnActionExecuted(ActionExecutionFixture fixture) => _actionExecutedContext = fixture.CreateActionExecutedContext();
+
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuted_OkObjectResultValueIsIETag_ETagHeaderSetFromResult(
+        public void OkObjectResultValueIsIETag_ETagHeaderSetFromResult(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
@@ -39,7 +38,7 @@ namespace Backend.WebApi.Tests.App.Filters
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuted_ExistingModelButETagMisMatch_ProducesOkObjectResultWithValueAndETag(
+        public void ExistingModelButETagMisMatch_ProducesOkObjectResultWithValueAndETag(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
@@ -63,7 +62,7 @@ namespace Backend.WebApi.Tests.App.Filters
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuted_ExistingETagInRequest_ProducesStatusCodeResult304(
+        public void ExistingETagInRequest_ProducesStatusCodeResult304(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
@@ -83,7 +82,7 @@ namespace Backend.WebApi.Tests.App.Filters
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuted_ExeptionThrownOnActionExecution_ResultIsUnChangedAndETagNotSet(
+        public void ExeptionThrownOnActionExecution_ResultIsUnChangedAndETagNotSet(
            // Arrange
            IActionResult result,
            Exception ex,
@@ -107,7 +106,7 @@ namespace Backend.WebApi.Tests.App.Filters
 
         [Theory]
         [AutoMoqData]
-        public void OnActionExecuted_ShortCircuited_ResultIsUnChangedAndETagNotSet(
+        public void ShortCircuited_ResultIsUnChangedAndETagNotSet(
            // Arrange
            IActionResult result,
            IfNoneMatchActionFilter sutActionFilter)
