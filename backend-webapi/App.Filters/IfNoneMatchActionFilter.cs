@@ -18,10 +18,10 @@ namespace Backend.WebApi.App.Filters;
 /// </summary>
 public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter //TODO: rename, remove "action" part, because it is more than that
 {
-    private readonly ICacheService<IETag> _cache;
+    private readonly ICacheService<object> _cache;
     private readonly ILogger<IfNoneMatchActionFilter> _logger;
 
-    public IfNoneMatchActionFilter(ICacheService<IETag> cache, ILogger<IfNoneMatchActionFilter> logger)
+    public IfNoneMatchActionFilter(ICacheService<object> cache, ILogger<IfNoneMatchActionFilter> logger)
         => (_cache, _logger) = (cache, logger);
 
     public void OnActionExecuting(ActionExecutingContext context)
