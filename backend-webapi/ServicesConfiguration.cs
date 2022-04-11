@@ -12,82 +12,89 @@ namespace Backend.WebApi;
 
 public static class ServicesConfiguration
 {
-    public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder) =>
-        builder.EntityFrameworkCoreSetup()
+    public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .EntityFrameworkCoreSetup(builder.Configuration)
             .AspNetCoreRoutingSetup()
             .ApplicationSetup()
             .MediatRSetup()
             .ApiSetup()
             .SwaggerSetup();
 
-    private static WebApplicationBuilder EntityFrameworkCoreSetup(this WebApplicationBuilder builder)
+        return builder;
+    }
     {
         string connectionString = builder.Configuration.GetConnectionString("ApiDbContext");
 
-        builder.Services.AddDbContext<ApiDbContext>(options =>
+    private static IServiceCollection EntityFrameworkCoreSetup(this IServiceCollection services, ConfigurationManager config)
+    {
+        string connectionString = config.GetConnectionString("ApiDbContext");
+
+        services.AddDbContext<ApiDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
         });
 
-        return builder;
+        return services;
     }
 
-    private static WebApplicationBuilder AspNetCoreRoutingSetup(this WebApplicationBuilder builder)
+    private static IServiceCollection AspNetCoreRoutingSetup(this IServiceCollection services)
     {
-        builder.Services.AddRouting(options =>
+        services.AddRouting(options =>
         {
             // Client tooling feels less errorprone this way. Other than lowercase URLs are not nice.
             options.LowercaseUrls = true;
             options.LowercaseQueryStrings = true;
         });
 
-        return builder;
+        return services;
     }
 
-    private static WebApplicationBuilder ApplicationSetup(this WebApplicationBuilder builder)
+    private static IServiceCollection ApplicationSetup(this IServiceCollection services)
     {
-        builder.Services
+        services
             .AddTransient<
                 IRequestHandler<UserInteractionGetQuery<UserInteractionDto>, (IEnumerable<UserInteractionDto>, int)>,
                 UserInteractionGetQuery<UserInteractionDto>.Handler>()
             .AddTransient<CUDOperationsExceptionFilter>()
             .AddTransient<OperationCancelledExceptionFilter>();
 
-        builder.Services
+        services
             .AddScoped<IfNoneMatchActionFilter>();
 
-        return builder;
+        return services;
     }
 
-    private static WebApplicationBuilder MediatRSetup(this WebApplicationBuilder builder)
+    private static IServiceCollection MediatRSetup(this IServiceCollection services)
     {
-        builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+        services.AddMediatR(Assembly.GetExecutingAssembly());
 
-        return builder;
+        return services;
     }
 
-    private static WebApplicationBuilder ApiSetup(this WebApplicationBuilder builder)
+    private static IServiceCollection ApiSetup(this IServiceCollection services)
     {
-        builder.Services.AddControllers().AddOData(c =>
+        services.AddControllers().AddOData(c =>
         {
             c.Select().Filter().OrderBy();
         });
 
-        return builder;
+        return services;
     }
 
-    private static WebApplicationBuilder SwaggerSetup(this WebApplicationBuilder builder)
+    private static IServiceCollection SwaggerSetup(this IServiceCollection services)
     {
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
+        services.AddEndpointsApiExplorer();
 
-        builder.Services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(c =>
         {
             c.IncludeXmlCommentsOfCurrentProject();
             c.DocumentFilter<LowerCaseTagsDocumentFilter>();
             c.CustomOperationIdsMethodAndApiPathToSnakeCase();
         });
 
-        return builder;
+        return services;
     }
 }
