@@ -1,4 +1,6 @@
 ﻿using AutoFixture.Xunit2;
+using Backend.WebApi.App.Cache;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Filters;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Xunit;
@@ -43,13 +45,15 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
     }
 
     [Theory]
-    [AutoMoqData(false)]
+    [AutoMoqDataConditionalHttpRequest(false)]
     public void HeaderETagIsInCache_ShouldShortCircuit(
         // Arrange
         [Frozen(Matching.PropertyName)] string ETag,
+        [Frozen] UserInteractionDto dto,
+        [Frozen] ICacheService<object> cache,
         IfNoneMatchActionFilter sutActionFilter)
     {
-
+        cache.Set(ETag, dto);
         _actionExecutingContext.HttpContext.Request.Headers.IfNoneMatch = ETag;
 
         // Act
@@ -59,5 +63,27 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
 
         // Assert
         _actionExecutingContext.Should().BeShortCircuited(ETag);
+    }
+
+    [Theory]
+    [AutoMoqDataConditionalHttpRequest(false)]
+    public void HeaderETagNotInCache_ShouldNotShortCircuit(
+        // Arrange
+        [Frozen(Matching.PropertyName)] string ETag,
+        [Frozen] UserInteractionDto dto,
+        [Frozen] ICacheService<object> cache,
+        IfNoneMatchActionFilter sutActionFilter,
+        string nonExistingETag)
+    {
+        cache.Set(ETag, dto);
+        _actionExecutingContext.HttpContext.Request.Headers.IfNoneMatch = nonExistingETag;
+
+        // Act
+        sutActionFilter.OnActionExecuting(
+            _actionExecutingContext
+            );
+
+        // Assert
+        _actionExecutingContext.Should().NotBeShortCircuited();
     }
 }
