@@ -10,7 +10,11 @@ public class AutoMoqDataAttribute : AutoDataAttribute
         : base(GetFixtureFactory(omitAutoProperties))
     { }
 
-    private static Func<IFixture> GetFixtureFactory(bool omitAutoProperties) => () =>
+    protected AutoMoqDataAttribute(Func<IFixture> fixture)
+        : base(fixture)
+    { }
+
+    protected static Func<IFixture> GetFixtureFactory(bool omitAutoProperties) => () =>
     {
         IFixture fixture = new Fixture() { OmitAutoProperties = omitAutoProperties };
 
