@@ -15,6 +15,7 @@ public static class ServicesConfiguration
     public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
     {
         builder.Services
+            .MemoryCacheSetup()
             .EntityFrameworkCoreSetup(builder.Configuration)
             .AspNetCoreRoutingSetup()
             .ApplicationSetup()
@@ -24,8 +25,15 @@ public static class ServicesConfiguration
 
         return builder;
     }
+
+    private static IServiceCollection MemoryCacheSetup(this IServiceCollection services)
     {
-        string connectionString = builder.Configuration.GetConnectionString("ApiDbContext");
+        services.AddMemoryCache();
+
+        services.AddSingleton(typeof(ICacheService<>), typeof(MemoryCacheService<>));
+
+        return services;
+    }
 
     private static IServiceCollection EntityFrameworkCoreSetup(this IServiceCollection services, ConfigurationManager config)
     {
