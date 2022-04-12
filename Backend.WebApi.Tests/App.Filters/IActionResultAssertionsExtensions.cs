@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Backend.WebApi.Tests.App.Filters;
 
-public static class ActionResultAssertionsExtensions
+public static class IActionResultAssertionsExtensions
 {
     public static FilterContextAssertions Should(this IActionResult? subject) => new(subject);
 
