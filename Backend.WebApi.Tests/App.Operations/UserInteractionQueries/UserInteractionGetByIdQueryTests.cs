@@ -1,4 +1,4 @@
-﻿using Backend.WebApi.App.Dto;
+using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
@@ -10,23 +10,23 @@ namespace Backend.WebApi.Tests.App.Operations.UserInteractionQueries;
 [Collection("ApiLocalDbFixture")]
 public sealed class UserInteractionGetByIdQueryTests : IDisposable
 {
-    private readonly (Guid Id, bool IsOpen)[] _knownEntitesIdIsOpen;
+    private readonly (Guid Id, bool IsOpen)[] _knownEntitiesIdIsOpen;
     private readonly ApiDbContext _sutDbContext;
     private readonly UserInteractionGetByIdQuery.Handler _sutCommandHandler;
 
     public UserInteractionGetByIdQueryTests(ApiLocalDbFixture dbFixture)
     {
-        _knownEntitesIdIsOpen = GenerateWithKnownIdIsOpen(1);
+        _knownEntitiesIdIsOpen = GenerateWithKnownIdIsOpen(1);
         _sutDbContext = dbFixture.CreateContext();
-        SeedData(dbFixture, _knownEntitesIdIsOpen);
+        SeedData(dbFixture, _knownEntitiesIdIsOpen);
         _sutCommandHandler = new(_sutDbContext);
     }
 
     [Fact]
-    public async Task GetOne_ByCorrectId_ReturnDtol()
+    public async Task GetOne_ByCorrectId_ReturnDto()
     {
         // Arrange
-        UserInteractionGetByIdQuery correctQuery = new(_knownEntitesIdIsOpen[0].Id);
+        UserInteractionGetByIdQuery correctQuery = new(_knownEntitiesIdIsOpen[0].Id);
 
         // Act
         UserInteractionDto? dto =
