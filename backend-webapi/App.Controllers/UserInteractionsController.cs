@@ -50,7 +50,7 @@ public class UserInteractionsController : ControllerBase
     /// Get Userinteraction by ID.
     /// </summary>
     [HttpGet("{Id}")]
-    [ServiceFilter(typeof(IfNoneMatchActionFilter))]
+    [ServiceFilter(typeof(IfNoneMatchFilter))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
