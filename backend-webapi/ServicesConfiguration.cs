@@ -1,6 +1,8 @@
 using System.Reflection;
+using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Extensions;
+using Backend.WebApi.App.Filters;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.App.Swagger;
 using Backend.WebApi.Infrastructure.Data.EF;
@@ -70,6 +72,8 @@ public static class ServicesConfiguration
 
         services
             .AddScoped<IfNoneMatchFilter>()
+            // .AddScoped<IfMatchActionFilter>()
+            ;
 
         return services;
     }
