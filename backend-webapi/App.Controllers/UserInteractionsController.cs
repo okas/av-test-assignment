@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Backend.WebApi.App.ActionResults;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Extensions;
@@ -15,8 +16,9 @@ namespace Backend.WebApi.App.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[ServiceFilter(typeof(OperationCancelledExceptionFilter))]
+[Consumes(MediaTypeNames.Application.Json)]
 [Produces("application/json")]
+[ServiceFilter(typeof(OperationCancelledExceptionFilter))]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
 [ProducesResponseType(499)]
 public class UserInteractionsController : ControllerBase
