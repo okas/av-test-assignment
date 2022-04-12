@@ -1,4 +1,4 @@
-using AutoFixture.Xunit2;
+﻿using AutoFixture.Xunit2;
 using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Filters;
