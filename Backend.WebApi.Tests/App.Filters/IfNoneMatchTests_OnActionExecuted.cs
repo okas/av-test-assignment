@@ -1,4 +1,5 @@
-using AutoFixture.Xunit2;
+﻿using AutoFixture.Xunit2;
+using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Filters;
 using Backend.WebApi.Tests.App.Extensions;
 using Backend.WebApi.Tests.App.Filters;
@@ -18,12 +19,13 @@ namespace Backend.WebApi.Tests.App.Filters
 
 
         [Theory]
-        [AutoMoqData]
-        public void OkObjectResultValueIsIETag_ETagHeaderSetFromResult(
+        [AutoMoqDataConditionalHttpRequest]
+        public void OkObjectResultValueIs_IETag_ShouldSetETagHeaderAndCacheValue(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
-            IfNoneMatchActionFilter sutActionFilter)
+            [Frozen] ICacheService<object> cache,
+            IfNoneMatchFilter sutActionFilter)
         {
             _actionExecutedContext.Result = result;
 
@@ -33,17 +35,23 @@ namespace Backend.WebApi.Tests.App.Filters
                 );
 
             // Assert
+            using AssertionScope _ = new();
+
             _actionExecutedContext.HttpContext.Response.Headers.ETag.Should().BeEquivalentTo(Value.ETag);
+
+            cache.Get(Value.ETag).Result.Should().BeEquivalentTo(result.Value);
         }
 
         [Theory]
         [AutoMoqData]
-        public void ExistingModelButETagMisMatch_ProducesOkObjectResultWithValueAndETag(
+        public void ExistingModelButETagMisMatch_ProducesOkObjectResultWithValueAndCorrectETag(
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
             IfNoneMatchFilter sutActionFilter,
+            string mismatchedETag)
         {
+            _actionExecutedContext.HttpContext.Request.Headers.IfNoneMatch = mismatchedETag;
             _actionExecutedContext.Result = result;
 
             // Act

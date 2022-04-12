@@ -1,4 +1,4 @@
-using Backend.WebApi.App.Cache;
+﻿using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.CrossCutting.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -53,10 +53,16 @@ public class IfNoneMatchFilter : IActionFilter, IAsyncResultFilter
             return;
         }
 
+        if (context.Result is not OkObjectResult initialResult || initialResult.Value is not IETag tagged)
         {
+            return;
+        }
+
         context.HttpContext.Response.Headers.ETag = tagged.ETag;
 
+        _cache.Set(tagged.ETag, initialResult.Value);
 
+        if (context.HttpContext.Request.Headers.IfNoneMatch == tagged.ETag)
         {
             context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
         }
