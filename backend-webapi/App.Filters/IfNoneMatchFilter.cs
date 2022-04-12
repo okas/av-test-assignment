@@ -9,19 +9,22 @@ using Microsoft.Net.Http.Headers;
 namespace Backend.WebApi.App.Filters;
 
 /// <summary>
-/// Action result filter, that will compare results <see cref="IETag.ETag"/> value against HTTP header <c>If-None-Match</c> value.
-/// <para>If they don't match then will return <see cref="OkObjectResult"/> with data.
-/// If they match then result will be of type <see cref="StatusCodeResult"/> with status code <see cref="StatusCodes.Status304NotModified"/>.
+/// Actionfilter+resultfilter, that will short-circuit by return <see cref="StatusCodeResult"/>
+/// with code <see cref="StatusCodes.Status304NotModified"/> if consumer provided HTTP Header <c>If-None-Match</c> has match.
+/// <para>
+/// Evaluate cache contents first: if has match then uses cached data for desition making.
+/// Result value that is retreived from <c>action method</c> will be cached.
 /// </para>
-/// HTTP header <c>ETAG</c> will be set if there no exceptions havent thrown and action execution is not cancelled.
-/// <para>NB! [currently] does not use any caching capabilities.</para>
+/// <para>
+/// If HTTP Header <c>If-None-Match="*"</c>, is empty or missing, then it will pass the control to <c>action method</c> for result retreival.
+/// </para>
 /// </summary>
-public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter //TODO: rename, remove "action" part, because it is more than that
+public class IfNoneMatchFilter : IActionFilter, IAsyncResultFilter
 {
     private readonly ICacheService<object> _cache;
-    private readonly ILogger<IfNoneMatchActionFilter> _logger;
+    private readonly ILogger<IfNoneMatchFilter> _logger;
 
-    public IfNoneMatchActionFilter(ICacheService<object> cache, ILogger<IfNoneMatchActionFilter> logger)
+    public IfNoneMatchFilter(ICacheService<object> cache, ILogger<IfNoneMatchFilter> logger)
         => (_cache, _logger) = (cache, logger);
 
     public void OnActionExecuting(ActionExecutingContext context)
@@ -50,16 +53,12 @@ public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter //TODO:
             return;
         }
 
-        if (context.Result is OkObjectResult r && r.Value is IETag tagged)
         {
-            context.HttpContext.Response.Headers.ETag = tagged.ETag;
+        context.HttpContext.Response.Headers.ETag = tagged.ETag;
 
-            StringValues ifNoneMatch = context.HttpContext.Request.Headers.IfNoneMatch;
 
-            if (ifNoneMatch.Any() && ifNoneMatch == tagged.ETag)
-            {
-                context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
-            }
+        {
+            context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
         }
     }
 

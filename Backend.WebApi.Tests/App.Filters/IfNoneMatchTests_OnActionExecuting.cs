@@ -1,4 +1,4 @@
-﻿using AutoFixture.Xunit2;
+using AutoFixture.Xunit2;
 using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Filters;
@@ -16,7 +16,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
     [AutoMoqData]
     public void HeaderIsNotProvided_ShouldNotShortCircuit(
     // Arrange
-    IfNoneMatchActionFilter sutActionFilter)
+    IfNoneMatchFilter sutActionFilter)
     {
         // Act
         sutActionFilter.OnActionExecuting(
@@ -31,7 +31,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
     [AutoMoqData]
     public void HeaderIsAsterisk_ShouldNotShortCircuit(
         // Arrange
-        IfNoneMatchActionFilter sutActionFilter)
+        IfNoneMatchFilter sutActionFilter)
     {
         _actionExecutingContext.HttpContext.Request.Headers.IfNoneMatch = "*";
 
@@ -51,7 +51,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
         [Frozen(Matching.PropertyName)] string ETag,
         [Frozen] UserInteractionDto dto,
         [Frozen] ICacheService<object> cache,
-        IfNoneMatchActionFilter sutActionFilter)
+        IfNoneMatchFilter sutActionFilter)
     {
         cache.Set(ETag, dto);
         _actionExecutingContext.HttpContext.Request.Headers.IfNoneMatch = ETag;
@@ -72,7 +72,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
         [Frozen(Matching.PropertyName)] string ETag,
         [Frozen] UserInteractionDto dto,
         [Frozen] ICacheService<object> cache,
-        IfNoneMatchActionFilter sutActionFilter,
+        IfNoneMatchFilter sutActionFilter,
         string nonExistingETag)
     {
         cache.Set(ETag, dto);

@@ -1,4 +1,4 @@
-﻿using AutoFixture.Xunit2;
+using AutoFixture.Xunit2;
 using Backend.WebApi.App.Filters;
 using Backend.WebApi.Tests.App.Extensions;
 using Backend.WebApi.Tests.App.Filters;
@@ -42,7 +42,7 @@ namespace Backend.WebApi.Tests.App.Filters
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
-            IfNoneMatchActionFilter sutActionFilter)
+            IfNoneMatchFilter sutActionFilter,
         {
             _actionExecutedContext.Result = result;
 
@@ -66,7 +66,7 @@ namespace Backend.WebApi.Tests.App.Filters
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
-            IfNoneMatchActionFilter sutActionFilter)
+            IfNoneMatchFilter sutActionFilter)
         {
             _actionExecutedContext.HttpContext.Request.Headers.IfNoneMatch = Value.ETag;
             _actionExecutedContext.Result = result;
@@ -86,7 +86,7 @@ namespace Backend.WebApi.Tests.App.Filters
            // Arrange
            IActionResult result,
            Exception ex,
-           IfNoneMatchActionFilter sutActionFilter)
+           IfNoneMatchFilter sutActionFilter)
         {
             _actionExecutedContext.Exception = ex;
             _actionExecutedContext.Result = result;
@@ -109,7 +109,7 @@ namespace Backend.WebApi.Tests.App.Filters
         public void ShortCircuited_ResultIsUnChangedAndETagNotSet(
            // Arrange
            IActionResult result,
-           IfNoneMatchActionFilter sutActionFilter)
+           IfNoneMatchFilter sutActionFilter)
         {
             _actionExecutedContext.Canceled = true;
             _actionExecutedContext.Result = result;

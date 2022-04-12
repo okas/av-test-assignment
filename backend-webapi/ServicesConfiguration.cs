@@ -69,7 +69,7 @@ public static class ServicesConfiguration
             .AddTransient<OperationCancelledExceptionFilter>();
 
         services
-            .AddScoped<IfNoneMatchActionFilter>();
+            .AddScoped<IfNoneMatchFilter>()
 
         return services;
     }
