@@ -1,7 +1,8 @@
-using Backend.WebApi.App.Dto;
+﻿using Backend.WebApi.App.Dto;
 using Backend.WebApi.App.Operations.UserInteractionQueries;
 using Backend.WebApi.Infrastructure.Data.EF;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 using static Backend.WebApi.Tests.UserInteractionUtilities;
 
@@ -36,7 +37,10 @@ public sealed class UserInteractionGetByIdQueryTests : IDisposable
                 );
 
         // Assert
+        using AssertionScope _ = new();
+
         dto.Should().NotBeNull();
+
         dto.Value.Id.Should().Be(correctQuery.Id);
     }
 
