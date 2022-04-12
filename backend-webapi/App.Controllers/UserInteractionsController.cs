@@ -19,7 +19,6 @@ namespace Backend.WebApi.App.Controllers;
 [Produces("application/json")]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
 [ProducesResponseType(499)]
-
 public class UserInteractionsController : ControllerBase
 {
     private readonly IMediator _mediator;

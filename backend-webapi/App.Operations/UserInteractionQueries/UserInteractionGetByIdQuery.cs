@@ -9,8 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.WebApi.App.Operations.UserInteractionQueries;
 
 public record UserInteractionGetByIdQuery(
-    [Required, NotDefault] Guid Id
-    )
+    [Required, NotDefault] Guid Id)
     : IRequest<UserInteractionDto?>
 {
     /// <summary>

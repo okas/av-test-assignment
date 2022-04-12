@@ -20,13 +20,12 @@ public readonly record struct UserInteractionDto(
     bool IsOpen,
     string ETag) : IETag
 {
-    public static Expression<Func<UserInteraction, UserInteractionDto>> Projection => (model) => new()
-    {
-        Id = model.Id,
-        Description = model.Description!,
-        Deadline = model.Deadline,
-        Created = model.Created,
-        IsOpen = model.IsOpen,
-        ETag = Convert.ToBase64String(model.RowVer),
-    };
+    public static Expression<Func<UserInteraction, UserInteractionDto>> Projection => (model) =>
+        new(model.Id,
+            model.Description!,
+            model.Deadline,
+            model.Created,
+            model.IsOpen,
+            Convert.ToBase64String(model.RowVer)
+        );
 }
