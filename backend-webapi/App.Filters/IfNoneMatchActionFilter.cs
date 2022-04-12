@@ -1,4 +1,4 @@
-﻿using Backend.WebApi.App.Cache;
+using Backend.WebApi.App.Cache;
 using Backend.WebApi.App.Dto;
 using Backend.WebApi.CrossCutting.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -26,19 +26,19 @@ public class IfNoneMatchActionFilter : IActionFilter, IAsyncResultFilter //TODO:
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        string? foundHeader = context.HttpContext.Request.Headers.IfNoneMatch.FirstOrDefault();
+        StringValues ifNoneMatchVals = context.HttpContext.Request.Headers.IfNoneMatch;
 
-        if (string.IsNullOrEmpty(foundHeader) || string.Equals(foundHeader, "*", StringComparison.Ordinal))
+        if (!ifNoneMatchVals.Any() || ifNoneMatchVals.Any(val => string.Equals(val, "*", StringComparison.Ordinal)))
         {
             return;
         }
 
-        if (_cache.Get(foundHeader).Result is null)
+        if (_cache.Get(ifNoneMatchVals).Result is null)
         {
             return;
         }
 
-        context.HttpContext.Response.Headers.ETag = foundHeader;
+        context.HttpContext.Response.Headers.ETag = ifNoneMatchVals;
 
         context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
     }
