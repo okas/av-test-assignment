@@ -95,7 +95,6 @@ public class UserInteractionsController : ControllerBase
     /// </summary>
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ServiceFilter(typeof(CUDOperationsExceptionFilter))]
     public async Task<IActionResult> PutUserInteraction(Guid id, UserInteractionUpdateCommand command, CancellationToken ct)
