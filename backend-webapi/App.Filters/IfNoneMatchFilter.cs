@@ -31,7 +31,7 @@ public class IfNoneMatchFilter : IActionFilter, IAsyncResultFilter
     {
         StringValues ifNoneMatchVals = context.HttpContext.Request.Headers.IfNoneMatch;
 
-        if (!ifNoneMatchVals.Any() || ifNoneMatchVals.Any(val => string.Equals(val, "*", StringComparison.Ordinal)))
+        if (StringValues.IsNullOrEmpty(ifNoneMatchVals) || ifNoneMatchVals == "*")
         {
             return;
         }
