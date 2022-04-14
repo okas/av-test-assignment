@@ -51,7 +51,7 @@ public class UserInteractionsController : ControllerBase
     /// Get Userinteraction by ID.
     /// </summary>
     [HttpGet("{Id}")]
-    [ServiceFilter(typeof(IfNoneMatchFilter))]
+    [ServiceFilter(typeof(HttpConditionalRequestFilter))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -82,7 +82,7 @@ public class UserInteractionsController : ControllerBase
     {
         if (id != command.Id)
         {
-        return BadRequest();
+            return BadRequest();
         }
 
         byte[] eTag = await _mediator.Send(command with { RowVer = rowVer }, ct);

@@ -19,12 +19,12 @@ namespace Backend.WebApi.App.Filters;
 /// If HTTP Header <c>If-None-Match="*"</c>, is empty or missing, then it will pass the control to <c>action method</c> for result retreival.
 /// </para>
 /// </summary>
-public class IfNoneMatchFilter : IActionFilter, IAsyncResultFilter
+public class HttpConditionalRequestFilter : IActionFilter, IAsyncResultFilter
 {
     private readonly ICacheService<object> _cache;
-    private readonly ILogger<IfNoneMatchFilter> _logger;
+    private readonly ILogger<HttpConditionalRequestFilter> _logger;
 
-    public IfNoneMatchFilter(ICacheService<object> cache, ILogger<IfNoneMatchFilter> logger)
+    public HttpConditionalRequestFilter(ICacheService<object> cache, ILogger<HttpConditionalRequestFilter> logger)
         => (_cache, _logger) = (cache, logger);
 
     public void OnActionExecuting(ActionExecutingContext context)

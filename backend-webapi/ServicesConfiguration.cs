@@ -71,7 +71,7 @@ public static class ServicesConfiguration
             .AddTransient<OperationCancelledExceptionFilter>();
 
         services
-            .AddScoped<IfNoneMatchFilter>()
+            .AddScoped<HttpConditionalRequestFilter>()
             // .AddScoped<IfMatchActionFilter>()
             ;
 

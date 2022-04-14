@@ -11,11 +11,11 @@ using Xunit;
 
 namespace Backend.WebApi.Tests.App.Filters
 {
-    public partial class IfNoneMatchTests_OnActionExecuted : IClassFixture<ActionExecutionFixture>
+    public partial class HttpConditionalRequestFilterTests_OnActionExecuted : IClassFixture<ActionExecutionFixture>
     {
         private readonly ActionExecutedContext _actionExecutedContext;
 
-        public IfNoneMatchTests_OnActionExecuted(ActionExecutionFixture fixture) => _actionExecutedContext = fixture.CreateActionExecutedContext();
+        public HttpConditionalRequestFilterTests_OnActionExecuted(ActionExecutionFixture fixture) => _actionExecutedContext = fixture.CreateActionExecutedContext();
 
 
         [Theory]
@@ -25,7 +25,7 @@ namespace Backend.WebApi.Tests.App.Filters
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
             [Frozen] ICacheService<object> cache,
-            IfNoneMatchFilter sutActionFilter)
+            HttpConditionalRequestFilter sutActionFilter)
         {
             _actionExecutedContext.Result = result;
 
@@ -48,7 +48,7 @@ namespace Backend.WebApi.Tests.App.Filters
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
-            IfNoneMatchFilter sutActionFilter,
+            HttpConditionalRequestFilter sutActionFilter,
             string mismatchedETag)
         {
             _actionExecutedContext.HttpContext.Request.Headers.IfNoneMatch = mismatchedETag;
@@ -74,7 +74,7 @@ namespace Backend.WebApi.Tests.App.Filters
             // Arrange
             [Frozen(Matching.PropertyName)] ETaggedStub Value,
             OkObjectResult result,
-            IfNoneMatchFilter sutActionFilter)
+            HttpConditionalRequestFilter sutActionFilter)
         {
             _actionExecutedContext.HttpContext.Request.Headers.IfNoneMatch = Value.ETag;
             _actionExecutedContext.Result = result;
@@ -94,7 +94,7 @@ namespace Backend.WebApi.Tests.App.Filters
            // Arrange
            IActionResult result,
            Exception ex,
-           IfNoneMatchFilter sutActionFilter)
+           HttpConditionalRequestFilter sutActionFilter)
         {
             _actionExecutedContext.Exception = ex;
             _actionExecutedContext.Result = result;
@@ -117,7 +117,7 @@ namespace Backend.WebApi.Tests.App.Filters
         public void ShortCircuited_ResultIsUnChangedAndETagNotSet(
            // Arrange
            IActionResult result,
-           IfNoneMatchFilter sutActionFilter)
+           HttpConditionalRequestFilter sutActionFilter)
         {
             _actionExecutedContext.Canceled = true;
             _actionExecutedContext.Result = result;

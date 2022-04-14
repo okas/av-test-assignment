@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Backend.WebApi.Tests.App.Filters;
-public static class IfNoneMatchActionFilterAssertionsExtensions
+public static class HttpConditionalRequestFilterTestsAssertionsExtensions
 {
     public static IfNoneMatchAssertions Should(this ActionExecutingContext subject) => new(subject);
 

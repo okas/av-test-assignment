@@ -6,17 +6,17 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Xunit;
 
 namespace Backend.WebApi.Tests.App.Filters;
-public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionExecutionFixture>
+public partial class HttpConditionalRequestFilterTests_OnActionExecuting : IClassFixture<ActionExecutionFixture>
 {
     private readonly ActionExecutingContext _actionExecutingContext;
 
-    public IfNoneMatchTests_OnActionExecuting(ActionExecutionFixture fixture) => _actionExecutingContext = fixture.CreateActionExecutingContext();
+    public HttpConditionalRequestFilterTests_OnActionExecuting(ActionExecutionFixture fixture) => _actionExecutingContext = fixture.CreateActionExecutingContext();
 
     [Theory]
     [AutoMoqData]
     public void HeaderIsNotProvided_ShouldNotShortCircuit(
     // Arrange
-    IfNoneMatchFilter sutActionFilter)
+    HttpConditionalRequestFilter sutActionFilter)
     {
         // Act
         sutActionFilter.OnActionExecuting(
@@ -31,7 +31,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
     [AutoMoqData]
     public void HeaderIsAsterisk_ShouldNotShortCircuit(
         // Arrange
-        IfNoneMatchFilter sutActionFilter)
+        HttpConditionalRequestFilter sutActionFilter)
     {
         _actionExecutingContext.HttpContext.Request.Headers.IfNoneMatch = "*";
 
@@ -51,7 +51,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
         [Frozen(Matching.PropertyName)] string ETag,
         [Frozen] UserInteractionDto dto,
         [Frozen] ICacheService<object> cache,
-        IfNoneMatchFilter sutActionFilter)
+        HttpConditionalRequestFilter sutActionFilter)
     {
         cache.Set(ETag, dto);
         _actionExecutingContext.HttpContext.Request.Headers.IfNoneMatch = ETag;
@@ -72,7 +72,7 @@ public partial class IfNoneMatchTests_OnActionExecuting : IClassFixture<ActionEx
         [Frozen(Matching.PropertyName)] string ETag,
         [Frozen] UserInteractionDto dto,
         [Frozen] ICacheService<object> cache,
-        IfNoneMatchFilter sutActionFilter,
+        HttpConditionalRequestFilter sutActionFilter,
         string nonExistingETag)
     {
         cache.Set(ETag, dto);
