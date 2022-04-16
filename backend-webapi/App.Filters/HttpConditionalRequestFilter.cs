@@ -58,9 +58,9 @@ public class HttpConditionalRequestFilter : IActionFilter, IAsyncResultFilter
             return;
         }
 
-        context.HttpContext.Response.Headers.ETag = tagged.ETag;
-
         _cache.Set(tagged.ETag, initialResult.Value);
+
+        context.HttpContext.Response.Headers.ETag = tagged.ETag;
 
         if (context.HttpContext.Request.Headers.IfNoneMatch == tagged.ETag)
         {
