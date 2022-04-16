@@ -40,7 +40,7 @@ public static class HttpConditionalRequestFilterTestsAssertionsExtensions
         /// <inheritdoc cref="BeShortCircuited"/>
         /// <para>
         /// <see cref="ActionExecutingContext.Result"/> is allowed to be <see langword="null"/>, because filter itself
-        /// should do anityhing with neither <see cref="ActionExecutingContext.Result"/>
+        /// should do anything with neither <see cref="ActionExecutingContext.Result"/>
         /// nor <see cref="ActionContext.HttpContext"/> contents in any way.
         /// </para>
         /// </summary>

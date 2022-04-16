@@ -67,7 +67,7 @@ public class UserInteractionsController : ControllerBase
     /// <summary>
     /// Patch UserInteraction model: change <c>IsOpen</c> state.
     /// </summary>
-    /// <remarks>Patching is constrainted to set <c>IsOpen</c> property only,
+    /// <remarks>Patching is constrained to set <c>IsOpen</c> property only,
     /// other props are ignored even if sent.
     /// </remarks>
     [HttpPatch("{id}")]
